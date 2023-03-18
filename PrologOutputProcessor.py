@@ -170,6 +170,8 @@ class PrologOutputHelper:
 
             variable_names = self._process_multiple_chaining_equals()
             value = self.prolog_outp_proc._process_value()
+            if variable_names == [] and value == "false":
+                self.ret.append(value)  # trailing false which I can't use BACKTRACK to separate it :(
 
             for variable_name in variable_names:
                 self.ret[-1][variable_name] = value

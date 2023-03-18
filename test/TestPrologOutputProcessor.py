@@ -87,14 +87,14 @@ class TestPrologOutputProcessor(TestCase):
         instance = self.instantiate(
             "BACKTRACK Var1=value1a, Var2=value2a"
             + " BACKTRACK Var1=value1b, Var2=value2b"
-            + " false."  # usually false is not preceded by BACKTRACK
+            + " false."  # usually `false` is not preceded by BACKTRACK
         )
-        # in this case, we do not care whether the result is ended with False or not
         result = instance.process_token(splitter_token=self.end_delimiter)
         self.assertEqual([
             {'Var1': 'value1a', 'Var2': 'value2a'},
             {'Var1': 'value1b', 'Var2': 'value2b'},
-        ], result[:2])
+            "false"
+        ], result)
 
 
     def test_process_token__should_be_able_to_handle_without_false_or_true(self):

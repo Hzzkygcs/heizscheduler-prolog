@@ -2,9 +2,6 @@ import Prolog
 from random import randint
 from typing import Callable, Optional
 
-prolog = Prolog.Prolog("inner_nuel.pl")
-
-
 class Tree:
     def __init__(self, value, left, right):
         self.value = value
@@ -88,10 +85,15 @@ class LeafStrategy:
     def get_answer(self):
         return self.tree.sum_leaf()
 
+
+prolog = Prolog.Prolog("daun_tara.pl")
+
+
+
 try:
     for i in range(1000):
         print(i)
-        strategy = InnerStrategy()
+        strategy = LeafStrategy()
         query = strategy.get_query()
         result = prolog.query(query)
 
@@ -109,4 +111,9 @@ try:
             raise RuntimeError("Multiple result")
 except Prolog.PrologException as e:
     print(query)
+    print(strategy.get_answer())
+    raise e
+except Exception as e:
+    print(query)
+    print(strategy.get_answer())
     raise e
