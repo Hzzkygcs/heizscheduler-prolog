@@ -5,34 +5,34 @@ from PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 class TestPrologOutputProcessor(TestCase):
     def instantiate(self, string):
-        return PrologOutputProcessor(string)
+        return PrologOutputProcessor(string, self.end_delimiter)
 
     def setUp(self) -> None:
         self.end_delimiter = "BACKTRACK"
 
     def test_process_token__allow_endDelimiter_prefix(self):
         instance = self.instantiate("BACKTRACK something.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual(["something"], result)
 
     def test_process_token__allow_no_endDelimiter_prefix(self):
         instance = self.instantiate("something.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual(["something"], result)
 
     def test_process_token__should_process_false_correctly(self):
         instance = self.instantiate("BACKTRACK false.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual(["false"], result)
 
     def test_process_token__should_process_true_correctly(self):
         instance = self.instantiate("BACKTRACK true.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual(["true"], result)
 
     def test_process_token__should_process_variables_correctly(self):
         instance = self.instantiate("BACKTRACK Var1 = value1 BACKTRACK false.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual([
             {'Var1': 'value1'},
             "false",
@@ -44,7 +44,7 @@ class TestPrologOutputProcessor(TestCase):
             + " BACKTRACK Var1 = value2"
             + " BACKTRACK Var1 = value3"
             + " BACKTRACK true.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual([
             {'Var1': 'value1'},
             {'Var1': 'value2'},
@@ -54,7 +54,7 @@ class TestPrologOutputProcessor(TestCase):
 
     def test_process_token__should_process_variables_with_multiple_variables_correctly(self):
         instance = self.instantiate("BACKTRACK Var1 = value1a, Var2 = value2a BACKTRACK false.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         expected = [
             {'Var1': 'value1a', 'Var2': 'value2a'},
             "false",
@@ -63,7 +63,7 @@ class TestPrologOutputProcessor(TestCase):
 
     def test_process_token__should_process_variables_with_chaining_multiple_variables_correctly(self):
         instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 = some_value BACKTRACK false.")
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         expected = [
             {'Var1': 'some_value', 'Var2': 'some_value', 'Var3': 'some_value'},
             "false",
@@ -76,7 +76,7 @@ class TestPrologOutputProcessor(TestCase):
             + " BACKTRACK Var1=value1b, Var2=value2b"
             + " BACKTRACK true."
         )
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual([
             {'Var1': 'value1a', 'Var2': 'value2a'},
             {'Var1': 'value1b', 'Var2': 'value2b'},
@@ -89,7 +89,7 @@ class TestPrologOutputProcessor(TestCase):
             + " BACKTRACK Var1=value1b, Var2=value2b"
             + " false."  # usually `false` is not preceded by BACKTRACK
         )
-        result = instance.process_token(splitter_token=self.end_delimiter)
+        result = instance.process_token()
         self.assertEqual([
             {'Var1': 'value1a', 'Var2': 'value2a'},
             {'Var1': 'value1b', 'Var2': 'value2b'},

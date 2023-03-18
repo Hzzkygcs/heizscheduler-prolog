@@ -13,20 +13,34 @@ class Prolog:
         self.script_file_name = script_file_name
 
     def reset(self):
+        args = ["swipl", '--quiet']
+        if self.script_file_name is not None:
+            args.append(self.script_file_name)
+
         self.p = subprocess.Popen(
-            ["swipl", '--quiet', self.script_file_name],
+            args,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
+        self.start_token = "START_TOKEN"
+
+    def prefix(self):
+        return "\n".join([
+            "set_prolog_flag(answer_write_options,[max_depth(0)]).",
+            f"write('{self.start_token}').",
+        ])
+
+    def suffix(self, approx_number_of_output):
+        return ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
 
     def query_raw(self, query, approx_number_of_output=1):
         self.reset()
         assert not query.endswith("."), "query should NOT be ended with punctuation"
 
-        prefix = ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
-        stdout, stderr = self.p.communicate(input=query+prefix)
+        query = query + self.suffix(approx_number_of_output)
+        stdout, stderr = self.p.communicate(input=query)
         return stdout, stderr
 
     def query(self, query, approx_number_of_output=100):

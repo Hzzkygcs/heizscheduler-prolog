@@ -27,17 +27,20 @@ class BinOp:  # operator that takes two operands (binary operator)
 
 
 class PrologOutputProcessor:
-    def __init__(self, string):
+    def __init__(self, string, splitter_token="BACKTRACK"):
         self.iter_tokens = TokenizerIterator(string)
         self.prev_value = None
+        self.splitter_token = splitter_token
 
-    def process_token(self, splitter_token='BACKTRACK'):
+    def pop_until(self, to_be_found_inclusive):
+        self.iter_tokens.pop_until(to_be_found_inclusive=to_be_found_inclusive)
+
+    def process_token(self):
         if not self.iter_tokens:
             return []
-        if self.iter_tokens[0] == splitter_token:
+        if self.iter_tokens[0] == self.splitter_token:
             next(self.iter_tokens)
-
-        process_token_helper = PrologOutputHelper(self, splitter_token=splitter_token)
+        process_token_helper = PrologOutputHelper(self)
         return process_token_helper.process_token()
 
     def _process_value(self):
@@ -134,10 +137,10 @@ class FlowControl(enum.Enum):
 
 
 class PrologOutputHelper:
-    def __init__(self, prolog_outp_proc: PrologOutputProcessor, splitter_token):
+    def __init__(self, prolog_outp_proc: PrologOutputProcessor):
         self.iter_tokens = prolog_outp_proc.iter_tokens
         self.prolog_outp_proc = prolog_outp_proc
-        self.splitter_token = splitter_token
+        self.splitter_token = prolog_outp_proc.splitter_token
         self.ret = []
 
     def process_token(self):
@@ -265,6 +268,11 @@ class TokenizerIterator(peekable):
             return self.__peek()
         except StopIteration:
             return default
+
+    def pop_until(self, to_be_found_inclusive):
+        curr = self.__next__()
+        while curr != to_be_found_inclusive:
+            curr = self.__next__()
 
     def __peek(self):
         try:
