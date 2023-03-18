@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from PrologOutputProcessor import PrologOutputProcessor
+from PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 
 class TestPrologOutputProcessor(TestCase):
@@ -97,13 +97,34 @@ class TestPrologOutputProcessor(TestCase):
         ], result[:2])
 
 
+    def test_process_token__should_be_able_to_handle_without_false_or_true(self):
+        instance = self.instantiate('BACKTRACK\nSum = 2.\n\n\n')
+        result = instance.process_token()
+        self.assertEqual([{"Sum": 2}], result)
+
     def test_process_value__should_return_correctly_for_integers(self):
         result = self.instantiate("123")._process_value()
         self.assertEqual(123, result)
 
+    def test_process_value__should_be_able_to_handle_negatives(self):
+        result = self.instantiate("-123")._process_value()
+        self.assertEqual(-123, result)
+
     def test_process_value__should_return_correctly_for_float(self):
         result = self.instantiate("123.456")._process_value()
         self.assertEqual(123.456, result)
+
+    def test_process_value__should_be_able_to_handle_negative_floats(self):
+        result = self.instantiate("-123.456")._process_value()
+        self.assertEqual(-123.456, result)
+
+    def test_process_value__should_be_able_to_differentiate_minus_and_negative(self):
+        """should be perform in two steps"""
+        inst = self.instantiate("123-123.456")
+        result1 = inst._process_value()
+        result2 = inst._process_value()
+        self.assertEqual(123, result1)
+        self.assertEqual(BinOp("-", 123, 123.456), result2)
 
     def test_process_value__should_return_correctly_for_normal_atom(self):
         result = self.instantiate('abc')._process_value()

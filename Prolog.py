@@ -10,8 +10,11 @@ class PrologException(Exception):
 
 class Prolog:
     def __init__(self, script_file_name):
+        self.script_file_name = script_file_name
+
+    def reset(self):
         self.p = subprocess.Popen(
-            ["swipl", '--quiet', script_file_name],
+            ["swipl", '--quiet', self.script_file_name],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -19,6 +22,9 @@ class Prolog:
         )
 
     def query_raw(self, query, approx_number_of_output=1):
+        self.reset()
+        assert not query.endswith("."), "query should NOT be ended with punctuation"
+
         prefix = ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
         stdout, stderr = self.p.communicate(input=query+prefix)
         return stdout, stderr
@@ -47,10 +53,4 @@ class Prolog:
         cond1 = "Stream user_input" in err_msg
         cond2 = "Syntax error: Unexpected end of file" in err_msg
         return cond1 and cond2
-
-
-
-prolog = Prolog("inner.pl")
-ret = prolog.query("append(A, B, [1, 2])")
-print(ret)
 

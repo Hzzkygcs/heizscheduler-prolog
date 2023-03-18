@@ -8,10 +8,28 @@ import enum
 from pyswip import Prolog
 
 
+class BinOp:  # operator that takes two operands (binary operator)
+    def __init__(self, operator_symbol, left_operand, right_operand):
+        self.operator_symbol = operator_symbol
+        self.left_operand = left_operand
+        self.right_operand = right_operand
+    def __repr__(self):
+        return f"BinOp({self.operator_symbol}, {self.left_operand!r}, {self.right_operand!r})"
+
+    def __eq__(self, other):
+        if not isinstance(other, BinOp):
+            return False
+        return (
+            self.operator_symbol == other.operator_symbol
+            and self.left_operand == other.left_operand
+            and self.right_operand == other.right_operand
+        )
+
 
 class PrologOutputProcessor:
     def __init__(self, string):
         self.iter_tokens = TokenizerIterator(string)
+        self.prev_value = None
 
     def process_token(self, splitter_token='BACKTRACK'):
         if not self.iter_tokens:
@@ -23,18 +41,39 @@ class PrologOutputProcessor:
         return process_token_helper.process_token()
 
     def _process_value(self):
+        ret = self.__process_value()
+        self.prev_value = ret
+        return ret
+
+    def check_if_next_is_operator(self):
+        operators = "-+*/"
+        return self.iter_tokens.peek() in  operators  # current list of operators
+
+    def __process_value(self):
         token = self.iter_tokens.peek()
         status = TokenType.get_token_status(token)
 
         if status == TokenType.ATOM:
             assert next(self.iter_tokens) == token
             return token
+        if token == "-":
+            return self._process_minus_sign()
         if status == TokenType.NUMERIC:
             return self._process_numeric()
         if token == "[":
             return self._process_square_bracket()
         if token == '"':
             return self._process_string_atom()
+
+    def _process_minus_sign(self):
+        prev_token = self.iter_tokens.prev
+        assert next(self.iter_tokens) == '-'
+
+        right_operand = self._process_numeric()
+        prev_token_is_not_none = prev_token is not None
+        if prev_token_is_not_none and TokenType.get_token_status(prev_token) == TokenType.NUMERIC:
+            return BinOp('-', self.prev_value, right_operand)
+        return -right_operand
 
     def _process_numeric(self):
         ret = next(self.iter_tokens)
@@ -102,7 +141,7 @@ class PrologOutputHelper:
         self.ret = []
 
     def process_token(self):
-        while bool(self.iter_tokens):  # parse  Var1 = value1, Var2 = value2 END Var1 = value3, Var2 = value4
+        while bool(self.iter_tokens):  # parse  ... BACKTRACK ... BACKTRACK ..., etc
             peek = self.iter_tokens.peek()
             if peek == self.splitter_token:
                 next(self.iter_tokens)
@@ -208,6 +247,7 @@ class NotAvailable():
 
 class TokenizerIterator(peekable):
     def __init__(self, string):
+        self.prev = None
         tokenized = HelperTokenizerIterator(string).tokenize()
         super().__init__(tokenized)
         self.include_space = False
@@ -245,7 +285,8 @@ class TokenizerIterator(peekable):
             if self.include_space or not peek.isspace():
                 break
             super().__next__()
-        return super().__next__()
+        self.prev = super().__next__()
+        return self.prev
 
 
 
