@@ -119,7 +119,7 @@ class TestPrologOutputProcessor(TestCase):
         self.assertEqual(-123.456, result)
 
     def test_process_value__should_be_able_to_differentiate_minus_and_negative(self):
-        """should be perform in two steps"""
+        """should be performed in two steps"""
         inst = self.instantiate("123-123.456")
         result1 = inst._process_value()
         result2 = inst._process_value()

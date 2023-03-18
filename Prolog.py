@@ -29,8 +29,15 @@ class Prolog:
     def prefix(self):
         return "\n".join([
             "set_prolog_flag(answer_write_options,[max_depth(0)]).",
-            f"write('{self.start_token}').",
-        ])
+        ] + [self.start_of_output_marker()])
+
+    def start_of_output_marker(self) -> str:
+        return f"write('{self.start_token}').\n"
+
+    def remove_start_of_output_mark(self, prolog_output_processor: PrologOutputProcessor):
+        prolog_output_processor.pop_until(self.start_token)
+        assert next(prolog_output_processor.iter_tokens) == "true"
+        assert next(prolog_output_processor.iter_tokens) == "."
 
     def suffix(self, approx_number_of_output):
         return ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
@@ -39,7 +46,7 @@ class Prolog:
         self.reset()
         assert not query.endswith("."), "query should NOT be ended with punctuation"
 
-        query = query + self.suffix(approx_number_of_output)
+        query = self.prefix() + query + self.suffix(approx_number_of_output)
         stdout, stderr = self.p.communicate(input=query)
         return stdout, stderr
 
@@ -53,6 +60,7 @@ class Prolog:
                 raise PrologException(stderr)
 
         output_processor = PrologOutputProcessor(stdout)
+        self.remove_start_of_output_mark(output_processor)
         ret = output_processor.process_token()
         return ret
 

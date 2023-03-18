@@ -86,14 +86,14 @@ class LeafStrategy:
         return self.tree.sum_leaf()
 
 
-prolog = Prolog.Prolog("daun_tara.pl")
+prolog = Prolog.Prolog("inner_nuel.pl")
 
 
 
 try:
     for i in range(1000):
         print(i)
-        strategy = LeafStrategy()
+        strategy = InnerStrategy()
         query = strategy.get_query()
         result = prolog.query(query)
 

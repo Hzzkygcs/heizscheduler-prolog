@@ -15,6 +15,12 @@ class TestProlog(unittest.TestCase):
         result = self.p.query("false")
         self.assertEqual(["false"], result)
 
+    def test_query__should_show_list_completely(self):
+        result = self.p.query("X=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]")
+        self.assertEqual([{
+            'X': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+        }], result)
+
     def test_query__should_return_correctly(self):
         result = self.p.query("append(A, B, [1,2,3])")
         self.assertEqual([

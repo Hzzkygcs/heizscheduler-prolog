@@ -28,6 +28,7 @@ class BinOp:  # operator that takes two operands (binary operator)
 
 class PrologOutputProcessor:
     def __init__(self, string, splitter_token="BACKTRACK"):
+        self.string = string
         self.iter_tokens = TokenizerIterator(string)
         self.prev_value = None
         self.splitter_token = splitter_token
