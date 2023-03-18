@@ -51,6 +51,18 @@ class TestHelperTokenizerIterator(TestCase):
         result = self._instantiate("12 + 23 = 35").tokenize()
         self.assertEqual(["12", " ", "+", " ", "23", " ", "=", " ", "35"], result)
 
+    def test_tokenize__should_combine_underscore_and_alphabets(self):
+        result = self._instantiate("ab_cd").tokenize()
+        self.assertEqual(["ab_cd"], result)
+
+    def test_tokenize__should_combine_underscore_alphabets_and_numbers(self):
+        result = self._instantiate("ab_cd12").tokenize()
+        self.assertEqual(["ab_cd12"], result)
+        result = self._instantiate("ab_12").tokenize()
+        self.assertEqual(["ab_12"], result)
+        result = self._instantiate("ab___1_2").tokenize()
+        self.assertEqual(["ab___1_2"], result)
+
 
 
 
