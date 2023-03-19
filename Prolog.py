@@ -1,4 +1,5 @@
-import subprocess
+import subprocess, collections
+from multiprocessing.pool import ThreadPool
 
 from PrologOutputProcessor import PrologOutputProcessor
 
@@ -76,3 +77,31 @@ class Prolog:
         cond2 = "Syntax error: Unexpected end of file" in err_msg
         return cond1 and cond2
 
+
+def for_multithread(func, args: list[tuple], pool_num=8, timeout=99999):
+    ret = []
+    with ThreadPool(pool_num) as pool:
+        ongoing_results = []
+        for grouped_args in group_iter(args, pool_num*5):
+            for arg in grouped_args:
+                ongoing_results.append(
+                    pool.apply_async(func, arg)
+                )
+        for result in ongoing_results:
+            ret.append(result.get(timeout=timeout))
+    return ret
+
+def group_iter(iterable, group_size):
+    assert group_size >= 1
+    if not isinstance(iterable, collections.abc.Iterator):
+        iterable = iter(iterable)
+    stop = False
+    while not stop:
+        ret = []
+        try:
+            for _i in range(group_size):
+                ret.append(next(iterable))
+        except StopIteration:
+            stop = True
+        if len(ret) >= 1:
+            yield ret
