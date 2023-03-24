@@ -2,3 +2,5 @@
 **/*.iml
 **/*.xml
 *.xml
+**/__pycache__
+**/temp
