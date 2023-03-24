@@ -9,7 +9,7 @@ class PrologException(Exception):
         super().__init__(*args, **kwargs)
 
 
-class Prolog:
+class HzzProlog:
     def __init__(self, script_file_name):
         self.script_file_name = script_file_name
 

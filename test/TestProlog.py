@@ -1,11 +1,11 @@
 import unittest
 
-from Prolog import Prolog
+from HzzProlog import HzzProlog
 
 
 class TestProlog(unittest.TestCase):
     def setUp(self) -> None:
-        self.p = Prolog(None)
+        self.p = HzzProlog(None)
 
     def test_query__should_return_true_for_true_query(self):
         result = self.p.query("true")
