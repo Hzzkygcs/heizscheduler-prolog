@@ -18,7 +18,8 @@ class TestTime(TestCase):
         expected = [
             {'X': 0, 'Y': 1, 'Z': 2},
             {'X': 3, 'Y': 4, 'Z': 5},
-            ChainedEquality.define_equality({'X': 6},  ['Y', 'Z'], 10),
+            ChainedEquality.define_equality(
+                {'X': 6},  ['Y', 'Z'], 10),
             {'X': 6, 'Y': 23, 'Z': 59},
         ]
         self.assertCountEqual(expected, result)
