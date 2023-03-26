@@ -163,8 +163,8 @@ class PrologOutputHelper:
         parse  Var1 = value1, Var2 = value2, Var3 = value3, ...
         :return: {'Var1': value1, 'Var2': value2, 'Var3': value3, ...}
         """
-        curr_ret = {}
-        self.ret.append(curr_ret)
+        variable_value_mapping = {}
+        self.ret.append(variable_value_mapping)
 
         while True:
             control = self._inner_loop_condition()
@@ -188,8 +188,19 @@ class PrologOutputHelper:
             if len(variable_names) > 1:
                 value = instantiation_status.create_chained_equality(variable_names, value)
             for variable_name in variable_names:
-                curr_ret[variable_name] = value
+                self.__unify_with_existing_one_if_any(variable_value_mapping, variable_name, value)
             assert (variable_names, value) != ([], None)  # usually cause infinite loops
+
+    def __unify_with_existing_one_if_any(self, variable_value_mapping, variable_name, new_value):
+        variable_already_defined = variable_name in variable_value_mapping
+        if variable_already_defined:
+            prev_value = variable_value_mapping.get(variable_name, None)
+            either_is_an_equality = isinstance(new_value, ChainedEquality) or isinstance(prev_value, ChainedEquality)
+            if either_is_an_equality:
+                ChainedEquality.unify(variable_value_mapping, new_value, prev_value)
+                return
+            assert prev_value == new_value
+        variable_value_mapping[variable_name] = new_value
 
     def _inner_loop_condition(self):
         inner_peek = self.iter_tokens.peek()
@@ -231,7 +242,7 @@ class ChainedEqualityInstantiationStatus(enum.Enum):
     PURE_VARiABLE_UNIFICATION = 1  # for exampel:  Val1 = Val2
     INSTANTIATED = 2  # for example"  Val1 = Val2 = some_instantiation_value
 
-    def create_chained_equality(self, variable_names, value):
+    def create_chained_equality(self, variable_names: list[str], value):
         if self == self.PURE_VARiABLE_UNIFICATION:
             return ChainedEquality(variable_names)
         assert self == self.INSTANTIATED

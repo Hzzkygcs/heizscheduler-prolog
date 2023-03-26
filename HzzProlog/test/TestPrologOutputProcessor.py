@@ -86,7 +86,7 @@ class TestPrologOutputProcessor(TestCase):
             {'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2, },
             "false",
         ]
-        self.assertEqual(expected, result, query)
+        self.assertEqual(expected, result)
 
     def test_process_token__should_process_variables_with_chained_equality_and_false_constant_value_correctly(self):
         instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = false false.")
