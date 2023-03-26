@@ -16,7 +16,6 @@ class HzzProlog:
     def __init__(self, script_file_io: IO):
         self.temp_folders = "temp/"
         self.script_file_io = script_file_io
-        # self.script_file_name = script_file_name
         self.facts = {}
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
