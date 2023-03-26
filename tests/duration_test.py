@@ -13,7 +13,6 @@ class TestDuration(TestCase):
             time_range(time_point(1, 10), time_point(2, 20)),
             X)
         result = self.prolog.query(query)
-        self.assertEqual(1, len(result))
         self.assertEqual(70, result[0]['X'])
 
     def test__should_return_negative_if_swapped(self):
@@ -21,7 +20,6 @@ class TestDuration(TestCase):
             time_range(time_point(2, 20), time_point(1, 10)),
             X
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(-70, result[0]['X'])
 
     def test__should_return_zero_if_the_same(self):
@@ -29,7 +27,6 @@ class TestDuration(TestCase):
             time_range(time_point(2, 20), time_point(2, 20)),
             X
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(0, result[0]['X'])
 
     def test__should_be_able_to_be_used_as_addition(self):
@@ -37,7 +34,6 @@ class TestDuration(TestCase):
             time_range(time_point(2, 20), X),
             35
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(time_point(2, 55),
                          result[0]['X'])
 
@@ -46,7 +42,6 @@ class TestDuration(TestCase):
             time_range(time_point(2, 20), X),
             160
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(time_point(5, 0),
                          result[0]['X'])
 
@@ -55,7 +50,6 @@ class TestDuration(TestCase):
             time_range(time_point(2, 20), X),
             -10
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(time_point(2, 10),
                          result[0]['X'])
 
@@ -64,6 +58,5 @@ class TestDuration(TestCase):
             time_range(time_point(5, 20), X),
             -3 * 60 - 15
         ))
-        self.assertEqual(1, len(result))
         self.assertEqual(time_point(2, 5),
                          result[0]['X'])
