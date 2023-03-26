@@ -138,7 +138,7 @@ class PrologOutputHelper:
     def __init__(self, prolog_outp_proc: PrologOutputProcessor):
         self.iter_tokens = prolog_outp_proc.iter_tokens
         self.prolog_outp_proc = prolog_outp_proc
-        self.splitter_token = prolog_outp_proc.splitter_token
+        self.splitter_token = prolog_outp_proc.splitter_token  # by default BACKTRACK
         self.ret = []
 
     def process_token(self):
@@ -199,7 +199,7 @@ class PrologOutputHelper:
         while True:
             token = self.iter_tokens.peek()
             curr_status = TokenType.get_token_status(token)
-            if curr_status != TokenType.VARIABLE:
+            if curr_status != TokenType.VARIABLE or token in (",", self.splitter_token):
                 break
             assert next(self.iter_tokens) == token
             variable_names.append(token)

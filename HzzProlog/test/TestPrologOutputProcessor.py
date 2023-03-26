@@ -63,7 +63,7 @@ class TestPrologOutputProcessor(TestCase):
         self.assertEqual(expected, result)
 
     def test_process_token__should_process_variables_with_chained_equality_correctly(self):
-        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 BACKTRACK false.")
+        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 false.")
         result = instance.process_token()
         equality = ChainedEquality(["Var1", "Var2", "Var3"])
         expected = [
@@ -73,7 +73,7 @@ class TestPrologOutputProcessor(TestCase):
         self.assertEqual(expected, result)
 
     def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly(self):
-        instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = some_value, BACKTRACK false.")
+        instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = some_value false.")
         result = instance.process_token()
         equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'some_value')
         expected = [
@@ -82,8 +82,9 @@ class TestPrologOutputProcessor(TestCase):
         ]
         self.assertEqual(expected, result)
 
+
     def test_process_token__should_process_variables_with_various_chained_equality(self):
-        instance = self.instantiate("BACKTRACK Var1a = Var1b, Var2a = Var2b = Var2c = some_value, BACKTRACK false.")
+        instance = self.instantiate("BACKTRACK Var1a = Var1b, Var2a = Var2b = Var2c = some_value BACKTRACK false.")
         result = instance.process_token()
         equality_var1 = ChainedEquality(["Var1a", "Var1b"])
         equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'some_value')
