@@ -2,41 +2,78 @@ import os
 import subprocess, collections
 from multiprocessing.pool import ThreadPool
 from random import randint
+from typing import IO
+
 from .PrologOutputProcessor import PrologOutputProcessor
 
 
 class PrologException(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args):
+        super().__init__(*args)
 
 
 class HzzProlog:
-    def __init__(self, script_file_name):
-        self.script_file_name = script_file_name
+    def __init__(self, script_file_io: IO):
+        self.temp_folders = "temp/"
+        self.script_file_io = script_file_io
+        # self.script_file_name = script_file_name
         self.facts = {}
 
-    def add_fact(self, point_name: str, fact_definition: str):
-        if point_name not in self.facts:
-            self.facts[point_name] = []
-        self.facts[point_name].append(fact_definition)
+    def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
+        for fact_definition in fact_definitions:
+            self.add_fact(template_variable_name=template_variable_name, fact_definition=fact_definition)
+
+    def add_fact(self, template_variable_name: str, fact_definition: str):
+        if template_variable_name not in self.facts:
+            self.facts[template_variable_name] = []
+        if not fact_definition.endswith("."):
+            fact_definition += "."
+        self.facts[template_variable_name].append(fact_definition)
 
     def get_injected_script(self):
-        create_dir_if_not_exist('temp')
-        file_name = [chr(randint(65, 65+26-1)) for _ in range(10)]
-        file_name = "".join(file_name) + ".pl"
-        file_name = os.path.join(self.script_file_name, file_name)
-        with open(file_name, 'r') as f:
-            file_content = f.read()
-        for key, facts in self.facts.items:
-            facts = "\n" + "\n".join(facts)
-            file_content = file_content.replace("{{"+key+"}}", facts)
+        print(os.getcwd())
+        create_dir_if_not_exist(self.temp_folders)
+        file_name = self.get_temporary_file_name()
+        self.script_file_io.seek(0)
+
+        file_content = self.script_file_io.read()
+        file_content = self.remove_ignored(file_content)
+        file_content = self.inject_facts(file_content)
+
         with open(file_name, "w") as f:
             f.write(file_content)
         return file_name
 
+    def get_temporary_file_name(self):
+        file_name = [chr(randint(65, 65 + 26 - 1)) for _ in range(10)]
+        file_name = "".join(file_name) + ".pl"
+        return os.path.join(self.temp_folders, file_name)
+
+    def inject_facts(self, template_prolog_content: str) -> str:
+        for key, facts in self.facts.items():
+            facts = "\n" + "\n".join(facts) + "\n"
+            template_prolog_content = template_prolog_content.replace("{{"+key+"}}", facts)
+        return template_prolog_content
+
+    def remove_ignored(self, template_prolog_content: str):
+        lines = template_prolog_content.split("\n")
+        ret = []
+        lines_iterator = iter(lines)
+        for line in lines_iterator:
+            if "{%ignored%}" in line:
+                continue
+            if "{%begin ignore%}" in line:
+                while True:
+                    curr_line = next(lines_iterator)
+                    if "{%end ignore%}" in curr_line:
+                        break
+                continue
+            ret.append(line)
+        return "\n".join(ret)
+
     def reset(self):
         args = ["swipl", '--quiet']
-        if self.script_file_name is not None:
+        if self.script_file_io is not None:
             script_file_name = self.get_injected_script()
             args.append(script_file_name)
 

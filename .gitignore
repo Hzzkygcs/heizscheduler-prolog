@@ -1,1 +1,5 @@
 /.idea
+venv/
+python venv/
+**/temp/
+/tests/temp/

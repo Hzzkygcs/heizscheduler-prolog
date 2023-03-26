@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from HzzProlog.ChainEquality import ChainedEquality
 from HzzProlog.PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 
@@ -61,11 +62,36 @@ class TestPrologOutputProcessor(TestCase):
         ]
         self.assertEqual(expected, result)
 
-    def test_process_token__should_process_variables_with_chaining_multiple_variables_correctly(self):
-        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 = some_value BACKTRACK false.")
+    def test_process_token__should_process_variables_with_chained_equality_correctly(self):
+        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 BACKTRACK false.")
         result = instance.process_token()
+        equality = ChainedEquality(["Var1", "Var2", "Var3"])
         expected = [
-            {'Var1': 'some_value', 'Var2': 'some_value', 'Var3': 'some_value'},
+            {'Var1': equality, 'Var2': equality, 'Var3': equality},
+            "false",
+        ]
+        self.assertEqual(expected, result)
+
+    def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly(self):
+        instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = some_value, BACKTRACK false.")
+        result = instance.process_token()
+        equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'some_value')
+        expected = [
+            {'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2,},
+            "false",
+        ]
+        self.assertEqual(expected, result)
+
+    def test_process_token__should_process_variables_with_various_chained_equality(self):
+        instance = self.instantiate("BACKTRACK Var1a = Var1b, Var2a = Var2b = Var2c = some_value, BACKTRACK false.")
+        result = instance.process_token()
+        equality_var1 = ChainedEquality(["Var1a", "Var1b"])
+        equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'some_value')
+        expected = [
+            {
+                'Var1a': equality_var1, 'Var1b': equality_var1,
+                'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2,
+            },
             "false",
         ]
         self.assertEqual(expected, result)

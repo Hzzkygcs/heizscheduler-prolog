@@ -6,8 +6,9 @@ class PrologCallable:
         ret = f"{self.name}"
         if len(args) == 0:
             return ret
-        ret += "("
-        for arg in args:
-            ret += str(arg)
-        ret += ")"
+        args = map(str, args)
+        ret += "(" + (", ".join(args)) + ")"
         return ret
+
+    def __str__(self):
+        return str(self.name)

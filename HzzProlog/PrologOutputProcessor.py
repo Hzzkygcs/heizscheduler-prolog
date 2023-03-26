@@ -2,10 +2,7 @@ import string
 from typing import overload, TypeVar, Union
 
 from more_itertools import peekable
-import subprocess
-import codecs
 import enum
-from pyswip import Prolog
 
 
 class BinOp:  # operator that takes two operands (binary operator)
