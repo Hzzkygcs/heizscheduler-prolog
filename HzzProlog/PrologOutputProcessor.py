@@ -4,6 +4,8 @@ from typing import overload, TypeVar, Union
 from more_itertools import peekable
 import enum
 
+from HzzProlog.ChainEquality import ChainedEquality
+
 
 class BinOp:  # operator that takes two operands (binary operator)
     def __init__(self, operator_symbol, left_operand, right_operand):
@@ -41,7 +43,7 @@ class PrologOutputProcessor:
         process_token_helper = PrologOutputHelper(self)
         return process_token_helper.process_token()
 
-    def _process_value(self):
+    def process_value(self):
         ret = self.__process_value()
         self.prev_value = ret
         return ret
@@ -94,7 +96,7 @@ class PrologOutputProcessor:
             if self.iter_tokens.peek("") == ",":
                 next(self.iter_tokens)
                 continue
-            items.append(self._process_value())
+            items.append(self.process_value())
             next_char = self.iter_tokens.peek("")
             assert next_char in ",]", "not a comma and not an ending square bracket"
         assert next(self.iter_tokens) == "]", "not ended by ]"
@@ -161,7 +163,9 @@ class PrologOutputHelper:
         parse  Var1 = value1, Var2 = value2, Var3 = value3, ...
         :return: {'Var1': value1, 'Var2': value2, 'Var3': value3, ...}
         """
-        self.ret.append({})
+        curr_ret = {}
+        self.ret.append(curr_ret)
+
         while True:
             control = self._inner_loop_condition()
             if control == FlowControl.CONTINUE:
@@ -169,13 +173,23 @@ class PrologOutputHelper:
             elif control == FlowControl.BREAK:
                 break
 
-            variable_names = self._process_multiple_chaining_equals()
-            value = self.prolog_outp_proc._process_value()
-            if variable_names == [] and value == "false":
-                self.ret.append(value)  # trailing false which I can't use BACKTRACK to separate it :(
+            variable_names, instantiation_status = self._process_multiple_equality_chains()
+            value = self.prolog_outp_proc.process_value()
 
+            # for example:  `BACKTRACK Val1 = Val2 false.`
+            # trailing false which I can't use BACKTRACK to separate it :(
+            false_is_not_part_of_equality = (
+                    value == "false"
+                    and (variable_names == []
+                        or instantiation_status == ChainedEqualityInstantiationStatus.PURE_VARiABLE_UNIFICATION))
+            if false_is_not_part_of_equality:
+                self.ret.append(value)
+
+            if len(variable_names) > 1:
+                value = instantiation_status.create_chained_equality(variable_names, value)
             for variable_name in variable_names:
-                self.ret[-1][variable_name] = value
+                curr_ret[variable_name] = value
+            assert (variable_names, value) != ([], None)  # usually cause infinite loops
 
     def _inner_loop_condition(self):
         inner_peek = self.iter_tokens.peek()
@@ -190,23 +204,40 @@ class PrologOutputHelper:
             next(self.iter_tokens)
             return FlowControl.BREAK
 
-    def _process_multiple_chaining_equals(self):
+    def _process_multiple_equality_chains(self):
         """
-        Parse  Var1 = Var2 = Var3 = ... = VarN = value
-        :return: ["Var1", "Var2", "Var3", ... "VarN"]
+        Parse:
+            `Var1 = Var2 = Var3 = ... = VarN`
+            or
+            `Var1 = Var2 = Var3 = ... = VarN = value`
+        :return: ["Var1", "Var2", "Var3", ... "VarN"], ChainedEqualityInstantiationStatus
         """
         variable_names = []
         while True:
             token = self.iter_tokens.peek()
             curr_status = TokenType.get_token_status(token)
-            if curr_status != TokenType.VARIABLE or token in (",", self.splitter_token):
-                break
+            if curr_status != TokenType.VARIABLE:
+                return variable_names, ChainedEqualityInstantiationStatus.INSTANTIATED
             assert next(self.iter_tokens) == token
             variable_names.append(token)
 
-            equalsign = next(self.iter_tokens)
-            assert equalsign == "=", equalsign
-        return variable_names
+            next_token = self.iter_tokens.peek()
+            if next_token != "=":
+                return variable_names, ChainedEqualityInstantiationStatus.PURE_VARiABLE_UNIFICATION
+            next(self.iter_tokens)
+
+
+class ChainedEqualityInstantiationStatus(enum.Enum):
+    PURE_VARiABLE_UNIFICATION = 1  # for exampel:  Val1 = Val2
+    INSTANTIATED = 2  # for example"  Val1 = Val2 = some_instantiation_value
+
+    def create_chained_equality(self, variable_names, value):
+        if self == self.PURE_VARiABLE_UNIFICATION:
+            return ChainedEquality(variable_names)
+        assert self == self.INSTANTIATED
+        return ChainedEquality(variable_names, value)
+
+
 
 
 class TokenType(enum.Enum):
@@ -244,7 +275,7 @@ class CharType(enum.Enum):
 _T = TypeVar('_T')
 
 
-class NotAvailable():
+class NotAvailable:
     pass
 
 

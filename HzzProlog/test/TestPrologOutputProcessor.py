@@ -63,7 +63,7 @@ class TestPrologOutputProcessor(TestCase):
         self.assertEqual(expected, result)
 
     def test_process_token__should_process_variables_with_chained_equality_correctly(self):
-        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 false.")
+        instance = self.instantiate("BACKTRACK Var1 = Var2 = Var3 false.")  # note no BACKTRACK before the false.
         result = instance.process_token()
         equality = ChainedEquality(["Var1", "Var2", "Var3"])
         expected = [
@@ -82,6 +82,15 @@ class TestPrologOutputProcessor(TestCase):
         ]
         self.assertEqual(expected, result)
 
+    def test_process_token__should_process_variables_with_chained_equality_and_false_constant_value_correctly(self):
+        instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = false false.")
+        result = instance.process_token()
+        equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'false')
+        expected = [
+            {'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2,},
+            "false",
+        ]
+        self.assertEqual(expected, result)
 
     def test_process_token__should_process_variables_with_various_chained_equality(self):
         instance = self.instantiate("BACKTRACK Var1a = Var1b, Var2a = Var2b = Var2c = some_value BACKTRACK false.")
@@ -130,62 +139,62 @@ class TestPrologOutputProcessor(TestCase):
         self.assertEqual([{"Sum": 2}], result)
 
     def test_process_value__should_return_correctly_for_integers(self):
-        result = self.instantiate("123")._process_value()
+        result = self.instantiate("123").process_value()
         self.assertEqual(123, result)
 
     def test_process_value__should_be_able_to_handle_negatives(self):
-        result = self.instantiate("-123")._process_value()
+        result = self.instantiate("-123").process_value()
         self.assertEqual(-123, result)
 
     def test_process_value__should_return_correctly_for_float(self):
-        result = self.instantiate("123.456")._process_value()
+        result = self.instantiate("123.456").process_value()
         self.assertEqual(123.456, result)
 
     def test_process_value__should_be_able_to_handle_negative_floats(self):
-        result = self.instantiate("-123.456")._process_value()
+        result = self.instantiate("-123.456").process_value()
         self.assertEqual(-123.456, result)
 
     def test_process_value__should_be_able_to_differentiate_minus_and_negative(self):
         """should be performed in two steps"""
         inst = self.instantiate("123-123.456")
-        result1 = inst._process_value()
-        result2 = inst._process_value()
+        result1 = inst.process_value()
+        result2 = inst.process_value()
         self.assertEqual(123, result1)
         self.assertEqual(BinOp("-", 123, 123.456), result2)
 
     def test_process_value__should_return_correctly_for_normal_atom(self):
-        result = self.instantiate('abc')._process_value()
+        result = self.instantiate('abc').process_value()
         self.assertEqual('abc', result)
 
     def test_process_value__should_return_correctly_for_string_atom(self):
-        result = self.instantiate('"abc"')._process_value()
+        result = self.instantiate('"abc"').process_value()
         self.assertEqual('abc', result)
 
     def test_process_value__should_return_correctly_for_string_atom_with_space(self):
-        result = self.instantiate('"abc  def  ghi"')._process_value()
+        result = self.instantiate('"abc  def  ghi"').process_value()
         self.assertEqual('abc  def  ghi', result)
 
     def test_process_value__should_return_correctly_for_string_atom_with_space_and_square_brackets(self):
-        result = self.instantiate('"abc [def, ghi, jklm] ghi"')._process_value()
+        result = self.instantiate('"abc [def, ghi, jklm] ghi"').process_value()
         self.assertEqual('abc [def, ghi, jklm] ghi', result)
 
     def test_process_value__should_return_correctly_for_string_atom_with_escape(self):
-        result = self.instantiate('"abc \\n\\t\\" def"')._process_value()
+        result = self.instantiate('"abc \\n\\t\\" def"').process_value()
         self.assertEqual('abc \n\t\" def', result)
 
     def test_process_value__should_return_correctly_for_empty_square_brackets(self):
-        result = self.instantiate('[]')._process_value()
+        result = self.instantiate('[]').process_value()
         self.assertEqual([], result)
 
     def test_process_value__should_return_correctly_for_single_item_square_brackets(self):
-        result = self.instantiate('[123]')._process_value()
+        result = self.instantiate('[123]').process_value()
         self.assertEqual([123], result)
 
     def test_process_value__should_return_correctly_for_multi_item_square_brackets(self):
-        result = self.instantiate('[123.5, "a b \\" cdef", 123, abc]')._process_value()
+        result = self.instantiate('[123.5, "a b \\" cdef", 123, abc]').process_value()
         self.assertEqual([123.5, "a b \" cdef", 123, 'abc'], result)
 
     def test_process_value__should_return_correctly_for_nested_brackets(self):
         instance = self.instantiate('[[[1], 2], [3, 4, "abc def"], [], [[[5], 6, 7], 8], [[[[[]]]]]]')
-        result = instance._process_value()
+        result = instance.process_value()
         self.assertEqual([[[1], 2], [3, 4, "abc def"], [], [[[5], 6, 7], 8], [[[[[]]]]]], result)
