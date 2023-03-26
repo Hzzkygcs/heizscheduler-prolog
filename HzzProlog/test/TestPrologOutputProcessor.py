@@ -72,15 +72,21 @@ class TestPrologOutputProcessor(TestCase):
         ]
         self.assertEqual(expected, result)
 
-    def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly(self):
-        instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = some_value false.")
+    def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly__format_1(self):
+        self.validate_chained_equality_with_constant_value("BACKTRACK Var2a = Var2b = Var2c = some_value false.")
+    def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly__format_2(self):
+        self.validate_chained_equality_with_constant_value("BACKTRACK Var2a = Var2b = Var2c, Var2c = some_value false.")
+    def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly__format_3(self):
+        self.validate_chained_equality_with_constant_value("BACKTRACK Var2c = some_value, Var2a = Var2b = Var2c false.")
+    def validate_chained_equality_with_constant_value(self, query):
+        instance = self.instantiate(query)
         result = instance.process_token()
         equality_var2 = ChainedEquality(["Var2a", "Var2b", "Var2c"], 'some_value')
         expected = [
-            {'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2,},
+            {'Var2a': equality_var2, 'Var2b': equality_var2, 'Var2c': equality_var2, },
             "false",
         ]
-        self.assertEqual(expected, result)
+        self.assertEqual(expected, result, query)
 
     def test_process_token__should_process_variables_with_chained_equality_and_false_constant_value_correctly(self):
         instance = self.instantiate("BACKTRACK Var2a = Var2b = Var2c = false false.")
