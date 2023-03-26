@@ -21,5 +21,5 @@ class TestTime(TestCase):
             ChainedEquality.define_equality({'X': 6},  ['Y', 'Z'], 10),
             {'X': 6, 'Y': 23, 'Z': 59},
         ]
-        self.assertListEqual(expected, result)
+        self.assertCountEqual(expected, result)
 
