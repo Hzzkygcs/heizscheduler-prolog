@@ -1,24 +1,22 @@
 :- op(500, xfx, :).
 :- op(600, xfx, -).
 
-% Time range format: HH:MM-HH:MM
+% Time range format: DD:HH:MM-HH:MM
 % 24 hour format
 
-duration(H1:M1-H2:M2, Duration) :- % in minutes
+duration(H1:M1 - H2:M2, Duration) :- % in minutes
     (H2 > H1 ; (H2 =:= H1, M2 >= M1)),
-    Duration is ((H2*60 + M2) - (H1*60 + M1)).
+    !, Duration is ((H2*60 + M2) - (H1*60 + M1)).
 
 duration(H1:M1-H2:M2, Duration) :- % in minutes
     (H2 < H1 ; (H2 =:= H1, M2 < M1)),
-    Duration is ((H2*60 + M2) - (H1*60 + M1)) + 24*60.
+    !, Duration is ((H2*60 + M2) - (H1*60 + M1)) + 24*60.
 
 valid_time_range(H1:M1-H2:M2) :-
     0 =< H1, H1 =< 24,
     0 =< H2, H2 =< 24,
     0 =< M1, M1 =< 60,
-    0 =< M2, M2 =< 60,
-    duration(H1:M1-H2:M2, Duration),
-    Duration > 0.
+    0 =< M2, M2 =< 60.
 
 time_in_range(H:M, _:_-H2:M2) :- % belom bener buat lebih dari 24 jam
     H =:= H2, M =:= M2, !, fail. % fail belom diajarin, materi next ppt
