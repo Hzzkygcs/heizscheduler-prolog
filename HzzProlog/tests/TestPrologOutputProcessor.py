@@ -78,6 +78,7 @@ class TestPrologOutputProcessor(TestCase):
         self.validate_chained_equality_with_constant_value("BACKTRACK Var2a = Var2b = Var2c, Var2c = some_value false.")
     def test_process_token__should_process_variables_with_chained_equality_and_constant_value_correctly__format_3(self):
         self.validate_chained_equality_with_constant_value("BACKTRACK Var2c = some_value, Var2a = Var2b = Var2c false.")
+
     def validate_chained_equality_with_constant_value(self, query):
         instance = self.instantiate(query)
         result = instance.process_token()

@@ -51,6 +51,7 @@ class ChainedEquality:
             assert isinstance(first, ChainedEquality)
             assert first.constant_value is None or first.constant_value == second
             first.constant_value = second
+            apply_to_defined_variables(variable_value_mapping, first.variable_names, first)
             return
 
         unified_equality = cls.unify_both_equality(first, second)
