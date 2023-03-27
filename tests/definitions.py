@@ -13,7 +13,8 @@ Result = PrologCallable("Result")
 
 time = PrologCallable("time")
 hari = PrologCallable("hari")
-add_time = PrologCallable("hari")
+add_time = PrologCallable("add_time")
+subtract_time = PrologCallable("subtract_time")
 convert_from_minutes = PrologCallable("convert_from_minutes")
 
 range = PrologCallable("range")
