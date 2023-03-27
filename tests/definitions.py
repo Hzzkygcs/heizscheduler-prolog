@@ -1,3 +1,4 @@
+from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.PrologCallable import PrologCallable, PrologOperator
 
 MAIN_PROLOG_FILE = "prolog.pl"
@@ -26,3 +27,8 @@ time_in_range = PrologCallable("time_in_range")
 duration = PrologCallable("duration")
 time_point = PrologOperator(":")
 time_range = PrologOperator("-")
+
+
+def define_tokenizer_regex(hzz_prolog: HzzProlog):
+    hzz_prolog.add_new_regex(150, "\d+:\d+:\d+")
+    return hzz_prolog

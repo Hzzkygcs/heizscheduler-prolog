@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
-from tests.definitions import HZZ_TIME_PL_IO, add_time, range, datetime, X, Y, Z, Result, convert_from_minutes
+from tests.definitions import HZZ_TIME_PL_IO, add_time, range, datetime, X, Y, Z, Result, convert_from_minutes, define_tokenizer_regex
 
 JAM = 60
 HARI = JAM * 60
@@ -10,6 +10,7 @@ HARI = JAM * 60
 class TestAddTime(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = define_tokenizer_regex(self.prolog)
 
     def test__should_convert_minutes_correctly(self):
         query = convert_from_minutes(
