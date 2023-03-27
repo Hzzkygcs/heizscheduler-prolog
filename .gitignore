@@ -3,3 +3,4 @@ venv/
 python venv/
 **/temp/
 /tests/temp/
+**/__pycache__/
