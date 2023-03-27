@@ -3,7 +3,7 @@ from unittest import TestCase
 from HzzProlog.PrologOutputProcessor import Tokenizer
 
 
-class TestHelperTokenizerIterator(TestCase):
+class TestTokenizer(TestCase):
     def _instantiate(self, parameter):
         return Tokenizer(parameter)
 
@@ -54,6 +54,17 @@ class TestHelperTokenizerIterator(TestCase):
     def test_tokenize__should_combine_underscore_and_alphabets(self):
         result = self._instantiate("ab_cd").tokenize()
         self.assertEqual(["ab_cd"], result)
+
+    def test_tokenize__custom_regex__should_separate_symbols_by_symbols_if_no_custom_regex(self):
+        tokenizer = self._instantiate("Var1 = Var2, Var2 = 6:23:59")
+        result = tokenizer.tokenize()
+        self.assertEqual(["Var1", ' ', '=', ' ', 'Var2', ',', ' ', 'Var2', ' ', '=', ' ', '6', ':', '23', ':', '59'], result)
+
+    def test_tokenize__custom_regex__should_return_token_correctly(self):
+        tokenizer = self._instantiate("Var1 = Var2, Var2 = 6:23:59")
+        tokenizer.add_new_regex(100, '\d+:\d+:\d+')
+        result = tokenizer.tokenize()
+        self.assertEqual(["Var1", ' ', '=', ' ', 'Var2', ',', ' ', 'Var2', ' ', '=', ' ', '6:23:59'], result)
 
     def test_tokenize__should_combine_underscore_alphabets_and_numbers(self):
         result = self._instantiate("ab_cd12").tokenize()

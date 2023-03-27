@@ -1,3 +1,4 @@
+import re
 import string
 from typing import overload, TypeVar, Union
 
@@ -339,8 +340,39 @@ class TokenizerIterator(peekable):
         return self.prev
 
 
-
 class Tokenizer:
+    def __init__(self, string):
+        self.string = string
+        self.curr_token = ""  # currently being-built token
+        self.prev_char_type = CharType.UNDERSCORE_ALPHA_NUMERIC
+        self.regex_tokenizer = [  # (priority_rank, regex_pattern). From lower to higher
+            (200, "[a-zA-Z0-9_]+"),
+            (400, "\\s+"),
+            (600, "."),
+        ]
+
+    def add_new_regex(self, priority_rank, regex):
+        self.regex_tokenizer.append((priority_rank, regex))
+        self.regex_tokenizer.sort(key=lambda x: x[0])
+
+    def tokenize(self):
+        ret = []
+        while len(self.string) > 0:
+            for _, pattern in self.regex_tokenizer:
+                match_result = re.match(pattern, self.string)
+                if match_result is not None:
+                    break
+            matched_str = self.string[0]
+            if match_result is not None:
+                matched_str = match_result[0]
+            matched_str_length = len(matched_str)
+            assert len(matched_str) == match_result.span()[1]
+            self.string = self.string[matched_str_length:]
+            ret.append(matched_str)
+        return ret
+
+
+class TokenizerOld:
     def __init__(self, string):
         self.string = string
         self.ret = []
