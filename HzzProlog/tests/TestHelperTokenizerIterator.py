@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from HzzProlog.PrologOutputProcessor import HelperTokenizerIterator
+from HzzProlog.PrologOutputProcessor import Tokenizer
 
 
 class TestHelperTokenizerIterator(TestCase):
     def _instantiate(self, parameter):
-        return HelperTokenizerIterator(parameter)
+        return Tokenizer(parameter)
 
     def test_tokenize__should_tokenize_integers_token_correctly(self):
         result = self._instantiate("123").tokenize()

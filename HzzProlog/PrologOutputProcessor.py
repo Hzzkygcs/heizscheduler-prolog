@@ -293,7 +293,7 @@ class NotAvailable:
 class TokenizerIterator(peekable):
     def __init__(self, string):
         self.prev = None
-        tokenized = HelperTokenizerIterator(string).tokenize()
+        tokenized = Tokenizer(string).tokenize()
         super().__init__(tokenized)
         self.include_space = False
 
@@ -340,7 +340,7 @@ class TokenizerIterator(peekable):
 
 
 
-class HelperTokenizerIterator:
+class Tokenizer:
     def __init__(self, string):
         self.string = string
         self.ret = []
