@@ -17,6 +17,11 @@ class HzzProlog:
         self.temp_folders = "temp/"
         self.script_file_io = script_file_io
         self.facts = {}
+        self.custom_regex_tokenizer: list[tuple[int, str]] = []
+
+    def add_new_regex(self, priority_rank, regex):
+        self.custom_regex_tokenizer.append((priority_rank, regex))
+        self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
         for fact_definition in fact_definitions:
@@ -118,7 +123,7 @@ class HzzProlog:
             elif not self._error_is_because_too_much_semicolon(stderr):
                 raise PrologException(stderr)
 
-        output_processor = PrologOutputProcessor(stdout)
+        output_processor = PrologOutputProcessor(stdout, additional_regex=self.custom_regex_tokenizer)
         self.remove_start_of_output_mark(output_processor)
         ret = output_processor.process_token()
         return ret

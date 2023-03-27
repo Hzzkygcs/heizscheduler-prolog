@@ -5,8 +5,8 @@ from HzzProlog.PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 
 class TestPrologOutputProcessor(TestCase):
-    def instantiate(self, string):
-        return PrologOutputProcessor(string, self.end_delimiter)
+    def instantiate(self, string, additional_regex=[]):
+        return PrologOutputProcessor(string, self.end_delimiter, additional_regex)
 
     def setUp(self) -> None:
         self.end_delimiter = "BACKTRACK"
@@ -205,3 +205,9 @@ class TestPrologOutputProcessor(TestCase):
         instance = self.instantiate('[[[1], 2], [3, 4, "abc def"], [], [[[5], 6, 7], 8], [[[[[]]]]]]')
         result = instance.process_value()
         self.assertEqual([[[1], 2], [3, 4, "abc def"], [], [[[5], 6, 7], 8], [[[[[]]]]]], result)
+
+    def test_process_value__should_be_able_to_process_custom_tokens_as_long_as_it_is_defined(self):
+        custom_token = "\d+:\d+:\d+"
+        result = self.instantiate('[normal, 1:23:45, 7:8:9, 123]', [(0, custom_token)])\
+            .process_value()
+        self.assertEqual(['normal', "1:23:45", '7:8:9', 123], result)

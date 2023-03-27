@@ -27,9 +27,9 @@ class BinOp:  # operator that takes two operands (binary operator)
 
 
 class PrologOutputProcessor:
-    def __init__(self, string, splitter_token="BACKTRACK"):
+    def __init__(self, string, splitter_token="BACKTRACK", additional_regex: list[tuple[int,str]]=[]):
         self.string = string
-        self.iter_tokens = TokenizerIterator(string)
+        self.iter_tokens = TokenizerIterator(string, tokenizer_regex=additional_regex)
         self.prev_value = None
         self.splitter_token = splitter_token
 
@@ -261,9 +261,9 @@ class TokenType(enum.Enum):
     @classmethod
     def get_token_status(cls, token: str):
         assert len(token) >= 1
-        if token[0].isnumeric():
+        if set(token) <= set(string.digits):
             return cls.NUMERIC
-        if set(token) <= set(string.ascii_letters + string.digits + "_"):
+        if len(set(string.ascii_letters + string.digits) & set(token)) >= 1:
             if token[0].isupper():
                 return cls.VARIABLE
             return cls.ATOM
@@ -292,9 +292,12 @@ class NotAvailable:
 
 
 class TokenizerIterator(peekable):
-    def __init__(self, string):
+    def __init__(self, string, tokenizer_regex: list[tuple[int, str]]=[]):
         self.prev = None
-        tokenized = Tokenizer(string).tokenize()
+        tokenizer = Tokenizer(string)
+        for priority, pattern in tokenizer_regex:
+            tokenizer.add_new_regex(priority, pattern)
+        tokenized = tokenizer.tokenize()
         super().__init__(tokenized)
         self.include_space = False
 
@@ -370,35 +373,4 @@ class Tokenizer:
             self.string = self.string[matched_str_length:]
             ret.append(matched_str)
         return ret
-
-
-class TokenizerOld:
-    def __init__(self, string):
-        self.string = string
-        self.ret = []
-        self.curr_token = ""  # currently being-built token
-        self.prev_char_type = CharType.UNDERSCORE_ALPHA_NUMERIC
-
-    def tokenize(self):
-        for char in self.string:
-            char_type = CharType.get_type(char)
-            if char_type in (CharType.UNDERSCORE_ALPHA_NUMERIC, CharType.WHITESPACE):
-                self.push_if_different_type(char_type, char)
-                self.curr_token += char
-                continue
-            self.push_if_different_type(CharType.SYMBOLS, char)
-            self.ret.append(char)
-        if self.curr_token != "":
-            self.ret.append(self.curr_token)
-        return self.ret
-
-    def push_if_different_type(self, desired_type: CharType, curr_char: str):
-        if self.curr_token == "":
-            self.prev_char_type = CharType.get_type(curr_char)
-            return
-        if self.prev_char_type == desired_type:
-            return
-        self.ret.append(self.curr_token)
-        self.curr_token = ""
-        self.prev_char_type = CharType.get_type(curr_char)
 

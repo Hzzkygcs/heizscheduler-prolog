@@ -3,7 +3,7 @@ import unittest
 from HzzProlog.HzzProlog import HzzProlog
 
 
-class TestProlog(unittest.TestCase):
+class TestHzzProlog(unittest.TestCase):
     def setUp(self) -> None:
         self.p = HzzProlog(None)
 
