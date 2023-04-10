@@ -14,83 +14,27 @@ class PrologException(Exception):
 
 
 class HzzProlog:
-    def __init__(self, script_file_io: IO, delete_temp_files=True):
-        self.temp_folders = "temp/"
-        self.script_file_io = script_file_io
-        self.facts = {}
+    def __init__(self, script_file_io: IO = None, delete_temp_files=True):
+        self.prolog_script = None
+        if script_file_io is not None:
+            self.prolog_script = PrologTemplatePreprocessor(script_file_io, delete_temp_files=delete_temp_files)
         self.custom_regex_tokenizer: list[tuple[int, str]] = []
         self.last_stdout = None
-        self.created_temp_files = []
-        self.delete_temp_files = delete_temp_files
 
     def add_new_regex(self, priority_rank, regex):
         self.custom_regex_tokenizer.append((priority_rank, regex))
         self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
-        for fact_definition in fact_definitions:
-            self.add_fact(template_variable_name=template_variable_name, fact_definition=fact_definition)
+        return self.prolog_script.add_facts(template_variable_name, fact_definitions)
 
     def add_fact(self, template_variable_name: str, fact_definition: str):
-        if template_variable_name not in self.facts:
-            self.facts[template_variable_name] = []
-        if not fact_definition.endswith("."):
-            fact_definition += "."
-        self.facts[template_variable_name].append(fact_definition)
-
-    def get_injected_script(self):
-        print(os.getcwd())
-        create_dir_if_not_exist(self.temp_folders)
-        file_name = self.get_temporary_file_name()
-        self.script_file_io.seek(0)
-
-        file_content = self.script_file_io.read()
-        file_content = self.remove_ignored(file_content)
-        file_content = self.inject_facts(file_content)
-
-        with open(file_name, "w") as f:
-            f.write(file_content)
-        return file_name
-
-    def get_temporary_file_name(self):
-        file_name = [chr(randint(65, 65 + 26 - 1)) for _ in range(10)]
-        file_name = "".join(file_name) + ".pl"
-        ret = os.path.join(self.temp_folders, file_name)
-        self.created_temp_files.append(ret)
-        return ret
-
-    def __del__(self):
-        if not self.delete_temp_files:
-            return 
-        for file in self.created_temp_files:
-            os.remove(file)
-
-    def inject_facts(self, template_prolog_content: str) -> str:
-        for key, facts in self.facts.items():
-            facts = "\n" + "\n".join(facts) + "\n"
-            template_prolog_content = template_prolog_content.replace("{{"+key+"}}", facts)
-        return template_prolog_content
-
-    def remove_ignored(self, template_prolog_content: str):
-        lines = template_prolog_content.split("\n")
-        ret = []
-        lines_iterator = iter(lines)
-        for line in lines_iterator:
-            if "{%ignored%}" in line:
-                continue
-            if "{%begin ignore%}" in line:
-                while True:
-                    curr_line = next(lines_iterator)
-                    if "{%end ignore%}" in curr_line:
-                        break
-                continue
-            ret.append(line)
-        return "\n".join(ret)
+        return self.prolog_script.add_fact(template_variable_name, fact_definition)
 
     def reset(self):
         args = ["swipl", '--quiet']
-        if self.script_file_io is not None:
-            script_file_name = self.get_injected_script()
+        if self.prolog_script is not None:
+            script_file_name = self.prolog_script.get_injected_script()
             args.append(script_file_name)
 
         self.p = subprocess.Popen(
@@ -152,6 +96,75 @@ class HzzProlog:
         cond1 = "Stream user_input" in err_msg
         cond2 = "Syntax error: Unexpected end of file" in err_msg
         return cond1 and cond2
+
+
+class PrologTemplatePreprocessor:
+    def __init__(self, script_file_io, delete_temp_files=True):
+        self.facts = {}
+        self.temp_folders = "temp/"
+        self.script_file_io = script_file_io
+        self.created_temp_files = []
+        self.delete_temp_files = delete_temp_files
+
+    def get_injected_script(self):
+        print(os.getcwd())
+        create_dir_if_not_exist(self.temp_folders)
+        file_name = self.get_temporary_file_name()
+        self.script_file_io.seek(0)
+
+        file_content = self.script_file_io.read()
+        file_content = self.remove_ignored(file_content)
+        file_content = self.inject_facts(file_content)
+
+        with open(file_name, "w") as f:
+            f.write(file_content)
+        return file_name
+
+    def get_temporary_file_name(self):
+        file_name = [chr(randint(65, 65 + 26 - 1)) for _ in range(10)]
+        file_name = "".join(file_name) + ".pl"
+        ret = os.path.join(self.temp_folders, file_name)
+        self.created_temp_files.append(ret)
+        return ret
+
+    def remove_ignored(self, template_prolog_content: str):
+        lines = template_prolog_content.split("\n")
+        ret = []
+        lines_iterator = iter(lines)
+        for line in lines_iterator:
+            if "{%ignored%}" in line:
+                continue
+            if "{%begin ignore%}" in line:
+                while True:
+                    curr_line = next(lines_iterator)
+                    if "{%end ignore%}" in curr_line:
+                        break
+                continue
+            ret.append(line)
+        return "\n".join(ret)
+
+    def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
+        for fact_definition in fact_definitions:
+            self.add_fact(template_variable_name=template_variable_name, fact_definition=fact_definition)
+
+    def add_fact(self, template_variable_name: str, fact_definition: str):
+        if template_variable_name not in self.facts:
+            self.facts[template_variable_name] = []
+        if not fact_definition.endswith("."):
+            fact_definition += "."
+        self.facts[template_variable_name].append(fact_definition)
+
+    def inject_facts(self, template_prolog_content: str) -> str:
+        for key, facts in self.facts.items():
+            facts = "\n" + "\n".join(facts) + "\n"
+            template_prolog_content = template_prolog_content.replace("{{"+key+"}}", facts)
+        return template_prolog_content
+
+    def __del__(self):
+        if not self.delete_temp_files:
+            return
+        for file in self.created_temp_files:
+            os.remove(file)
 
 
 def for_multithread(func, args: list[tuple], pool_num=8, timeout=99999):
