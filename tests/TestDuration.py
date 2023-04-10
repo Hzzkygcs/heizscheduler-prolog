@@ -12,7 +12,8 @@ class TestDuration(TestCase):
     def test__should_return_correctly(self):
         query = duration(
             time_range(time_point(1, 10), time_point(2, 20)),
-            X)
+            X
+        )
         result = self.prolog.query(query)
         self.assertEqual(70, result[0]['X'])
 

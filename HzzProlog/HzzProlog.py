@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import os
+import re
 import subprocess, collections
 from multiprocessing.pool import ThreadPool
 from random import randint
@@ -14,10 +17,14 @@ class PrologException(Exception):
 
 
 class HzzProlog:
-    def __init__(self, script_file_io: IO = None, delete_temp_files=True):
+    def __init__(self, script_file_abs_path: str, file_content=None, delete_temp_files=True):
         self.prolog_script = None
-        if script_file_io is not None:
-            self.prolog_script = PrologTemplatePreprocessor(script_file_io, delete_temp_files=delete_temp_files)
+        if script_file_abs_path is not None:
+            self.main_prolog_script = PrologTemplatePreprocessor(
+                script_file_abs_path, file_content=file_content, delete_temp_files=delete_temp_files
+            )
+            self.prolog_script = PrologTemplateProcessingContext(self.main_prolog_script,
+                                                                 delete_temp_files=delete_temp_files)
         self.custom_regex_tokenizer: list[tuple[int, str]] = []
         self.last_stdout = None
 
@@ -26,15 +33,16 @@ class HzzProlog:
         self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
-        return self.prolog_script.add_facts(template_variable_name, fact_definitions)
+        return self.main_prolog_script.add_facts(template_variable_name, fact_definitions)
 
     def add_fact(self, template_variable_name: str, fact_definition: str):
-        return self.prolog_script.add_fact(template_variable_name, fact_definition)
+        return self.main_prolog_script.add_fact(template_variable_name, fact_definition)
 
     def reset(self):
         args = ["swipl", '--quiet']
         if self.prolog_script is not None:
-            script_file_name = self.prolog_script.get_injected_script()
+            self.prolog_script.reset()
+            script_file_name = self.prolog_script.save_injected_script_to_file()
             args.append(script_file_name)
 
         self.p = subprocess.Popen(
@@ -98,34 +106,138 @@ class HzzProlog:
         return cond1 and cond2
 
 
-class PrologTemplatePreprocessor:
-    def __init__(self, script_file_io, delete_temp_files=True):
-        self.facts = {}
-        self.temp_folders = "temp/"
-        self.script_file_io = script_file_io
-        self.created_temp_files = []
+class PrologTemplateProcessingContext:
+    def __init__(self, main_template: PrologTemplatePreprocessor, delete_temp_files=True):
+        self.main_template = main_template
+        self.templates: list[PrologTemplatePreprocessor] = [main_template]
         self.delete_temp_files = delete_temp_files
 
-    def get_injected_script(self):
+    def contains(self, other_template: PrologTemplatePreprocessor):
+        for template in self.templates:
+            if template.script_file_abs_path == other_template.script_file_abs_path:
+                return True
+            if hash(template) == hash(other_template):
+                return True
+        return False
+
+    def add_template(self, template: PrologTemplatePreprocessor):
+        self.templates.append(template)
+
+    def reset(self):
+        self.main_template.reset()
+
+    def save_injected_script_to_file(self, template: PrologTemplatePreprocessor=None, included_templates=None):
+        if included_templates is None:
+            included_templates = {}  # key: hash of the original template, value: temporary name for it
+        if template is None:
+            template = self.main_template
+        if hash(template) in included_templates:
+            return included_templates[hash(template)]
+
+        included_templates[hash(template)] = template.temp_file_path
+
+        generator = template.get_and_replace_imports()  # SIDE EFFECT
+        while True:
+            try:
+                import_file_name = next(generator)
+            except StopIteration:
+                break
+            directory_name = os.path.dirname(template.script_file_abs_path)
+            abs_imported_file_path = os.path.join(directory_name, import_file_name)
+
+            imported_template = PrologTemplatePreprocessor(
+                f"{abs_imported_file_path}.pl", delete_temp_files=self.delete_temp_files)
+            self.add_template(imported_template)  # to prevent imported_template.__del__ from being called.
+            processed_file_name = self.save_injected_script_to_file(imported_template)
+            processed_file_name = os.path.basename(processed_file_name)
+            processed_file_name = os.path.splitext(processed_file_name)[0]
+            try:
+                generator.send(processed_file_name)
+            except StopIteration:
+                break
+        template.save_injected_script_to_file()  # SIDE EFFECT
+        return template.temp_file_path
+
+
+
+class PrologTemplatePreprocessor:
+    def __init__(self, script_file_abs_path: str, file_content=None, delete_temp_files=True):
+        self.facts = {}
+        assert os.path.isabs(script_file_abs_path)
+        self.script_file_abs_path = script_file_abs_path
+        self.temp_folders = os.path.join(self.script_folder_abs_path, "temp")
+
+        self.original_file_content = file_content
+        if file_content is None:
+            with open(script_file_abs_path) as f:
+                self.original_file_content = f.read()
+        self.created_temp_files = set()
+        self.delete_temp_files = delete_temp_files
+
+        self.temp_file_path = None  # see self.reset() at the end of constructor
+        self.script_file_content = None
+        self.reset()
+        self.before_preprocessed_script_hash = hash(self.script_file_content)
+
+    @property
+    def script_folder_abs_path(self):
+        return os.path.dirname(self.script_file_abs_path)
+
+    @property
+    def temp_file_name(self):
+        return os.path.basename(self.temp_file_path)
+
+    def reset(self):
+        self.script_file_content = self.original_file_content
+        self.load_temporary_file_name()
+
+    def get_and_replace_imports(self):
+        patterns = [
+            (":-\\s*\\[([a-zA-Z0-9]+)\\]\\s*\\.", lambda x: f"[{x}]"),
+            (":-\\s*consult\\(([a-zA-Z0-9]+)\\)\\s*\\.", lambda x: f"consult({x})"),
+             (":-\\s*ensure_loaded\\(([a-zA-Z0-9]+)\\)\\s*\\.", lambda x: f"ensure_loaded({x})"),
+        ]
+        file_content = self.script_file_content
+        for pattern, import_transformer in patterns:
+            temp_file_content = []
+
+            tokens = tokenize_using_regex(re.compile(pattern), file_content)
+            for token in tokens:
+                match = re.match(pattern, token)
+                if not match:
+                    temp_file_content.append(token)
+                    continue
+                original_imported_file_name = match.group(1)
+                modified_imported_file_name = yield original_imported_file_name
+
+                import_syntax = import_transformer(modified_imported_file_name)
+                assert len({".", "/", "\\"} & set(import_syntax)) == 0
+                import_syntax = f":- {import_syntax}."
+                temp_file_content.append(import_syntax)
+            file_content = "".join(temp_file_content)
+        self.script_file_content = file_content
+
+    def save_injected_script_to_file(self):
         print(os.getcwd())
         create_dir_if_not_exist(self.temp_folders)
-        file_name = self.get_temporary_file_name()
-        self.script_file_io.seek(0)
 
-        file_content = self.script_file_io.read()
+        file_content = self.script_file_content
         file_content = self.remove_ignored(file_content)
         file_content = self.inject_facts(file_content)
 
-        with open(file_name, "w") as f:
+        with open(self.temp_file_path, "w") as f:
             f.write(file_content)
-        return file_name
+        self.created_temp_files.add(self.temp_file_path)
 
-    def get_temporary_file_name(self):
+    def load_temporary_file_name(self):
         file_name = [chr(randint(65, 65 + 26 - 1)) for _ in range(10)]
-        file_name = "".join(file_name) + ".pl"
+        file_name = "".join(file_name)
+        original_file_name = os.path.basename(self.script_file_abs_path).replace(" ", "_")
+        original_file_name = os.path.splitext(original_file_name)[0]
+        file_name = f"{original_file_name}_{file_name}.pl"
+
         ret = os.path.join(self.temp_folders, file_name)
-        self.created_temp_files.append(ret)
-        return ret
+        self.temp_file_path = ret
 
     def remove_ignored(self, template_prolog_content: str):
         lines = template_prolog_content.split("\n")
@@ -165,6 +277,27 @@ class PrologTemplatePreprocessor:
             return
         for file in self.created_temp_files:
             os.remove(file)
+
+    def __hash__(self):
+        return self.before_preprocessed_script_hash
+
+
+def tokenize_using_regex(regex_pattern: re.Pattern, string):
+    matches_obj = list(regex_pattern.finditer(string))
+    ret = []
+    curr_index = 0
+    for match in matches_obj:
+        start_nonmatching = curr_index
+        start_matching = match.span()[0]
+        end_matching = match.span()[1]
+        ret.append(string[start_nonmatching: start_matching])  # non-matching string
+        ret.append(string[start_matching: end_matching])  # non-matching string
+
+        curr_index = end_matching
+    ret.append(string[curr_index: ])  # remaining
+    return ret
+
+
 
 
 def for_multithread(func, args: list[tuple], pool_num=8, timeout=99999):

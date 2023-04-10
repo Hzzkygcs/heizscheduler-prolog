@@ -1,10 +1,12 @@
+import os
+
 from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.PrologCallable import PrologCallable, PrologOperator
 
 MAIN_PROLOG_FILE = "prolog.pl"
-MAIN_PROLOG_FILE_IO = open("../prolog.pl")
-TIME_CONFLICT_PL_IO = open("../time_conflict.pl")
-HZZ_TIME_PL_IO = open("../hzztime.pl")
+MAIN_PROLOG_FILE_IO = os.path.abspath("../prolog.pl")
+TIME_CONFLICT_PL_IO = os.path.abspath("../time_conflict.pl")
+HZZ_TIME_PL_IO = os.path.abspath("../hzztime.pl")
 
 
 X = PrologCallable("X")
