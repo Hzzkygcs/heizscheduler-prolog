@@ -4,7 +4,8 @@ from multiprocessing.pool import ThreadPool
 from random import randint
 from typing import IO
 
-from .PrologOutputProcessor import PrologOutputProcessor
+import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+from PrologOutputProcessor import PrologOutputProcessor
 
 
 class PrologException(Exception):
@@ -13,11 +14,14 @@ class PrologException(Exception):
 
 
 class HzzProlog:
-    def __init__(self, script_file_io: IO):
+    def __init__(self, script_file_io: IO, delete_temp_files=True):
         self.temp_folders = "temp/"
         self.script_file_io = script_file_io
         self.facts = {}
         self.custom_regex_tokenizer: list[tuple[int, str]] = []
+        self.last_stdout = None
+        self.created_temp_files = []
+        self.delete_temp_files = delete_temp_files
 
     def add_new_regex(self, priority_rank, regex):
         self.custom_regex_tokenizer.append((priority_rank, regex))
@@ -51,7 +55,15 @@ class HzzProlog:
     def get_temporary_file_name(self):
         file_name = [chr(randint(65, 65 + 26 - 1)) for _ in range(10)]
         file_name = "".join(file_name) + ".pl"
-        return os.path.join(self.temp_folders, file_name)
+        ret = os.path.join(self.temp_folders, file_name)
+        self.created_temp_files.append(ret)
+        return ret
+
+    def __del__(self):
+        if not self.delete_temp_files:
+            return 
+        for file in self.created_temp_files:
+            os.remove(file)
 
     def inject_facts(self, template_prolog_content: str) -> str:
         for key, facts in self.facts.items():
@@ -116,6 +128,7 @@ class HzzProlog:
 
     def query(self, query, approx_number_of_output=100):
         stdout, stderr = self.query_raw(query, approx_number_of_output=approx_number_of_output)
+        self.last_stdout = stdout
 
         if stderr:
             if self._error_is_because_too_few_semi_colon(stderr):

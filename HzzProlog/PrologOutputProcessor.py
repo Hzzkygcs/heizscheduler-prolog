@@ -1,10 +1,11 @@
 import re
 import string
-from typing import overload, TypeVar, Union
+from typing import TypeVar
 
 from more_itertools import peekable
 import enum
 
+import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from HzzProlog.ChainEquality import ChainedEquality
 
 
@@ -13,6 +14,7 @@ class BinOp:  # operator that takes two operands (binary operator)
         self.operator_symbol = operator_symbol
         self.left_operand = left_operand
         self.right_operand = right_operand
+
     def __repr__(self):
         return f"BinOp({self.operator_symbol}, {self.left_operand!r}, {self.right_operand!r})"
 

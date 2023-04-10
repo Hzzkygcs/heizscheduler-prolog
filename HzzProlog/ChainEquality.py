@@ -75,6 +75,10 @@ class ChainedEquality:
                                first.constant_value or second.constant_value)
 
     @staticmethod
+    def equality(*variable_names: str, value):
+        return ChainedEquality.define_equality({}, list(variable_names), value)
+
+    @staticmethod
     def define_equality(variable_value_mapping, variable_names: list[str], value):
         assert not isinstance(value, ChainedEquality)
         equality = ChainedEquality(variable_names, value)
@@ -82,6 +86,7 @@ class ChainedEquality:
             variable_value_mapping[variable_name] = equality
         return variable_value_mapping
 
+equality = ChainedEquality.equality
 
 def apply_to_defined_variables(defined_variables: dict[str, Union[int, str, ChainedEquality]],
                                new_variables: list[str], new_value):
