@@ -8,6 +8,7 @@ MAIN_PROLOG_FILE_IO = os.path.abspath("../prolog.pl")
 TIME_CONFLICT_PL_IO = os.path.abspath("../time_conflict.pl")
 HZZ_TIME_PL_IO = os.path.abspath("../hzztime.pl")
 
+dont_care = 0  # arbitrary value
 
 X = PrologCallable("X")
 Y = PrologCallable("Y")
@@ -23,8 +24,17 @@ convert_from_minutes = PrologCallable("convert_from_minutes")
 range = PrologCallable("range")
 datetime = PrologOperator(":")
 
+def have_time(npm, is_preferred, start, end):
+    func = PrologCallable("have_time")
+    return func(npm, is_preferred, start, end)
+
+def all_npm(npm):
+    func = PrologCallable("all_npm")
+    return func(npm)
 
 available = PrologCallable("available")
+
+
 time_in_range = PrologCallable("time_in_range")
 duration = PrologCallable("duration")
 time_point = PrologOperator(":")

@@ -206,7 +206,12 @@ class PrologOutputHelper:
         variable_value_mapping[variable_name] = new_value
 
     def _inner_loop_condition(self):
-        inner_peek = self.iter_tokens.peek()
+        try:
+            inner_peek = self.iter_tokens.peek()
+        except StopIteration:
+            print("GATAU INI HARUSNYA BREAK ATAU ENGGA (PrologOutputProcessor:212)")
+            return FlowControl.BREAK
+
         if inner_peek == self.splitter_token:
             return FlowControl.BREAK
 
@@ -308,7 +313,7 @@ class TokenizerIterator(peekable):
 
     def peek(self, default=NotAvailable()):
         if isinstance(default, NotAvailable):
-            return self.__peek()
+            return self.__peek()  # may rise StopIteration
 
         try:
             return self.__peek()
