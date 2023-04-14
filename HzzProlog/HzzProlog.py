@@ -5,9 +5,13 @@ import re
 import subprocess, collections
 from multiprocessing.pool import ThreadPool
 from random import randint
-from typing import IO
+from typing import IO, Union
 
-import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+import os, sys;
+
+from HzzProlog.PrologCallable import BasePrologCallable
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from PrologOutputProcessor import PrologOutputProcessor
 
 
@@ -36,10 +40,10 @@ class HzzProlog:
         self.custom_regex_tokenizer.append((priority_rank, regex))
         self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
-    def add_facts(self, template_variable_name: str, fact_definitions: list[str]):
+    def add_facts(self, template_variable_name: str, fact_definitions: list[Union[str, BasePrologCallable]]):
         return self.main_prolog_script.add_facts(template_variable_name, fact_definitions)
 
-    def add_fact(self, template_variable_name: str, fact_definition: str):
+    def add_fact(self, template_variable_name: str, fact_definition: Union[str, BasePrologCallable]):
         return self.main_prolog_script.add_fact(template_variable_name, fact_definition)
 
     def reset(self):
@@ -78,6 +82,7 @@ class HzzProlog:
 
     def query_raw(self, query, approx_number_of_output=1):
         self.reset()
+        query = str(query)
         assert not query.endswith("."), "query should NOT be ended with punctuation"
 
         query = self.prefix() + query + self.suffix(approx_number_of_output)
@@ -273,7 +278,10 @@ class PrologTemplatePreprocessor:
         for fact_definition in fact_definitions:
             self.add_fact(template_variable_name=template_variable_name, fact_definition=fact_definition)
 
-    def add_fact(self, template_variable_name: str, fact_definition: str):
+    def add_fact(self, template_variable_name: str, fact_definition: Union[str, BasePrologCallable]):
+        assert isinstance(template_variable_name, (str, BasePrologCallable))
+        fact_definition = str(fact_definition)
+
         if template_variable_name not in self.facts:
             self.facts[template_variable_name] = []
         if not fact_definition.endswith("."):
