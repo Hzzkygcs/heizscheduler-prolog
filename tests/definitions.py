@@ -46,6 +46,7 @@ time_point = define_prolog_operator("time_point", ":")
 time_range = define_prolog_operator("time_range", "-")
 
 
+
 def define_tokenizer_regex(hzz_prolog: HzzProlog):
     hzz_prolog.add_new_regex(150, "\d+:\d+:\d+")
     return hzz_prolog

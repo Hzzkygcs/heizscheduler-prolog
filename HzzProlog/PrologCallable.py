@@ -1,5 +1,6 @@
 import abc
-from typing import Any
+import typing
+from typing import Any, TypeVar, Generic
 
 
 class BasePrologCallable(abc.ABC):
@@ -40,6 +41,7 @@ class PrologOperator(BasePrologCallable):
         return self.opening + (self.separator.join(args)) + self.enclosing
 
 
+
 def new_class_init(self, *args):
     self.args = args
 
@@ -71,3 +73,12 @@ def define_prolog_operator(name, operator_separator: str, opening="", enclosing=
         '__eq__': new_class_eq,
     })
 
+
+# =============== Specific Definitions ===============
+
+T = TypeVar("T")
+
+
+class PrologList(Generic[T], define_prolog_operator("PrologList", ",", "[", "]")):
+    def __init__(self, *args: T):
+        super().__init__(*args)
