@@ -12,19 +12,23 @@ from PrologOutputProcessor import PrologOutputProcessor
 
 
 class PrologException(Exception):
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, msg, file_content, *args):
+        msg += "\n\n\n"
+        msg += "================= COMPILED SCRIPT ================= \n"
+        msg += str(file_content)
+        super().__init__(msg, *args)
 
 
 class HzzProlog:
     def __init__(self, script_file_abs_path: str, file_content=None, delete_temp_files=True):
-        self.prolog_script = None
+        self.last_processed_file_content = None
+        self.prolog_script_context = None
         if script_file_abs_path is not None:
             self.main_prolog_script = PrologTemplatePreprocessor(
                 script_file_abs_path, file_content=file_content, delete_temp_files=delete_temp_files
             )
-            self.prolog_script = PrologTemplateProcessingContext(self.main_prolog_script,
-                                                                 delete_temp_files=delete_temp_files)
+            self.prolog_script_context = PrologTemplateProcessingContext(self.main_prolog_script,
+                                                                         delete_temp_files=delete_temp_files)
         self.custom_regex_tokenizer: list[tuple[int, str]] = []
         self.last_stdout = None
 
@@ -40,9 +44,11 @@ class HzzProlog:
 
     def reset(self):
         args = ["swipl", '--quiet']
-        if self.prolog_script is not None:
-            self.prolog_script.reset()
-            script_file_name = self.prolog_script.save_injected_script_to_file()
+        if self.prolog_script_context is not None:
+            self.prolog_script_context.reset()
+            script_file_name = self.prolog_script_context.save_injected_script_to_file()
+            with open(script_file_name, "r") as f:
+                self.last_processed_file_content = f.read()
             args.append(script_file_name)
 
         self.p = subprocess.Popen(
@@ -79,16 +85,18 @@ class HzzProlog:
         return stdout, stderr
 
     def query(self, query, approx_number_of_output=100):
-        stdout, stderr = self.query_raw(query, approx_number_of_output=approx_number_of_output)
-        self.last_stdout = stdout
+        output, err_output = self.query_raw(query, approx_number_of_output=approx_number_of_output)
+        self.last_stdout = output
 
-        if stderr:
-            if self._error_is_because_too_few_semi_colon(stderr):
-                stdout += "BACKTRACK false."
-            elif not self._error_is_because_too_much_semicolon(stderr):
-                raise PrologException(stderr)
+        if err_output:
+            if self._error_is_because_too_few_semi_colon(err_output):
+                output += "BACKTRACK false."
+            elif self._invalid_script_error(err_output):
+                raise PrologException(err_output, self.last_processed_file_content)
+            elif not self._error_is_because_too_much_semicolon(err_output):
+                raise PrologException(err_output, self.last_processed_file_content)
 
-        output_processor = PrologOutputProcessor(stdout, additional_regex=self.custom_regex_tokenizer)
+        output_processor = PrologOutputProcessor(output, additional_regex=self.custom_regex_tokenizer)
         self.remove_start_of_output_mark(output_processor)
         ret = output_processor.process_token()
         return ret
@@ -104,6 +112,9 @@ class HzzProlog:
         cond1 = "Stream user_input" in err_msg
         cond2 = "Syntax error: Unexpected end of file" in err_msg
         return cond1 and cond2
+    def _invalid_script_error(self, err_msg):
+        file_name = self.main_prolog_script.temp_file_name
+        return file_name.lower() in err_msg.lower()
 
 
 class PrologTemplateProcessingContext:
@@ -174,10 +185,13 @@ class PrologTemplatePreprocessor:
         self.created_temp_files = set()
         self.delete_temp_files = delete_temp_files
 
-        self.temp_file_path = None  # see self.reset() at the end of constructor
+        self.temp_file_path = None  # see self.reset() for its initialization
         self.script_file_content = None
         self.reset()
         self.before_preprocessed_script_hash = hash(self.script_file_content)
+
+    def __repr__(self):
+        return f"<<{self.temp_file_path}>>"
 
     @property
     def script_folder_abs_path(self):
