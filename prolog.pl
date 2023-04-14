@@ -1,7 +1,7 @@
 :- [hzztime].
 
 :- dynamic available/2.
-:- dynamic have_time/2.
+:- dynamic have_time/4.
 
 
 

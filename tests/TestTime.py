@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from HzzProlog.ChainEquality import apply_to_defined_variables, ChainedEquality, equality
 from HzzProlog.HzzProlog import HzzProlog
+from HzzProlog.test_util import assert_prolog_output_the_same
 from tests.definitions import available, time, hari, MAIN_PROLOG_FILE_IO, X, Y, Z, time_point, have_time, dont_care
 
 
@@ -22,7 +23,7 @@ class TestTime(TestCase):
             {'X': 6, 'Y': 23, 'Z': 59},
         ]
         assert expected[2]['Y'] == result[1]['Y']
-        self.assertCountEqual(expected, result)
+        assert_prolog_output_the_same(self, expected, result)
 
 
     def test_time__should_return_list_of_endpoints_correctly_from_haveTime(self):
@@ -37,7 +38,7 @@ class TestTime(TestCase):
             {'X': 3, 'Y': 13, 'Z': 30},
             {'X': 3, 'Y': 18, 'Z': 00},
         ]
-        self.assertCountEqual(expected, result)
+        assert_prolog_output_the_same(self, expected, result)
 
 
     def test_time__should_return_list_of_endpoints_correctly_from_all_of_them(self):
@@ -59,5 +60,6 @@ class TestTime(TestCase):
             {'X': 3, 'Y': 13, 'Z': 30},
             {'X': 3, 'Y': 18, 'Z': 00},
         ]
-        self.assertCountEqual(expected, result)
+        assert_prolog_output_the_same(self, expected, result)
+
 
