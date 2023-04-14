@@ -1,4 +1,5 @@
 from HzzProlog.PrologCallable import define_parameterized_predicate, PrologList
+from definitions.functors import booked_slot
 from definitions.operators import datetime, time_point
 
 time = define_parameterized_predicate("time")
@@ -25,6 +26,7 @@ duration = define_parameterized_predicate("duration")
 
 class find_jadwal(define_parameterized_predicate("find_jadwal")):
     def __init__(self,
-                 time_points: PrologList[time_point],
-                 booked_slots: PrologList[range]):
-        pass
+                 time_points: list[time_point],
+                 booked_slots: list[booked_slot],
+                 npm_not_yet_book: list[int]):
+        super.__init__(time_points, booked_slots, npm_not_yet_book)

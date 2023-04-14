@@ -1,7 +1,14 @@
-from HzzProlog.PrologCallable import define_parameterized_predicate
+from HzzProlog.PrologCallable import define_parameterized_functor
 from definitions.operators import time_point
 
 
-class time_range(define_parameterized_predicate("time_range")):
+class time_range(define_parameterized_functor("time_range")):
     def __init__(self, start: time_point, end: time_point):
         super().__init__(start, end)
+
+
+# nuel tara
+class booked_slot(define_parameterized_functor("booked_slot")):
+    def __init__(self, npm: int, range: time_range):
+        super().__init__(npm, range)
+

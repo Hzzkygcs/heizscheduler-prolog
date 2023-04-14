@@ -62,6 +62,20 @@ def define_parameterized_predicate(name):
     })
 
 
+def define_parameterized_functor(name):
+    """
+    Gaada bedanya dengan define_parameterized_predicate.
+    Dibedakan hanya untuk readability
+    :param name: nama dari functor
+    """
+    return type(name, (PrologCallable,), {
+        'name': name,
+        '__init__': new_class_init,
+        '__str__': new_class_repr,
+        '__repr__': new_class_repr,
+        '__eq__': new_class_eq,
+    })
+
 def define_variable(name):
     return PrologCallable(name)
 

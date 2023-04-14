@@ -54,5 +54,3 @@ time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, _:_:
 %  time_conflict(time_range(00:02:30,00:03:30),time_range(00:04:00,00:05:30)). false
 %  time_conflict(time_range(00:02:30,01:01:30),time_range(00:04:00,00:05:30)). true
 
-
-
