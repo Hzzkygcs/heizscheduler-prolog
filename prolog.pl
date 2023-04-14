@@ -1,5 +1,8 @@
 :- [hzztime].
 
+:- dynamic available/2.
+:- dynamic have_time/2.
+
 
 
 % {%begin ignore%}
@@ -24,9 +27,9 @@ have_time(2006462664, 0, 3:13:30, 3:18:00)
 
 all_npm(NPM) :- have_time(NPM, _, _, _).
 
-time(Hari, Jam, Tanggal) :- available(Hari:Jam:Tanggal, _:_:_).
-time(Hari, Jam, Tanggal) :- available(_:_:_, Hari:Jam:Tanggal).
+time(Hari:Jam:Tanggal) :- available(Hari:Jam:Tanggal, _:_:_).
+time(Hari:Jam:Tanggal) :- available(_:_:_, Hari:Jam:Tanggal).
 
-time(Hari, Jam, Tanggal) :- have_time(_NPM, _Is_Preferred, Hari:Jam:Tanggal, _:_:_).
-time(Hari, Jam, Tanggal) :- have_time(_NPM, _Is_Preferred, _:_:_, Hari:Jam:Tanggal).
+time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, Hari:Jam:Tanggal, _:_:_).
+time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, _:_:_, Hari:Jam:Tanggal).
 

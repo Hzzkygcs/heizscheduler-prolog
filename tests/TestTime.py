@@ -7,14 +7,14 @@ from tests.definitions import available, time, hari, MAIN_PROLOG_FILE_IO, X, Y, 
 
 class TestTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO, delete_temp_files=False)
 
     def test_time__should_return_list_of_endpoints_correctly_from_available(self):
         self.prolog.add_facts("available_definitions", [
             available(time_point(0, 1, 2), time_point(3, 4, 5)),
             available(time_point(6, 10, 10), time_point(6, 23, 59)),
         ])
-        result = self.prolog.query(time(X, Y, Z))
+        result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [
             {'X': 0, 'Y': 1, 'Z': 2},
             {'X': 3, 'Y': 4, 'Z': 5},
@@ -30,7 +30,7 @@ class TestTime(TestCase):
             have_time(dont_care, dont_care, time_point(3, 13, 45), time_point(3, 16, 00)),
             have_time(dont_care, dont_care, time_point(3, 13, 30), time_point(3, 18, 00)),
         ])
-        result = self.prolog.query(time(X, Y, Z))
+        result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [
             {'X': 3, 'Y': 13, 'Z': 45},
             {'X': 3, 'Y': 16, 'Z': 00},
@@ -47,7 +47,7 @@ class TestTime(TestCase):
             have_time(dont_care, dont_care, time_point(3, 13, 45), time_point(3, 16, 00)),
             have_time(dont_care, dont_care, time_point(3, 13, 30), time_point(3, 18, 00)),
         ])
-        result = self.prolog.query(time(X, Y, Z))
+        result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [
             {'X': 0, 'Y': 1, 'Z': 2},
             {'X': 3, 'Y': 4, 'Z': 5},
