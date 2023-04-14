@@ -23,11 +23,6 @@ time_in_range = define_parameterized_predicate("time_in_range")
 duration = define_parameterized_predicate("duration")
 
 
-class range(define_parameterized_predicate("range")):
-    def __init__(self, start: time_point, end):
-        super().__init__(start, end)
-
-
 class find_jadwal(define_parameterized_predicate("find_jadwal")):
     def __init__(self,
                  time_points: PrologList[time_point],

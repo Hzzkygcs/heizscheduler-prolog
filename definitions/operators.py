@@ -11,7 +11,7 @@ class datetime(define_prolog_operator('datetime', ":")):
 
 
 @deprecation.deprecated("time range using - operator is deprecated")
-class time_range(define_prolog_operator("time_range", "-")):
+class deprecated_time_range(define_prolog_operator("time_range", "-")):
     def __init__(self, start, end, *args):
         super().__init__(start, end)
 

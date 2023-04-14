@@ -1,4 +1,4 @@
-% Format waktu: range(00:00:00, 06:23:59)
+% Format waktu: time_range(00:00:00, 06:23:59)
 :- op(500, xfy, :).
 
 convert_from_minutes(Minutes, Time) :-
@@ -33,26 +33,26 @@ subtract_time(D:H:M, Minutes, Result) :-
     Sum is InitialMinutes - Minutes,
     convert_from_minutes(Sum, Result).
 
-duration(range(D1:H1:M1, D2:H2:M2), Duration) :-  % In minutes
+duration(time_range(D1:H1:M1, D2:H2:M2), Duration) :-  % In minutes
     convert_to_minutes(D1:H1:M1, Minutes1),
     convert_to_minutes(D2:H2:M2, Minutes2),
     Duration is Minutes1 + Minutes2.
 
-time_conflict(range(LD1:LH1:LM1, RD1:RH1:RM1), range(LD2:LH2:LM2, RD2:RH2:RM2)) :-
-    duration(range(LD1:LH1:LM1, RD1:RH1:RM1), DurationL),
-    duration(range(LD2:LH2:LM2, RD2:RH2:RM2), DurationR),
+time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, RD2:RH2:RM2)) :-
+    duration(time_range(LD1:LH1:LM1, RD1:RH1:RM1), DurationL),
+    duration(time_range(LD2:LH2:LM2, RD2:RH2:RM2), DurationR),
     DurationL < DurationR, !,
-    time_conflict(range(LD2:LH2:LM2, RD2:RH2:RM2), range(LD1:LH1:LM1, RD1:RH1:RM1)).
+    time_conflict(time_range(LD2:LH2:LM2, RD2:RH2:RM2), time_range(LD1:LH1:LM1, RD1:RH1:RM1)).
 
-time_conflict(range(LD1:LH1:LM1, RD1:RH1:RM1), range(LD2:LH2:LM2, _:_:_)) :- % True means conflict
+time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, _:_:_)) :- % True means conflict
     convert_to_minutes(LD1:LH1:LM1, LHS),
     convert_to_minutes(RD1:RH1:RM1, RHS),
     convert_to_minutes(LD2:LH2:LM2, LHSConflict),
     LHS =< LHSConflict, LHSConflict < RHS.
 
-%  time_conflict(range(00:02:30,00:03:30),range(00:02:00,00:05:30)). true
-%  time_conflict(range(00:02:30,00:03:30),range(00:04:00,00:05:30)). false
-%  time_conflict(range(00:02:30,01:01:30),range(00:04:00,00:05:30)). true
+%  time_conflict(time_range(00:02:30,00:03:30),time_range(00:02:00,00:05:30)). true
+%  time_conflict(time_range(00:02:30,00:03:30),time_range(00:04:00,00:05:30)). false
+%  time_conflict(time_range(00:02:30,01:01:30),time_range(00:04:00,00:05:30)). true
 
 
 
