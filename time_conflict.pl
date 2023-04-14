@@ -46,3 +46,5 @@ is_conflict(LH1:LM1-LH2:LM2, RH1:RM1-RH2:RM2) :- % True if left and right time o
 % is_conflict(01:10-02:30, 02:25-03:40). True
 
 % is_conflict(02:10-01:30, 02:25-03:40). True
+
+

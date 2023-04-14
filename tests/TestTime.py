@@ -1,9 +1,12 @@
 from unittest import TestCase
 
-from HzzProlog.ChainEquality import apply_to_defined_variables, ChainedEquality, equality
+from HzzProlog.ChainEquality import equality
 from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.test_util import assert_prolog_output_the_same
-from tests.definitions import available, time, hari, MAIN_PROLOG_FILE_IO, X, Y, Z, time_point, have_time, dont_care
+from definitions.predicates import available, time, have_time
+from definitions.operators import time_point
+from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.variables import X, Y, Z, dont_care
 
 
 class TestTime(TestCase):

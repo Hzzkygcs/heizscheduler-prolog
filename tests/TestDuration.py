@@ -1,7 +1,11 @@
 from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
-from tests.definitions import TIME_CONFLICT_PL_IO, duration, time_range, time_point, X, define_tokenizer_regex
+from definitions.predicates import duration
+from definitions.misc import define_tokenizer_regex
+from definitions.operators import time_range, time_point
+from definitions.paths import TIME_CONFLICT_PL_IO
+from definitions.variables import X
 
 
 class TestDuration(TestCase):
