@@ -19,7 +19,7 @@ class PrologCallable(BasePrologCallable):
         ret += "(" + (", ".join(args)) + ")"
         return ret
 
-    def __str__(self):
+    def __str__(self):  # for zero arity predicates (aka variables)
         return str(self.name)
     def __repr__(self):
         return repr(self.name)
@@ -51,7 +51,7 @@ def new_class_repr(self) -> str:
 def new_class_eq(self, other) -> bool:
     return str(self) == str(other)
 
-def define_prolog_callable(name):
+def define_parameterized_predicate(name):
 
     return type(name, (PrologCallable,), {
         'name': name,
@@ -60,6 +60,10 @@ def define_prolog_callable(name):
         '__repr__': new_class_repr,
         '__eq__': new_class_eq,
     })
+
+
+def define_variable(name):
+    return PrologCallable(name)
 
 
 def define_prolog_operator(name, operator_separator: str, opening="", enclosing=""):

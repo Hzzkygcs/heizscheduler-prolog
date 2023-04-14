@@ -10,8 +10,10 @@ class TestDuration(TestCase):
         self.prolog = define_tokenizer_regex(self.prolog)
 
     def test__should_return_correctly(self):
+        temp1 = time_point(1, 10)
+        temp2 = time_point(2, 20)
         query = duration(
-            time_range(time_point(1, 10), time_point(2, 20)),
+            time_range(temp1, temp2),
             X
         )
         result = self.prolog.query(query)
