@@ -29,4 +29,4 @@ class find_jadwal(define_parameterized_predicate("find_jadwal")):
                  time_points: list[time_point],
                  booked_slots: list[booked_slot],
                  npm_not_yet_book: list[int]):
-        super.__init__(time_points, booked_slots, npm_not_yet_book)
+        super().__init__(time_points, booked_slots, npm_not_yet_book)
