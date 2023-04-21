@@ -394,14 +394,18 @@ class TokenizerIterator(peekable):
             if not multiple_times:
                 return
 
-    def __next__(self):
+    def next(self, include_space=None):
         # if there's no ignored-token, then it's guaranteed that giving 0 index returns 0 index
-        number_of_ignored_tokens = self.__get_nth_index_that_conform_includeSpace_property(0)
+        number_of_ignored_tokens = self.__get_nth_index_that_conform_includeSpace_property(0, include_space=include_space)
         for _ in range(number_of_ignored_tokens):
             super().__next__()
 
         self.prev = super().__next__()
         return self.prev
+
+
+    def __next__(self):
+        return self.next()
 
     def as_list(self):
         ret = []
