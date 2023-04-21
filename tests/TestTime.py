@@ -11,7 +11,7 @@ from definitions.variables import X, Y, Z, dont_care
 
 class TestTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO, delete_temp_files=False)
+        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
 
     def test_time__should_return_list_of_endpoints_correctly_from_available(self):
         self.prolog.add_facts("available_definitions", [

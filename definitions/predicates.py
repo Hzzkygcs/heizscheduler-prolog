@@ -1,5 +1,5 @@
 from HzzProlog.PrologCallable import define_parameterized_predicate, PrologList, Variable
-from definitions.functors import booked_slot
+from definitions.functors import booked_slot, time_range
 from definitions.operators import datetime, time_point
 
 time = define_parameterized_predicate("time")
@@ -19,15 +19,23 @@ class all_npm(define_parameterized_predicate("all_npm")):
         super().__init__(npm)
 
 
-available = define_parameterized_predicate("available")
+class available(define_parameterized_predicate("available")):
+    def __init__(self, start: time_point, end: time_point):
+        super().__init__(start, end)
+
+
 time_in_range = define_parameterized_predicate("time_in_range")
 duration = define_parameterized_predicate("duration")
 
 
 class find_jadwal(define_parameterized_predicate("find_jadwal")):
-    def __init__(self,
-                 time_points: list[time_point], booked_slots: list[booked_slot], npm_not_yet_book: list[int]):
-        super().__init__(time_points, booked_slots, npm_not_yet_book)
+    def __init__(self, duration: int, booking_result: list[booked_slot]):
+        super().__init__(duration, booking_result)
+
+
+class time_conflict(define_parameterized_predicate("time_conflict")):
+    def __init__(self, range1: time_range, range2: time_range):
+        super().__init__(range1, range2)
 
 
 class bruteforce_timeranges(define_parameterized_predicate("bruteforce_timeranges")):

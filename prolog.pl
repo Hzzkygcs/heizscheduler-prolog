@@ -46,9 +46,13 @@ bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
 
 
 
-%find_jadwal :- time find_jadwal(TimePoint).
+%find_jadwal(Duration, Result) :-
+%    find_all(X, all_npm(X), NpmList),
+%    find_jadwal(NpmList, Result).
 %
-%find_jadwal(time_points, booked_slots, npm_not_yet_book).
+%find_jadwal(Duration, [Npm | RemainingNpm], BookedSlots) :-
+%
+%    find_jadwal(Duration, RemainingNpm, BookedSlots).
 
 
 %find_jadwal(_):-
