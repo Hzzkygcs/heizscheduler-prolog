@@ -1,6 +1,9 @@
 % Format waktu: time_range(00:00:00, 06:23:59)
 :- op(500, xfy, :).
 
+convert_from_minutes(Minutes, _) :-
+    Minutes < 0,
+    throw("Menit tidak boleh negatif").
 convert_from_minutes(Minutes, Time) :-
     M is Minutes mod 60,
     Hours is Minutes // 60,
