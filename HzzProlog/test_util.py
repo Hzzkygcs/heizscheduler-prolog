@@ -8,3 +8,11 @@ def assert_prolog_output_the_same(self, expected: list, actual: list, ignore_dup
         raise NotImplementedError()
     self.assertCountEqual(expected, actual)
 
+
+def remove_trailing_false_or_true(value):
+    value = value[:]
+    if len(value) == 0:
+        return value
+    if value[-1] in ('true', 'false'):
+        value.pop()
+    return value

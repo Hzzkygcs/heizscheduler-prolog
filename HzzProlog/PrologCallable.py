@@ -29,6 +29,9 @@ class PrologCallable(BasePrologCallable):
         return str(self) == other
 
 
+Variable = PrologCallable
+
+
 class PrologOperator(BasePrologCallable):
     def __init__(self, operator_separator: str, opening="", enclosing=""):
         self.separator = operator_separator
@@ -77,7 +80,7 @@ def define_parameterized_functor(name):
     })
 
 def define_variable(name):
-    return PrologCallable(name)
+    return Variable(name)
 
 
 def define_prolog_operator(name, operator_separator: str, opening="", enclosing=""):

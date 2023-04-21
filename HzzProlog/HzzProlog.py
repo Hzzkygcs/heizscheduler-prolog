@@ -27,6 +27,7 @@ class HzzProlog:
     def __init__(self, script_file_abs_path: str, file_content=None, delete_temp_files=True):
         self.last_processed_file_content = None
         self.prolog_script_context = None
+        self.main_prolog_script = None
         if script_file_abs_path is not None:
             self.main_prolog_script = PrologTemplatePreprocessor(
                 script_file_abs_path, file_content=file_content, delete_temp_files=delete_temp_files
@@ -96,7 +97,7 @@ class HzzProlog:
         if err_output:
             if self._error_is_because_too_few_semi_colon(err_output):
                 output += "BACKTRACK false."
-            elif self._invalid_script_error(err_output):
+            elif self._is_invalid_script_error(err_output):
                 raise PrologException(err_output, self.last_processed_file_content)
             elif not self._error_is_because_too_much_semicolon(err_output):
                 raise PrologException(err_output, self.last_processed_file_content)
@@ -117,7 +118,9 @@ class HzzProlog:
         cond1 = "Stream user_input" in err_msg
         cond2 = "Syntax error: Unexpected end of file" in err_msg
         return cond1 and cond2
-    def _invalid_script_error(self, err_msg):
+    def _is_invalid_script_error(self, err_msg):
+        if self.main_prolog_script is None:
+            return False
         file_name = self.main_prolog_script.temp_file_name
         return file_name.lower() in err_msg.lower()
 

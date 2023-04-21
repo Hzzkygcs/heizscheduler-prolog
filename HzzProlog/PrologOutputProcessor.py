@@ -5,7 +5,11 @@ from typing import TypeVar
 from more_itertools import peekable
 import enum
 
-import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+import os, sys;
+
+from HzzProlog.PrologCallable import PrologCallable
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from HzzProlog.ChainEquality import ChainedEquality
 
 
@@ -59,6 +63,8 @@ class PrologOutputProcessor:
         token = self.iter_tokens.peek()
         status = TokenType.get_token_status(token)
 
+        if self.__current_token_is_functor():
+            return self.__process_functor()
         if status == TokenType.ATOM:
             assert next(self.iter_tokens) == token
             return token
@@ -70,6 +76,36 @@ class PrologOutputProcessor:
             return self._process_square_bracket()
         if token == '"':
             return self._process_string_atom()
+
+    def __current_token_is_functor(self):
+        token = self.iter_tokens.peek()
+        status = TokenType.get_token_status(token)
+        if status != TokenType.ATOM:
+            return False
+        token = self._peek_index_or_default(1, None)
+        return token == "("
+
+    def __process_functor(self):
+        functor_name = next(self.iter_tokens)
+        args = self.__process_functor_argumens()
+        resulting_functor = PrologCallable(functor_name)
+        return resulting_functor(*args)
+
+    def __process_functor_argumens(self):
+        assert next(self.iter_tokens) == "("
+        if self.iter_tokens.peek() == ")":
+            assert next(self.iter_tokens) == ")"
+            return []
+        args = []
+        while True:
+            arg = self.__process_value()
+            args.append(arg)
+            if self.iter_tokens.peek() == ")":
+                assert next(self.iter_tokens) == ")"
+                break
+            assert next(self.iter_tokens) == ","
+        return args
+
 
     def _process_minus_sign(self):
         prev_token = self.iter_tokens.prev
@@ -86,7 +122,10 @@ class PrologOutputProcessor:
 
         dot = self._peek_index_or_default(0, default=None)
         floating_number = self._peek_index_or_default(1, default=None)
-        if dot == "." and TokenType.get_token_status(floating_number) == TokenType.NUMERIC:
+        if floating_number is None:
+            return int(ret)
+        is_floating = (dot == "." and TokenType.get_token_status(floating_number) == TokenType.NUMERIC)
+        if is_floating:
             next(self.iter_tokens)
             next(self.iter_tokens)
             return float(ret + dot + floating_number)
@@ -129,7 +168,7 @@ class PrologOutputProcessor:
 
     def _peek_index_or_default(self, index, default=None):
         try:
-            return self.iter_tokens[index]
+            return self.iter_tokens.get_index(index)
         except IndexError:
             return default
 
@@ -264,6 +303,7 @@ class TokenType(enum.Enum):
     ATOM = 2
     NUMERIC = 3
     OPERATOR = 4
+    FUNCTOR = 5
 
     @classmethod
     def get_token_status(cls, token: str):
@@ -298,6 +338,8 @@ class NotAvailable:
     pass
 
 
+
+
 class TokenizerIterator(peekable):
     def __init__(self, string, tokenizer_regex: list[tuple[int, str]]=[]):
         self.prev = None
@@ -327,12 +369,24 @@ class TokenizerIterator(peekable):
 
     def __peek(self):
         try:
-            i = 0
-            while not (self.include_space or not super().__getitem__(i).isspace()):
-                i += 1
+            i = self.__get_nth_index_that_conform_includeSpace_property(0)  # peek == get index 0
             return super().__getitem__(i)
         except IndexError:
             raise StopIteration
+
+    def __get_nth_index_that_conform_includeSpace_property(self, index, include_space=None):
+        if include_space is None:
+            include_space = self.include_space
+        if include_space:
+            return index
+        i = 0
+        while True:
+            while super().__getitem__(i).isspace():
+                i += 1
+            if index == 0:
+                return i
+            index -= 1
+            i += 1
 
     def do_next_if_currently_whitespace(self, multiple_times):
         while super().peek().isspace():
@@ -349,8 +403,29 @@ class TokenizerIterator(peekable):
         self.prev = super().__next__()
         return self.prev
 
+    def as_list(self):
+        ret = []
+        i = 0
+        try:
+            while True:
+                ret.append(super().__getitem__(i))
+                i += 1
+        except IndexError:
+            pass
+        return ret
+
     def __repr__(self):
-        return f"Peekable({list(self)})"
+        return f"Peekable({self.as_list()})"
+
+    def get_index(self, index, include_space=None):
+        index = self.__get_nth_index_that_conform_includeSpace_property(index, include_space=include_space)
+        return super().__getitem__(index)
+
+    def get_index_or_default(self, index, default, include_space=None):
+        try:
+            return self.get_index(index, include_space=include_space)
+        except IndexError:
+            return default
 
 
 class Tokenizer:

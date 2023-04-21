@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from HzzProlog.ChainEquality import ChainedEquality
+from HzzProlog.PrologCallable import define_parameterized_functor
 from HzzProlog.PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 
@@ -208,6 +209,55 @@ class TestPrologOutputProcessor(TestCase):
 
     def test_process_value__should_be_able_to_process_custom_tokens_as_long_as_it_is_defined(self):
         custom_token = "\d+:\d+:\d+"
-        result = self.instantiate('[normal, 1:23:45, 7:8:9, 123]', [(0, custom_token)])\
-            .process_value()
+        result = self.instantiate('[normal, 1:23:45, 7:8:9, 123]', [(0, custom_token)]).process_value()
         self.assertEqual(['normal', "1:23:45", '7:8:9', 123], result)
+
+
+funcA = define_parameterized_functor("funcA")
+funcB = define_parameterized_functor("funcB")
+funcC = define_parameterized_functor("funcC")
+
+class TestPrologOutputProcessorFunctors(TestCase):
+    def instantiate(self, string, additional_regex=[]):
+        return PrologOutputProcessor(string, self.end_delimiter, additional_regex)
+    def setUp(self) -> None:
+        self.end_delimiter = "BACKTRACK"
+        self.some_functor = define_parameterized_functor("some_functor")
+
+    def test_process_value__should_be_able_to_process_functor(self):
+        result = self.instantiate('some_functor()').process_value()
+        self.assertEqual(self.some_functor(), result)
+
+    def test_process_value__should_be_able_to_process_functor_in_a_list(self):
+        result = self.instantiate('[some_functor(), some_functor()]').process_value()
+        self.assertEqual([self.some_functor(), self.some_functor()], result)
+
+    def test_process_value__should_be_able_to_process_simple_single_argument_functor(self):
+        result = self.instantiate('some_functor(1)').process_value()
+        self.assertEqual(self.some_functor(1), result)
+
+    def test_process_value__should_be_able_to_process_simple_double_argument_functor(self):
+        result = self.instantiate('some_functor(1, 2)').process_value()
+        self.assertEqual(self.some_functor(1, 2), result)
+
+    def test_process_value__should_be_able_to_process_argument_functor(self):
+        result = self.instantiate('[some_functor(1, 2), some_functor(3, 4)]').process_value()
+        self.assertEqual([self.some_functor(1, 2), self.some_functor(3, 4)], result)
+
+    def test_process_value__should_be_able_to_process_nested_functor(self):
+        result = self.instantiate('funcA(funcB(), funcC())').process_value()
+        expect = funcA(funcB(), funcC())
+        self.assertEqual(expect, result)
+
+    def test_process_value__should_be_able_to_process_multilevel_nested_functor(self):
+        result = self.instantiate('funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))').process_value()
+        expect = funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))
+        self.assertEqual(expect, result)
+
+    def test_process_value__should_be_able_to_process_multilevel_nested_functor_in_an_array(self):
+        query1 = 'funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))'
+        expect1 = funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))
+        query2 = 'funcC(1, 2, funcB(1, 2, funcA(3, 4)), 4, 5)'
+        expect2 = funcC(1, 2, funcB(1, 2, funcA(3, 4)), 4, 5)
+        result = self.instantiate(f'[{query1}, {query2}]').process_value()
+        self.assertEqual([expect1, expect2], result)
