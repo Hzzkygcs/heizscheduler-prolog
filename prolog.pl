@@ -4,7 +4,6 @@
 :- dynamic have_time/4.
 
 
-
 % {%begin ignore%}
 
 available(1:12:10, 1:14:15).
@@ -20,6 +19,7 @@ have_time(2006462664, 1, 3:13:45, 3:16:00).
 have_time(2006462664, 0, 3:13:30, 3:18:00).
 
 % {%end ignore%}
+
 % {{available_definitions}}
 % {{have_time_definitions}}
 
@@ -32,6 +32,12 @@ time(Hari:Jam:Tanggal) :- available(_:_:_, Hari:Jam:Tanggal).
 time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, Hari:Jam:Tanggal, _:_:_).
 time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, _:_:_, Hari:Jam:Tanggal).
 time_all(List) :- findall(X, time(X), List).
+
+%bruteforce_timeranges(Duration, TimeRange) :- time(TimePoint).
+
+%find_jadwal :- time find_jadwal(TimePoint).
+%
+%find_jadwal(time_points, booked_slots, npm_not_yet_book).
 
 
 %find_jadwal(_):-

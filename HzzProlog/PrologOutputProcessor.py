@@ -349,6 +349,9 @@ class TokenizerIterator(peekable):
         self.prev = super().__next__()
         return self.prev
 
+    def __repr__(self):
+        return f"Peekable({list(self)})"
+
 
 class Tokenizer:
     def __init__(self, string):

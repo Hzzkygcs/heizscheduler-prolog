@@ -11,10 +11,10 @@ JAM = 60
 HARI = JAM * 60
 
 
-class TestAddTime(TestCase):
+class TestConvertFromMinutes(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(HZZ_TIME_PL_IO)
-        self.prolog = define_tokenizer_regex(self.prolog)
+        define_tokenizer_regex(self.prolog)
 
     def test__should_convert_minutes_correctly(self):
         query = convert_from_minutes(

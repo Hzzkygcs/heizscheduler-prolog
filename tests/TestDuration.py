@@ -11,7 +11,7 @@ from definitions.variables import X
 class TestDuration(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(TIME_CONFLICT_PL_IO)
-        self.prolog = define_tokenizer_regex(self.prolog)
+        define_tokenizer_regex(self.prolog)
 
     def test__should_return_correctly(self):
         temp1 = time_point(1, 10)
