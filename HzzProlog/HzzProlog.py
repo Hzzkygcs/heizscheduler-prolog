@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess, collections
+import warnings
 from multiprocessing.pool import ThreadPool
 from random import randint
 from typing import IO, Union
@@ -20,6 +21,7 @@ class PrologException(Exception):
         msg += "\n\n\n"
         msg += "================= COMPILED SCRIPT ================= \n"
         msg += str(file_content)
+        msg += "=================================================== \n"
         super().__init__(msg, *args)
 
 
@@ -97,6 +99,7 @@ class HzzProlog:
         if err_output:
             if self._error_is_because_too_few_semi_colon(err_output):
                 output += "BACKTRACK false."
+                warnings.warn("Too few semicolons")
             elif self._is_invalid_script_error(err_output):
                 raise PrologException(err_output, self.last_processed_file_content)
             elif not self._error_is_because_too_much_semicolon(err_output):

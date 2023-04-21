@@ -33,6 +33,11 @@ class find_jadwal(define_parameterized_predicate("find_jadwal")):
         super().__init__(duration, booking_result)
 
 
+class less_than(define_parameterized_predicate("less_than")):
+    def __init__(self, point1: time_point, point2: time_point):
+        super().__init__(point1, point2)
+
+
 class time_conflict(define_parameterized_predicate("time_conflict")):
     def __init__(self, range1: time_range, range2: time_range):
         super().__init__(range1, range2)
