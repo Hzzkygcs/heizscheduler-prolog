@@ -20,7 +20,7 @@ def is_less_than(result):
 
 class LessThanTrue(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO, delete_temp_files=False)
+        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
 
     def test__should_be_true_if_RHS_is_more_than_a_day(self):
         result = self.prolog.query(less_than(

@@ -83,17 +83,20 @@ class HzzProlog:
     def suffix(self, approx_number_of_output):
         return ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
 
-    def query_raw(self, query, approx_number_of_output=1):
+    def query_raw(self, query, approx_number_of_output=1, print_query=False):
         self.reset()
         query = str(query)
         assert not query.endswith("."), "query should NOT be ended with punctuation"
+        if print_query:
+            print(query)
 
         query = self.prefix() + query + self.suffix(approx_number_of_output)
         stdout, stderr = self.p.communicate(input=query)
         return stdout, stderr
 
-    def query(self, query, approx_number_of_output=100):
-        output, err_output = self.query_raw(query, approx_number_of_output=approx_number_of_output)
+    def query(self, query, approx_number_of_output=100, print_query=False):
+        output, err_output = self.query_raw(query, approx_number_of_output=approx_number_of_output,
+                                            print_query=print_query)
         self.last_stdout = output
 
         if err_output:

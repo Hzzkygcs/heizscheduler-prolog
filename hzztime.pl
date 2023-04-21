@@ -46,6 +46,16 @@ less_than(D1:_:_,  D2:_:_) :- D1 < D2, !.
 less_than(D1:H1:_, D2:H2:_) :- D1 == D2, H1 < H2, !.
 less_than(D1:H1:M1, D2:H2:M2) :- D1 == D2, H1 == H2, M1 < M2.
 
+less_than_or_equal(X:Y:Z, X:Y:Z).
+less_than_or_equal(D1:H1:M1, D2:H2:M2) :- less_than(D1:H1:M1, D2:H2:M2).
+
+
+time_conflict(time_range(Start1, End1), time_range(Start2, End2)) :-
+    \+((
+      less_than_or_equal(End1, Start2) ;  less_than_or_equal(End2, Start1)
+    )).
+
+
 
 
 %time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, RD2:RH2:RM2)) :-
