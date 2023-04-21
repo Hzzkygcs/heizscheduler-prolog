@@ -149,17 +149,14 @@ class PrologOutputProcessor:
         temp = next(self.iter_tokens)
         assert temp == '"', "char is not a double quotes"  # opening quote
 
-        self.iter_tokens.set_include_space(True)
-
         items = []
         while True:
-            token = next(self.iter_tokens)
+            token = self.iter_tokens.next(include_space=True)
             if token == "\\":
-                escaped = next(self.iter_tokens)  # harusnya ada jika bukan syntax error
+                escaped = self.iter_tokens.next(include_space=True)  # harusnya ada jika bukan syntax error
                 items.append(self._string_unescape(token + escaped))
                 continue
             if token == '"':
-                self.iter_tokens.set_include_space(False)
                 return "".join(items)
             items.append(token)
 
