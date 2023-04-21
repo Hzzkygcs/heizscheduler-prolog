@@ -345,10 +345,6 @@ class TokenizerIterator(peekable):
             tokenizer.add_new_regex(priority, pattern)
         tokenized = tokenizer.tokenize()
         super().__init__(tokenized)
-        self.include_space = False
-
-    def set_include_space(self, value):
-        self.include_space = value
 
     def peek(self, default=NotAvailable()):
         if isinstance(default, NotAvailable):
@@ -373,7 +369,7 @@ class TokenizerIterator(peekable):
 
     def __get_nth_index_that_conform_includeSpace_property(self, index, include_space=None):
         if include_space is None:
-            include_space = self.include_space
+            include_space = False
         if include_space:
             return index
         i = 0
