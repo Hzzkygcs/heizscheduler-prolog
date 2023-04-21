@@ -14,7 +14,7 @@ from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_d
 HOUR = 60
 DAY = 24*HOUR
 
-class TestConvertFromMinutes(TestCase):
+class TestBruteForceTimeranges(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
         define_tokenizer_regex(self.prolog)
