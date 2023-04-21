@@ -395,11 +395,11 @@ class TokenizerIterator(peekable):
                 return
 
     def __next__(self):
-        while True:
-            peek: str = super().peek()
-            if self.include_space or not peek.isspace():
-                break
+        # if there's no ignored-token, then it's guaranteed that giving 0 index returns 0 index
+        number_of_ignored_tokens = self.__get_nth_index_that_conform_includeSpace_property(0)
+        for _ in range(number_of_ignored_tokens):
             super().__next__()
+
         self.prev = super().__next__()
         return self.prev
 
