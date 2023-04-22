@@ -45,19 +45,22 @@ bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
 
 
 list_of_timeranges_inside_booked_slot([], []).
-list_of_timeranges_inside_booked_slot(
-    [booked_slot(_, _, Result) | ListOfBookedSlots], [Result | ListOfResultingTimeranges]
-) :-
+list_of_timeranges_inside_booked_slot([booked_slot(_, _, Result) | ListOfBookedSlots], [Result | ListOfResultingTimeranges]) :-
     list_of_timeranges_inside_booked_slot(ListOfBookedSlots, ListOfResultingTimeranges).
+
+
 
 
 %find_jadwal(Duration, Result) :-
 %    find_all(X, all_npm(X), NpmList),
 %    find_jadwal(Duration, NpmList, Result).
 %
-%find_jadwal(Duration, [Npm | RemainingNpm], BookedSlots) :-
+%find_jadwal(_, [], []).
+%find_jadwal(Duration, [Npm | RemainingNpm], [NewBookedSlot | BookedSlots]) :-
 %    bruteforce_timeranges(Duration, TimeRange),
-%    \+time_conflict_list(TimeRange, ),
+%    list_of_timeranges_inside_booked_slot(BookedSlots, ListOfTimeRanges),
+%    \+time_conflict_list(TimeRange, ListOfTimeRanges),
+%    NewBookedSlot = booked_slot(),
 %    find_jadwal(Duration, RemainingNpm, BookedSlots).
 
 

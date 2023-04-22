@@ -38,6 +38,11 @@ class less_than(define_parameterized_predicate("less_than")):
         super().__init__(point1, point2)
 
 
+class inside_another_timerange(define_parameterized_predicate("inside_another_timerange")):
+    def __init__(self, smaller_timerange: time_range, bigger_timerange: time_range):
+        super().__init__(smaller_timerange, bigger_timerange)
+
+
 class time_conflict(define_parameterized_predicate("time_conflict")):
     def __init__(self, range1: time_range, range2: time_range):
         super().__init__(range1, range2)
