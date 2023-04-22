@@ -1,13 +1,10 @@
 from unittest import TestCase
 
-from HzzProlog.ChainEquality import equality
 from HzzProlog.HzzProlog import HzzProlog
-from HzzProlog.test_util import assert_prolog_output_the_same
 from definitions.functors import time_range
-from definitions.predicates import available, time, have_time, time_conflict
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO, HZZ_TIME_PL_IO
-from definitions.variables import X, Y, Z, dont_care
+from definitions.paths import HZZ_TIME_PL_IO
+from definitions.predicates import time_conflict
 
 
 def is_conflict(result):
@@ -26,7 +23,7 @@ class TestTimeConflict(TestCase):
         result = self.prolog.query(time_conflict(
             time_range(time_point(0, 0, 0), time_point(1, 0, 0)),
             time_range(time_point(1, 0, 0), time_point(2, 0, 0)),
-        ), print_query=True)
+        ))
         self.assertFalse(is_conflict(result))
 
     def test__should_be_false_if_they_do_not_intersect(self):
