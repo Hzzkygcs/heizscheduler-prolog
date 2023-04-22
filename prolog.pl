@@ -58,11 +58,11 @@ list_of_timeranges_inside_booked_slot(
 
 
 
-% Result will be unique todo
 find_jadwal(Duration, Result) :-
     setof(X, all_npm(X), NpmList),
-    find_jadwal(Duration, NpmList, [], ResultNonUnique),
-    sort(ResultNonUnique, Result).
+    unique_call(
+        TemporaryResult, find_jadwal(Duration, NpmList, [], TemporaryResult), Result
+    ).
 
 
 find_jadwal(_, [], FinalBookedSlots, FinalBookedSlots).

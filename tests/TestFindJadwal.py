@@ -1,22 +1,26 @@
 from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
-from HzzProlog.test_util import remove_trailing_false_or_true
-from definitions.functors import time_range
+from HzzProlog.test_util import remove_trailing_false_or_true, assert_prolog_output_the_same
+from definitions.functors import time_range, booked_slot
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
 from definitions.paths import MAIN_PROLOG_FILE_IO
 from definitions.predicates import available, have_time, find_jadwal
 from definitions.variables import Result, dont_care
+from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
 
 HOUR = 60
 DAY = 24*HOUR
 
 NPM_FIRST = 1000
 NPM_SECOND = 2000
+NPM_THIRD = 3000
 
+PREFERRED = 1
+NOT_PREFERRED = 0
 
-class TestFindJadwal(TestCase):    # TODO
+class TestFindJadwal(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
         define_tokenizer_regex(self.prolog)
@@ -87,22 +91,115 @@ class TestFindJadwal(TestCase):    # TODO
         self.assertEqual([], result)
 
     def test__should_return_correctly_if_there_is_one_valid_option(self):
-        return # TODO
         duration = 10
         self.prolog.add_facts('testing_definitions', [
             available(time_range(
                 time_point(1, 0, 0),
                 time_point(1, 1, 0),
             )),
-            have_time(NPM_FIRST, 1,
-                      time_range(
-                          time_point(1, 0, 50), time_point(2, 0, 0)
-                      )),
+            have_time(NPM_FIRST, PREFERRED,
+                      time_range(time_point(1, 0, 50), time_point(2, 0, 0))),
         ])
 
         result = self.prolog.query(find_jadwal(duration, Result))
         result = remove_trailing_false_or_true(result)
-        self.assertEqual([], result)
+        assert len(result) == 1
+        result = result[0]['Result']
+        self.assertEqual([booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 50), time_point(1, 1, 0)))],
+                         result)
 
+    def test__should_return_all_valid_possibility__but_remember_dont_bruteforce_minute_by_minute(self):
+        duration = 5
+        self.prolog.add_facts('testing_definitions', [
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 1, 0),
+            )),
+            have_time(NPM_FIRST, PREFERRED,
+                      time_range(time_point(1, 0, 30), time_point(2, 0, 0))),
+            have_time(NPM_FIRST, NOT_PREFERRED,
+                      time_range(time_point(1, 0, 55), time_point(2, 0, 0))),
+        ])
+
+        result = self.prolog.query(find_jadwal(duration, Result))
+        result = remove_trailing_false_or_true(result)
+        result = get_list_from_list_of_dicts(result, 'Result')
+        self.assertCountEqual([[
+                booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 30), time_point(1, 0, 35)))
+            ], [
+                booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 50), time_point(1, 0, 55)))
+            ], [
+                booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+            ], [
+                booked_slot(NPM_FIRST, NOT_PREFERRED, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+            ],
+        ], result)
+
+    def test__should_consider_all_npm(self):
+        duration = 5
+        self.prolog.add_facts('testing_definitions', [
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 1, 0),
+            )),
+            have_time(NPM_FIRST, PREFERRED,
+                      time_range(time_point(1, 0, 30), time_point(2, 0, 0))),
+            have_time(NPM_FIRST, NOT_PREFERRED,
+                      time_range(time_point(1, 0, 30), time_point(2, 0, 0))),
+            have_time(NPM_SECOND, NOT_PREFERRED,
+                      time_range(time_point(1, 0, 55), time_point(2, 0, 0))),
+        ])
+        expected_second_npm_booked_slot = booked_slot(NPM_SECOND, NOT_PREFERRED,
+                                                      time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+
+        result = self.prolog.query(find_jadwal(duration, Result))
+        result = remove_trailing_false_or_true(result)
+        result = get_list_from_list_of_dicts(result, 'Result')
+        assert_prolog_output_the_same(self, [
+            [
+                booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 30), time_point(1, 0, 35))),
+                expected_second_npm_booked_slot,
+            ], [
+                booked_slot(NPM_FIRST, NOT_PREFERRED, time_range(time_point(1, 0, 30), time_point(1, 0, 35))),
+                expected_second_npm_booked_slot,
+            ], [
+                booked_slot(NPM_FIRST, PREFERRED, time_range(time_point(1, 0, 50), time_point(1, 0, 55))),
+                expected_second_npm_booked_slot,
+            ], [
+                booked_slot(NPM_FIRST, NOT_PREFERRED, time_range(time_point(1, 0, 50), time_point(1, 0, 55))),
+                expected_second_npm_booked_slot,
+            ],
+        ], result, ignore_duplicates=True, nested_ignore=True)
+
+
+    def test__should_consider_all_npm__three_npm(self):
+        duration = 5
+        self.prolog.add_facts('testing_definitions', [
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 1, 0),
+            )),
+
+            # this should be possible. An example of the arrangement:
+            # NPM1: 45-50. NPM2: 50-55. NPM3: 55-1:00
+            have_time(NPM_FIRST, dont_care,
+                      time_range(time_point(1, 0, 45), time_point(2, 0, 0))),
+            have_time(NPM_SECOND, dont_care,
+                      time_range(time_point(1, 0, 45), time_point(2, 0, 0))),
+            have_time(NPM_THIRD, dont_care,
+                      time_range(time_point(1, 0, 45), time_point(2, 0, 0))),
+        ])
+        result = self.prolog.query(find_jadwal(duration, Result))
+        result = remove_trailing_false_or_true(result)
+        result = get_list_from_list_of_dicts(result, 'Result')
+        self.assertEqual([
+            [
+                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 30), time_point(1, 0, 35))),
+            ], [
+                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+            ], [
+                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+            ],
+        ], result)
 
 
