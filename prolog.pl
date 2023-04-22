@@ -44,7 +44,9 @@ bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
     add_time(EndTime, NegativeDuration, StartTime).
 
 % in: Npm, TimeRange. Out: IsPreferred
-%check_if_they_have_time(Npm, TimeRange, IsPreferred) :- true.
+check_if_they_have_time(Npm, TimeRange, IsPreferred) :-
+    have_time(Npm, IsPreferred, TheirAvailabilityTimeRange),
+    inside_another_timerange(TimeRange, TheirAvailabilityTimeRange).
 
 
 list_of_timeranges_inside_booked_slot([], []).
