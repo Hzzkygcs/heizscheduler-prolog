@@ -66,3 +66,8 @@ class bruteforce_timeranges(define_parameterized_predicate("bruteforce_timerange
 class list_of_timeranges_inside_booked_slot(define_parameterized_predicate("list_of_timeranges_inside_booked_slot")):
     def __init__(self, list_of_booked_slots: list[booked_slot], list_of_resulting_timeranges: list[time_range]):
         super().__init__(list_of_booked_slots, list_of_resulting_timeranges)
+
+
+class unique_call(define_parameterized_predicate("unique_call")):
+    def __init__(self, template, goal, bag):
+        super().__init__(template, goal, bag)

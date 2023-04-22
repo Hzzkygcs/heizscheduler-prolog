@@ -1,13 +1,13 @@
+import enum
+import os
 import re
 import string
-from typing import TypeVar
+import sys
+from typing import TypeVar, Callable
 
 from more_itertools import peekable
-import enum
 
-import os, sys;
-
-from HzzProlog.PrologCallable import PrologCallable
+from HzzProlog.PrologCallable import PrologCallable, Variable
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from HzzProlog.ChainEquality import ChainedEquality
@@ -32,8 +32,16 @@ class BinOp:  # operator that takes two operands (binary operator)
         )
 
 
+
+class Default:
+    pass
+
+
 class PrologOutputProcessor:
-    def __init__(self, string, splitter_token="BACKTRACK", additional_regex: list[tuple[int,str]]=[]):
+    def __init__(self, string, splitter_token="BACKTRACK",
+                 additional_regex: list[tuple[int,str,Callable]] = Default):
+        if additional_regex == Default:
+            additional_regex = []
         self.string = string
         self.iter_tokens = TokenizerIterator(string, tokenizer_regex=additional_regex)
         self.prev_value = None
@@ -68,6 +76,9 @@ class PrologOutputProcessor:
         if status == TokenType.ATOM:
             assert next(self.iter_tokens) == token
             return token
+        if status == TokenType.VARIABLE:
+            assert next(self.iter_tokens) == token
+            return Variable(token)
         if token == "-":
             return self._process_minus_sign()
         if status == TokenType.NUMERIC:
@@ -338,12 +349,14 @@ class NotAvailable:
 
 
 class TokenizerIterator(peekable):
-    def __init__(self, string, tokenizer_regex: list[tuple[int, str]]=[]):
+    def __init__(self, string, tokenizer_regex: list[tuple[int, str, Callable]] = Default):
+        if tokenizer_regex == Default:
+            tokenizer_regex = []
         self.prev = None
         tokenizer = Tokenizer(string)
-        for priority, pattern in tokenizer_regex:
-            tokenizer.add_new_regex(priority, pattern)
-        tokenized = tokenizer.tokenize()
+        for priority, pattern, mapping in tokenizer_regex:
+            tokenizer.add_new_regex(priority, pattern, mapping)
+        tokenized = tokenizer.tokenize
         super().__init__(tokenized)
 
     def peek(self, default=NotAvailable()):
@@ -425,34 +438,41 @@ class TokenizerIterator(peekable):
             return default
 
 
+do_nothing = lambda x: x
+
 class Tokenizer:
     def __init__(self, string):
         self.string = string
         self.curr_token = ""  # currently being-built token
         self.prev_char_type = CharType.UNDERSCORE_ALPHA_NUMERIC
         self.regex_tokenizer = [  # (priority_rank, regex_pattern). From lower to higher
-            (200, "[a-zA-Z0-9_]+"),
-            (400, "\\s+"),
-            (600, "."),
+            (200, "[a-zA-Z0-9_]+", do_nothing),
+            (400, "\\s+", do_nothing),
+            (600, ".", do_nothing),
         ]
 
-    def add_new_regex(self, priority_rank, regex):
-        self.regex_tokenizer.append((priority_rank, regex))
+    def add_new_regex(self, priority_rank, regex, mapping=do_nothing):
+        self.regex_tokenizer.append((priority_rank, regex, mapping))
         self.regex_tokenizer.sort(key=lambda x: x[0])
 
+    @property
     def tokenize(self):
         ret = []
         while len(self.string) > 0:
-            for _, pattern in self.regex_tokenizer:
+            final_mapping = lambda x: x
+            for _, pattern, mapping in self.regex_tokenizer:
                 match_result = re.match(pattern, self.string)
                 if match_result is not None:
+                    final_mapping = mapping
                     break
+
             matched_str = self.string[0]
             if match_result is not None:
                 matched_str = match_result[0]
+
             matched_str_length = len(matched_str)
             assert len(matched_str) == match_result.span()[1]
             self.string = self.string[matched_str_length:]
-            ret.append(matched_str)
+            ret.append(final_mapping(matched_str))
         return ret
 

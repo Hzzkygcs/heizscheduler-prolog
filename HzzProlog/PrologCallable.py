@@ -1,10 +1,32 @@
 import abc
-import typing
 from typing import Any, TypeVar, Generic
 
 
 class BasePrologCallable(abc.ABC):
     pass
+
+
+class Processed:
+    def __init__(self, value: str):
+        self.string = value
+    def __str__(self):
+        return str(self.string)
+    def __repr__(self):
+        return str(self.string)
+    def __contains__(self, item):
+        return item in self.string
+
+    # methods to imitate/delegate the str object
+    def __eq__(self, other):
+        return str(self) == str(other)
+    def __getitem__(self, i):
+        return self.string.__getitem__(i)
+    def __iter__(self):
+        return iter(self.string)
+    def __len__(self):
+        return len(self.string)
+    def __getattr__(self, name):
+        return getattr(self.string, name)
 
 
 class PrologCallable(BasePrologCallable):
@@ -14,15 +36,15 @@ class PrologCallable(BasePrologCallable):
     def __call__(self, *args: Any):
         ret = f"{self.name}"
         if len(args) == 0:
-            return ret
-        args = map(str, args)
+            return Processed(ret)
+        args = map(stringify, args)
         ret += "(" + (", ".join(args)) + ")"
-        return ret
+        return Processed(ret)
 
     def __str__(self):  # for zero arity predicates (aka variables)
         return str(self.name)
     def __repr__(self):
-        return repr(self.name)
+        return str(self.name)
     def __hash__(self):
         return hash(str(self))
     def __eq__(self, other):
@@ -40,16 +62,31 @@ class PrologOperator(BasePrologCallable):
 
     def __call__(self, *args: list[str]):
         assert len(args) > 0
-        args = map(str, args)
-        return self.opening + (self.separator.join(args)) + self.enclosing
+        args = map(stringify, args)
+        return Processed(self.opening + (self.separator.join(args)) + self.enclosing)
 
+
+
+def stringify(value):
+    if isinstance(value, (BasePrologCallable, Processed)):
+        return repr(value)
+    if isinstance(value, (int, str, float)):
+        return repr(value)
+    if isinstance(value, (list, tuple)):
+        value = list(map(stringify, value))
+        value = ", ".join(value)
+        return f"[{value}]"
+    raise NotImplementedError
 
 
 def new_class_init(self, *args):
     self.args = args
 
 def new_class_repr(self) -> str:
-    return self.__call__(*self.args)
+    ret = self.__call__(*self.args)
+    if isinstance(ret, Processed):
+        ret = repr(ret)
+    return ret
 
 def new_class_eq(self, other) -> bool:
     return str(self) == str(other)

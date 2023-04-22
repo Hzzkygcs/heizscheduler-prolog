@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+import collections
 import os
 import re
-import subprocess, collections
+import subprocess
+import sys
 import warnings
 from multiprocessing.pool import ThreadPool
 from random import randint
-from typing import IO, Union
-
-import os, sys;
+from typing import Union, Callable
 
 from HzzProlog.PrologCallable import BasePrologCallable
 
@@ -36,11 +36,11 @@ class HzzProlog:
             )
             self.prolog_script_context = PrologTemplateProcessingContext(self.main_prolog_script,
                                                                          delete_temp_files=delete_temp_files)
-        self.custom_regex_tokenizer: list[tuple[int, str]] = []
+        self.custom_regex_tokenizer: list[tuple[int, str, Callable]] = []
         self.last_stdout = None
 
-    def add_new_regex(self, priority_rank, regex):
-        self.custom_regex_tokenizer.append((priority_rank, regex))
+    def add_new_regex(self, priority_rank, regex, mapping=lambda x: x):
+        self.custom_regex_tokenizer.append((priority_rank, regex, mapping))
         self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[Union[str, BasePrologCallable]]):

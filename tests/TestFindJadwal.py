@@ -12,6 +12,9 @@ from definitions.variables import Result, dont_care
 HOUR = 60
 DAY = 24*HOUR
 
+NPM_FIRST = 1000
+NPM_SECOND = 2000
+
 
 class TestFindJadwal(TestCase):    # TODO
     def setUp(self) -> None:
@@ -37,10 +40,10 @@ class TestFindJadwal(TestCase):    # TODO
 
     def test__should_return_empty_when_the_only_fact_provided_is_have_time(self):
         self.prolog.add_facts('testing_definitions', [
-            have_time(dont_care, dont_care,
+            have_time(NPM_FIRST, dont_care,
                       time_range(
-                          time_point(dont_care, dont_care, dont_care),
-                          time_point(dont_care, dont_care, dont_care),
+                          time_point(0, 0, 0),
+                          time_point(1, 1, 1),
                       )),
         ])
         result = self.prolog.query(find_jadwal(10, Result))
@@ -79,6 +82,24 @@ class TestFindJadwal(TestCase):    # TODO
                           time_point(2, 0, 0),
                       )),
         ])
+        result = self.prolog.query(find_jadwal(duration, Result))
+        result = remove_trailing_false_or_true(result)
+        self.assertEqual([], result)
+
+    def test__should_return_correctly_if_there_is_one_valid_option(self):
+        return # TODO
+        duration = 10
+        self.prolog.add_facts('testing_definitions', [
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 1, 0),
+            )),
+            have_time(NPM_FIRST, 1,
+                      time_range(
+                          time_point(1, 0, 50), time_point(2, 0, 0)
+                      )),
+        ])
+
         result = self.prolog.query(find_jadwal(duration, Result))
         result = remove_trailing_false_or_true(result)
         self.assertEqual([], result)

@@ -64,6 +64,10 @@ time_conflict_list(TimeRange1, [_TimeRange2 | ListOfTimeRange]) :- time_conflict
 inside_another_timerange(time_range(ChildStart, ChildEnd), time_range(ParentStart, ParentEnd)) :-
     less_than_or_equal(ParentStart, ChildStart), less_than_or_equal(ChildEnd, ParentEnd).
 
+unique_call(Template, Goal, Bag) :-
+    findall(Template, Goal, Result),
+    sort(Result, ResultDuplicationRemoved),
+    member(Bag, ResultDuplicationRemoved).
 
 
 %time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, RD2:RH2:RM2)) :-

@@ -1,12 +1,15 @@
+from typing import Callable
 from unittest import TestCase
 
 from HzzProlog.ChainEquality import ChainedEquality
-from HzzProlog.PrologCallable import define_parameterized_functor
+from HzzProlog.PrologCallable import define_parameterized_functor, Processed
 from HzzProlog.PrologOutputProcessor import PrologOutputProcessor, BinOp
 
 
 class TestPrologOutputProcessor(TestCase):
-    def instantiate(self, string, additional_regex=[]):
+    def instantiate(self, string, additional_regex: list[tuple[int, str, Callable]]=None):
+        if additional_regex is None:
+            additional_regex = []
         return PrologOutputProcessor(string, self.end_delimiter, additional_regex)
 
     def setUp(self) -> None:
@@ -207,10 +210,35 @@ class TestPrologOutputProcessor(TestCase):
         result = instance.process_value()
         self.assertEqual([[[1], 2], [3, 4, "abc def"], [], [[[5], 6, 7], 8], [[[[[]]]]]], result)
 
+
+class TestPrologOutputProcessorCustomTokens(TestCase):
+    def instantiate(self, string, additional_regex: list[tuple[int, str, Callable]]=None):
+        if additional_regex is None:
+            additional_regex = []
+        return PrologOutputProcessor(string, self.end_delimiter, additional_regex)
+
+    def setUp(self) -> None:
+        self.end_delimiter = "BACKTRACK"
+        self.example_query_raw = '[normal, 1:23:45, 7:8:9, 123]'
+
     def test_process_value__should_be_able_to_process_custom_tokens_as_long_as_it_is_defined(self):
         custom_token = "\d+:\d+:\d+"
-        result = self.instantiate('[normal, 1:23:45, 7:8:9, 123]', [(0, custom_token)]).process_value()
+        result = self.instantiate(self.example_query_raw, [(0, custom_token, lambda x: x)]).process_value()
         self.assertEqual(['normal', "1:23:45", '7:8:9', 123], result)
+
+    def test_process_value__should_be_able_to_process_custom_tokens_with_its_own_mapping(self):
+        custom_token = "\\d+:\\d+:\\d+"
+        custom_token_regex = [(0, custom_token, lambda x: "TEST")]
+        result = self.instantiate(self.example_query_raw, custom_token_regex).process_value()
+        self.assertEqual(['normal', "TEST", 'TEST', 123], result)
+
+    def test_process_value__should_be_able_to_process_custom_tokens_with_its_own_mapping__allow_Processed(self):
+        custom_token = "\\d+:\\d+:\\d+"
+        custom_token_regex = [(0, custom_token, lambda x: Processed(x))]
+        result = self.instantiate(self.example_query_raw, custom_token_regex).process_value()
+        self.assertIsInstance(result[1], Processed)
+        self.assertIsInstance(result[2], Processed)
+        self.assertEqual(['normal', Processed("1:23:45"), Processed('7:8:9'), 123], result)
 
 
 funcA = define_parameterized_functor("funcA")
@@ -249,10 +277,31 @@ class TestPrologOutputProcessorFunctors(TestCase):
         expect = funcA(funcB(), funcC())
         self.assertEqual(expect, result)
 
+    def test_process_value__should_not_contain_quote(self):
+        result1 = funcA(funcB(), funcC())
+        result1 = str(result1)
+        self.assertNotIn("'", result1)
+        self.assertNotIn('"', result1)
+
+        result2 = self.instantiate('funcA(funcB(), funcC())').process_value()
+        result2 = str(result2)
+        self.assertNotIn("'", result2)
+        self.assertNotIn('"', result2)
+
     def test_process_value__should_be_able_to_process_multilevel_nested_functor(self):
         result = self.instantiate('funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))').process_value()
         expect = funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))
         self.assertEqual(expect, result)
+
+    def test_process_value__should_be_able_to_process_atom_with_spaces(self):
+        result = self.instantiate('funcA(funcB(funcA(1, 2, "abc def ghi"), 4), funcC(3, 4))').process_value()
+        expect = funcA(funcB(funcA(1, 2, "abc def ghi"), 4), funcC(3, 4))
+        self.assertEqual(expect, result)
+
+    def test_process_value__atom_with_spaces__should_result_in_apostrophe(self):
+        result = self.instantiate('funcA(funcB(funcA(1, 2, "abc def ghi"), 4), funcC(3, 4))').process_value()
+        self.assertIn("'", result)
+
 
     def test_process_value__should_be_able_to_process_multilevel_nested_functor_in_an_array(self):
         query1 = 'funcA(funcB(funcA(1, 2, "abc"), 4), funcC(3, 4))'

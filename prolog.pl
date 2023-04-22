@@ -6,17 +6,17 @@
 
 % {%begin ignore%}
 
-%available(time_range(1:12:10, 1:14:15)).
-%available(time_range(2:12:10, 2:14:15)).
-%available(time_range(3:12:10, 3:14:15)).
-%
-%have_time(2006463162, 1, time_range(1:10:10, 1:15:10)).
-%have_time(2006463162, 1, time_range(3:13:45, 3:16:00)).
-%have_time(2006463162, 0, time_range(3:13:30, 3:18:00)).
-%
-%have_time(2006462664, 0, time_range(1:14:30, 1:17:10)).
-%have_time(2006462664, 1, time_range(3:13:45, 3:16:00)).
-%have_time(2006462664, 0, time_range(3:13:30, 3:18:00)).
+available(time_range(1:12:10, 1:14:15)).
+available(time_range(2:12:10, 2:14:15)).
+available(time_range(3:12:10, 3:14:15)).
+
+have_time(2006463162, 1, time_range(1:10:10, 1:15:10)).
+have_time(2006463162, 1, time_range(3:13:45, 3:16:00)).
+have_time(2006463162, 0, time_range(3:13:30, 3:18:00)).
+
+have_time(2006462664, 0, time_range(1:14:30, 1:17:10)).
+have_time(2006462664, 1, time_range(3:13:45, 3:16:00)).
+have_time(2006462664, 0, time_range(3:13:30, 3:18:00)).
 
 % {%end ignore%}
 
@@ -50,23 +50,33 @@ check_if_they_have_time(Npm, TimeRange, IsPreferred) :-
 
 
 list_of_timeranges_inside_booked_slot([], []).
-list_of_timeranges_inside_booked_slot([booked_slot(_, _, Result) | ListOfBookedSlots], [Result | ListOfResultingTimeranges]) :-
+list_of_timeranges_inside_booked_slot(
+        [booked_slot(_, _, Result) | ListOfBookedSlots],
+        [Result | ListOfResultingTimeranges]
+    ) :-
     list_of_timeranges_inside_booked_slot(ListOfBookedSlots, ListOfResultingTimeranges).
 
 
 
+% Result will be unique todo
+find_jadwal(Duration, Result) :-
+    setof(X, all_npm(X), NpmList),
+    find_jadwal(Duration, NpmList, [], ResultNonUnique),
+    sort(ResultNonUnique, Result).
 
-%find_jadwal(Duration, Result) :-
-%    find_all(X, all_npm(X), NpmList),
-%    find_jadwal(Duration, NpmList, Result).
-%
-%find_jadwal(_, [], []).
-%find_jadwal(Duration, [Npm | RemainingNpm], [NewBookedSlot | BookedSlots]) :-
-%    bruteforce_timeranges(Duration, TimeRange),
-%    list_of_timeranges_inside_booked_slot(BookedSlots, ListOfTimeRanges),
-%    \+time_conflict_list(TimeRange, ListOfTimeRanges),
-%    NewBookedSlot = booked_slot(),
-%    find_jadwal(Duration, RemainingNpm, BookedSlots).
+
+find_jadwal(_, [], FinalBookedSlots, FinalBookedSlots).
+find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, FinalBookedSlots) :-
+    bruteforce_timeranges(Duration, TimeRange),
+    list_of_timeranges_inside_booked_slot(CurrentBookedSlots, ListOfTimeRanges),
+    \+time_conflict_list(TimeRange, ListOfTimeRanges),
+
+    available(AsdosAvailability),
+    inside_another_timerange(TimeRange, AsdosAvailability),
+    check_if_they_have_time(Npm, TimeRange, IsPreferred),
+
+    NewBookedSlot = booked_slot(Npm, IsPreferred, TimeRange),
+    find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], FinalBookedSlots).
 
 
 %find_jadwal(_):-
