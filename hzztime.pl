@@ -73,6 +73,16 @@ unique_call(Template, Goal, Bag) :-
     member(Bag, ResultDuplicationRemoved).
 
 
+list_of_timeranges_to_list_of_timepoints(ListOfTimerange, ResultingListOfTimepoint) :-
+    findall(
+        X,
+        (
+            member(time_range(Start, End), ListOfTimerange),
+            (X=Start ; X=End)
+        ), ResultingListOfTimepoint
+    ).
+
+
 %time_conflict(time_range(LD1:LH1:LM1, RD1:RH1:RM1), time_range(LD2:LH2:LM2, RD2:RH2:RM2)) :-
 %    duration(time_range(LD1:LH1:LM1, RD1:RH1:RM1), DurationL),
 %    duration(time_range(LD2:LH2:LM2, RD2:RH2:RM2), DurationR),

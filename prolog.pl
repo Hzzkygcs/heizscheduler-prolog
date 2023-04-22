@@ -35,13 +35,11 @@ time(Hari:Jam:Tanggal) :- have_time(_NPM, _IsPreferred, time_range(_:_:_, Hari:J
 time_all(List) :- findall(X, time(X), List).
 
 
-bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
-    time(StartTime),
-    add_time(StartTime, Duration, EndTime).
-bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
-    time(EndTime),
+bruteforce_timerange(Duration, BaseTimePoint, time_range(BaseTimePoint, EndTime)) :-
+    add_time(BaseTimePoint, Duration, EndTime).
+bruteforce_timerange(Duration, BaseTimePoint, time_range(StartTime, BaseTimePoint)) :-
     NegativeDuration is -Duration,
-    add_time(EndTime, NegativeDuration, StartTime).
+    add_time(BaseTimePoint, NegativeDuration, StartTime).
 
 % in: Npm, TimeRange. Out: IsPreferred
 check_if_they_have_time(Npm, TimeRange, IsPreferred) :-
@@ -60,15 +58,19 @@ list_of_timeranges_inside_booked_slot(
 
 find_jadwal(Duration, Result) :-
     setof(X, all_npm(X), NpmList),
+    time_all(ListOfRawTimerangeBruteforces),
     unique_call(
-        TemporaryResult, find_jadwal(Duration, NpmList, [], TemporaryResult), Result
+        TemporaryResult, find_jadwal(Duration, NpmList, [], ListOfRawTimerangeBruteforces, TemporaryResult), Result
     ).
 
 
-find_jadwal(_, [], FinalBookedSlots, FinalBookedSlots).
-find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, FinalBookedSlots) :-
-    bruteforce_timeranges(Duration, TimeRange),
+find_jadwal(_, [], FinalBookedSlots, _, FinalBookedSlots).
+find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimerangeBruteforces, FinalBookedSlots) :-
     list_of_timeranges_inside_booked_slot(CurrentBookedSlots, ListOfTimeRanges),
+    append(ListOfTimeRanges, ListOfRawTimerangeBruteforces, TimeRangeBruteforces),
+    member(BaseTimeRange, TimeRangeBruteforces),
+    bruteforce_timerange(Duration, BaseTimeRange, TimeRange),  % TimeRange == current bruteforced TimeRange
+
     \+time_conflict_list(TimeRange, ListOfTimeRanges),
 
     available(AsdosAvailability),
@@ -76,7 +78,7 @@ find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, FinalBookedSlots
     check_if_they_have_time(Npm, TimeRange, IsPreferred),
 
     NewBookedSlot = booked_slot(Npm, IsPreferred, TimeRange),
-    find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], FinalBookedSlots).
+    find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], ListOfRawTimerangeBruteforces, FinalBookedSlots).
 
 
 %find_jadwal(_):-
