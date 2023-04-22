@@ -51,10 +51,14 @@ less_than_or_equal(D1:H1:M1, D2:H2:M2) :- less_than(D1:H1:M1, D2:H2:M2).
 
 
 time_conflict(time_range(Start1, End1), time_range(Start2, End2)) :-
-    \+((
-      less_than_or_equal(End1, Start2) ;  less_than_or_equal(End2, Start1)
-    )).
+    \+(
+      (less_than_or_equal(End1, Start2) ;  less_than_or_equal(End2, Start1))
+    ).
 
+
+
+time_conflict_list(TimeRange1, [TimeRange2 | _ListOfTimeRange]) :- time_conflict(TimeRange1, TimeRange2).
+time_conflict_list(TimeRange1, [_TimeRange2 | ListOfTimeRange]) :- time_conflict_list(TimeRange1, ListOfTimeRange).
 
 
 

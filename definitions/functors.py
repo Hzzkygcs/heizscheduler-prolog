@@ -9,6 +9,6 @@ class time_range(define_parameterized_functor("time_range")):
 
 # nuel tara
 class booked_slot(define_parameterized_functor("booked_slot")):
-    def __init__(self, npm: int, range: time_range):
-        super().__init__(npm, range)
+    def __init__(self, npm: int, is_preferred: 1, _range: time_range):
+        super().__init__(npm, is_preferred, _range)
 

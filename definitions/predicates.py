@@ -43,6 +43,11 @@ class time_conflict(define_parameterized_predicate("time_conflict")):
         super().__init__(range1, range2)
 
 
+class time_conflict_list(define_parameterized_predicate("time_conflict_list")):
+    def __init__(self, range1: time_range, range2: list[time_range]):
+        super().__init__(range1, range2)
+
+
 class bruteforce_timeranges(define_parameterized_predicate("bruteforce_timeranges")):
     def __init__(self, duration: int, result: Variable):
         super().__init__(duration, result)
