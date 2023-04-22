@@ -12,6 +12,7 @@ from definitions.variables import Result, dont_care
 HOUR = 60
 DAY = 24*HOUR
 
+
 class TestFindJadwal(TestCase):    # TODO
     def setUp(self) -> None:
         self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
@@ -24,8 +25,10 @@ class TestFindJadwal(TestCase):    # TODO
 
     def test__should_return_empty_when_the_only_fact_provided_is_available(self):
         self.prolog.add_facts('testing_definitions', [
-            available(time_point(dont_care, dont_care, dont_care),
-                      time_point(dont_care, dont_care, dont_care)),
+            available(time_range(
+                time_point(dont_care, dont_care, dont_care),
+                time_point(dont_care, dont_care, dont_care),
+            )),
         ])
         result = self.prolog.query(find_jadwal(10, Result))
         result = remove_trailing_false_or_true(result)
@@ -47,8 +50,10 @@ class TestFindJadwal(TestCase):    # TODO
 
     def test__should_return_empty_when_available_and_haveTime_do_not_intersect(self):
         self.prolog.add_facts('testing_definitions', [
-            available(time_point(1, 0, 0),
-                      time_point(1, 1, 0)),
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 1, 0),
+            )),
             have_time(dont_care, dont_care,
                       time_range(
                           time_point(2, 0, 0),
@@ -64,8 +69,10 @@ class TestFindJadwal(TestCase):    # TODO
         intersect_width = duration - 1
         assert intersect_width < duration   # for the purpose of this test case
         self.prolog.add_facts('testing_definitions', [
-            available(time_point(1, 0, 0),
-                      time_point(1, 0, 59)),
+            available(time_range(
+                time_point(1, 0, 0),
+                time_point(1, 0, 59),
+            )),
             have_time(dont_care, dont_care,
                       time_range(
                           time_point(1, 0, 59 - intersect_width),

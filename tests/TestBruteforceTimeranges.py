@@ -27,7 +27,7 @@ class TestBruteForceTimeranges(TestCase):
 
     def test_bruteforce_timeranges__should_return_correctly(self):
         self.prolog.add_facts("testing_definitions", [
-            available(time_point(3, 2, 1), time_point(6, 5, 4),)
+            available(time_range(time_point(3, 2, 1), time_point(6, 5, 4)))
         ])
         result = self.prolog.query(bruteforce_timeranges(
             1, Result
@@ -44,7 +44,7 @@ class TestBruteForceTimeranges(TestCase):
 
     def test_bruteforce_timeranges__should_return_correctly__duration_other_than_1(self):
         self.prolog.add_facts("testing_definitions", [
-            available(time_point(3, 2, 1), time_point(6, 5, 4),)
+            available(time_range(time_point(3, 2, 1), time_point(6, 5, 4)))
         ])
         result = self.prolog.query(bruteforce_timeranges(
             3*DAY + 2*HOUR + 1, Result
@@ -62,7 +62,7 @@ class TestBruteForceTimeranges(TestCase):
 
     def test_bruteforce_timeranges__should_return_correctly__even_if_there_are_multiple_source(self):
         self.prolog.add_facts("testing_definitions", [
-            available(time_point(1, 1, 30), time_point(2, 2, 30),),
+            available(time_range(time_point(1, 1, 30), time_point(2, 2, 30))),
             have_time(dont_care, dont_care, time_range(time_point(3, 3, 30), time_point(4, 4, 30))),
         ])
         result = self.prolog.query(bruteforce_timeranges(

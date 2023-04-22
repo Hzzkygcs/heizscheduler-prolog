@@ -20,8 +20,8 @@ class all_npm(define_parameterized_predicate("all_npm")):
 
 
 class available(define_parameterized_predicate("available")):
-    def __init__(self, start: time_point, end: time_point):
-        super().__init__(start, end)
+    def __init__(self, range_: time_range):
+        super().__init__(range_)
 
 
 time_in_range = define_parameterized_predicate("time_in_range")

@@ -13,7 +13,6 @@ def extract_bool(result):
     return result[0] == 'true'
 
 
-
 class TestCheckIfTheyHaveTime(TestCase):
     def setUp(self) -> None:
         self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)

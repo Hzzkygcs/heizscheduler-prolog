@@ -16,8 +16,8 @@ class TestTime(TestCase):
 
     def test_time__should_return_list_of_endpoints_correctly_from_available(self):
         self.prolog.add_facts("available_definitions", [
-            available(time_point(0, 1, 2), time_point(3, 4, 5)),
-            available(time_point(6, 10, 10), time_point(6, 23, 59)),
+            available(time_range(time_point(0, 1, 2), time_point(3, 4, 5))),
+            available(time_range(time_point(6, 10, 10), time_point(6, 23, 59))),
         ])
         result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [
@@ -51,8 +51,8 @@ class TestTime(TestCase):
 
     def test_time__should_return_list_of_endpoints_correctly_from_all_of_them(self):
         self.prolog.add_facts("available_definitions", [
-            available(time_point(0, 1, 2), time_point(3, 4, 5)),
-            available(time_point(6, 10, 10), time_point(6, 23, 59)),
+            available(time_range(time_point(0, 1, 2), time_point(3, 4, 5))),
+            available(time_range(time_point(6, 10, 10), time_point(6, 23, 59))),
             have_time(dont_care, dont_care, time_range(
                 time_point(3, 13, 45), time_point(3, 16, 00)
             )),
