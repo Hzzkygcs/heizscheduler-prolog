@@ -1,6 +1,9 @@
 % Format waktu: time_range(00:00:00, 06:23:59)
 :- op(500, xfy, :).
 
+% {{hzztime_defintitions}}
+
+
 convert_from_minutes(Minutes, _) :-
     Minutes < 0,
     throw("Menit tidak boleh negatif").
