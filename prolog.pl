@@ -1,7 +1,7 @@
 :- [hzztime].
 
 :- dynamic available/2.
-:- dynamic have_time/4.
+:- dynamic have_time/3.
 
 
 % {%begin ignore%}
@@ -10,13 +10,13 @@
 %available(2:12:10, 2:14:15).
 %available(3:12:10, 3:14:15).
 %
-%have_time(2006463162, 1, 1:10:10, 1:15:10).
-%have_time(2006463162, 1, 3:13:45, 3:16:00).
-%have_time(2006463162, 0, 3:13:30, 3:18:00).
+%have_time(2006463162, 1, time_range(1:10:10, 1:15:10)).
+%have_time(2006463162, 1, time_range(3:13:45, 3:16:00)).
+%have_time(2006463162, 0, time_range(3:13:30, 3:18:00)).
 %
-%have_time(2006462664, 0, 1:14:30, 1:17:10).
-%have_time(2006462664, 1, 3:13:45, 3:16:00).
-%have_time(2006462664, 0, 3:13:30, 3:18:00).
+%have_time(2006462664, 0, time_range(1:14:30, 1:17:10)).
+%have_time(2006462664, 1, time_range(3:13:45, 3:16:00)).
+%have_time(2006462664, 0, time_range(3:13:30, 3:18:00)).
 
 % {%end ignore%}
 
@@ -25,13 +25,13 @@
 % {{testing_definitions}}
 
 
-all_npm(NPM) :- have_time(NPM, _, _, _).
+all_npm(NPM) :- have_time(NPM, _, _).
 
 time(Hari:Jam:Tanggal) :- available(Hari:Jam:Tanggal, _:_:_).
 time(Hari:Jam:Tanggal) :- available(_:_:_, Hari:Jam:Tanggal).
 
-time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, Hari:Jam:Tanggal, _:_:_).
-time(Hari:Jam:Tanggal) :- have_time(_NPM, _Is_Preferred, _:_:_, Hari:Jam:Tanggal).
+time(Hari:Jam:Tanggal) :- have_time(_NPM, _IsPreferred, time_range(Hari:Jam:Tanggal, _:_:_)).
+time(Hari:Jam:Tanggal) :- have_time(_NPM, _IsPreferred, time_range(_:_:_, Hari:Jam:Tanggal)).
 time_all(List) :- findall(X, time(X), List).
 
 
@@ -42,6 +42,9 @@ bruteforce_timeranges(Duration, time_range(StartTime, EndTime)) :-
     time(EndTime),
     NegativeDuration is -Duration,
     add_time(EndTime, NegativeDuration, StartTime).
+
+% in: Npm, TimeRange. Out: IsPreferred
+%check_if_they_have_time(Npm, TimeRange, IsPreferred) :- true.
 
 
 list_of_timeranges_inside_booked_slot([], []).

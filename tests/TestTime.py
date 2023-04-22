@@ -3,9 +3,10 @@ from unittest import TestCase
 from HzzProlog.ChainEquality import equality
 from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.test_util import assert_prolog_output_the_same
-from definitions.predicates import available, time, have_time
+from definitions.functors import time_range
 from definitions.operators import time_point
 from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.predicates import available, time, have_time
 from definitions.variables import X, Y, Z, dont_care
 
 
@@ -31,8 +32,12 @@ class TestTime(TestCase):
 
     def test_time__should_return_list_of_endpoints_correctly_from_haveTime(self):
         self.prolog.add_facts("have_time_definitions", [
-            have_time(dont_care, dont_care, time_point(3, 13, 45), time_point(3, 16, 00)),
-            have_time(dont_care, dont_care, time_point(3, 13, 30), time_point(3, 18, 00)),
+            have_time(dont_care, dont_care, time_range(
+                time_point(3, 13, 45), time_point(3, 16, 00)
+            )),
+            have_time(dont_care, dont_care, time_range(
+                time_point(3, 13, 30), time_point(3, 18, 00)
+            )),
         ])
         result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [
@@ -48,8 +53,12 @@ class TestTime(TestCase):
         self.prolog.add_facts("available_definitions", [
             available(time_point(0, 1, 2), time_point(3, 4, 5)),
             available(time_point(6, 10, 10), time_point(6, 23, 59)),
-            have_time(dont_care, dont_care, time_point(3, 13, 45), time_point(3, 16, 00)),
-            have_time(dont_care, dont_care, time_point(3, 13, 30), time_point(3, 18, 00)),
+            have_time(dont_care, dont_care, time_range(
+                time_point(3, 13, 45), time_point(3, 16, 00)
+            )),
+            have_time(dont_care, dont_care, time_range(
+                time_point(3, 13, 30), time_point(3, 18, 00)
+            )),
         ])
         result = self.prolog.query(time(time_point(X, Y, Z)))
         expected = [

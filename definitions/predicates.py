@@ -1,6 +1,6 @@
 from HzzProlog.PrologCallable import define_parameterized_predicate, Variable
 from definitions.functors import booked_slot, time_range
-from definitions.operators import datetime, time_point
+from definitions.operators import time_point
 
 time = define_parameterized_predicate("time")
 hari = define_parameterized_predicate("hari")
@@ -10,8 +10,8 @@ convert_from_minutes = define_parameterized_predicate("convert_from_minutes")
 
 
 class have_time(define_parameterized_predicate('have_time')):
-    def __init__(self, npm: int, is_preferred: int, start: datetime, end: datetime):
-        super().__init__(npm, is_preferred, start, end)
+    def __init__(self, npm: int, is_preferred: int, timerange: time_range):
+        super().__init__(npm, is_preferred, timerange)
 
 
 class all_npm(define_parameterized_predicate("all_npm")):
@@ -41,6 +41,11 @@ class less_than(define_parameterized_predicate("less_than")):
 class inside_another_timerange(define_parameterized_predicate("inside_another_timerange")):
     def __init__(self, smaller_timerange: time_range, bigger_timerange: time_range):
         super().__init__(smaller_timerange, bigger_timerange)
+
+
+class check_if_they_have_time(define_parameterized_predicate("check_if_they_have_time")):
+    def __init__(self, npm: int, time_range: time_range, is_preferred):
+        super().__init__(npm, time_range, is_preferred)
 
 
 class time_conflict(define_parameterized_predicate("time_conflict")):

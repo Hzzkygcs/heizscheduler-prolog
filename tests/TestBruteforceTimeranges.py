@@ -63,7 +63,7 @@ class TestBruteForceTimeranges(TestCase):
     def test_bruteforce_timeranges__should_return_correctly__even_if_there_are_multiple_source(self):
         self.prolog.add_facts("testing_definitions", [
             available(time_point(1, 1, 30), time_point(2, 2, 30),),
-            have_time(dont_care, dont_care, time_point(3, 3, 30), time_point(4, 4, 30)),
+            have_time(dont_care, dont_care, time_range(time_point(3, 3, 30), time_point(4, 4, 30))),
         ])
         result = self.prolog.query(bruteforce_timeranges(
             30, Result
