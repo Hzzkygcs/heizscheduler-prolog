@@ -58,27 +58,29 @@ list_of_timeranges_inside_booked_slot(
 
 find_jadwal(Duration, Result) :-
     setof(X, all_npm(X), NpmList),
-    time_all(ListOfRawTimerangeBruteforces),
+    time_all(ListOfRawTimePointBruteforces),
     unique_call(
-        TemporaryResult, find_jadwal(Duration, NpmList, [], ListOfRawTimerangeBruteforces, TemporaryResult), Result
+        TemporaryResult, find_jadwal(Duration, NpmList, [], ListOfRawTimePointBruteforces, TemporaryResult), Result
     ).
 
 
 find_jadwal(_, [], FinalBookedSlots, _, FinalBookedSlots).
-find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimerangeBruteforces, FinalBookedSlots) :-
-    list_of_timeranges_inside_booked_slot(CurrentBookedSlots, ListOfTimeRanges),
-    append(ListOfTimeRanges, ListOfRawTimerangeBruteforces, TimeRangeBruteforces),
+find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimePointBruteforces, FinalBookedSlots) :-
+    list_of_timeranges_inside_booked_slot(CurrentBookedSlots, ListOfTimeRangesInsideBookedSlot),
+    list_of_timeranges_to_list_of_timepoints(ListOfTimeRangesInsideBookedSlot, ListOfTimePointsInsideBookedSlot),
+    
+    append(ListOfTimePointsInsideBookedSlot, ListOfRawTimePointBruteforces, TimeRangeBruteforces),
     member(BaseTimeRange, TimeRangeBruteforces),
     bruteforce_timerange(Duration, BaseTimeRange, TimeRange),  % TimeRange == current bruteforced TimeRange
 
-    \+time_conflict_list(TimeRange, ListOfTimeRanges),
+    \+time_conflict_list(TimeRange, ListOfTimeRangesInsideBookedSlot),
 
     available(AsdosAvailability),
     inside_another_timerange(TimeRange, AsdosAvailability),
     check_if_they_have_time(Npm, TimeRange, IsPreferred),
 
     NewBookedSlot = booked_slot(Npm, IsPreferred, TimeRange),
-    find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], ListOfRawTimerangeBruteforces, FinalBookedSlots).
+    find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], ListOfRawTimePointBruteforces, FinalBookedSlots).
 
 
 %find_jadwal(_):-

@@ -1,7 +1,9 @@
+from itertools import permutations
 from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
-from HzzProlog.test_util import remove_trailing_false_or_true, assert_prolog_output_the_same
+from HzzProlog.test_util import remove_trailing_false_or_true, assert_prolog_output_the_same, \
+    compare_list_just_like_a_set
 from definitions.functors import time_range, booked_slot
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
@@ -173,12 +175,28 @@ class TestFindJadwal(TestCase):
 
 
     def test__should_consider_all_npm__three_npm(self):
-        duration = 5
-        self.prolog.add_facts('testing_definitions', [
+        self.__test__should_consider_all_npm__three_npm([
             available(time_range(
                 time_point(1, 0, 0),
                 time_point(1, 1, 0),
             )),
+        ])
+
+
+    def test__should_consider_all_npm__three_npm__multiple_available_time(self):
+        available_lists = [
+            available(time_range(
+                time_point(1, 0, 0), time_point(1, 0, 50)
+            )),
+            available(time_range(
+                time_point(1, 0, 50), time_point(1, 1, 0)
+            )),
+        ]
+        self.__test__should_consider_all_npm__three_npm(available_lists)
+
+    def __test__should_consider_all_npm__three_npm(self, available_lists):
+        duration = 5
+        self.prolog.add_facts('testing_definitions', available_lists + [
 
             # this should be possible. An example of the arrangement:
             # NPM1: 45-50. NPM2: 50-55. NPM3: 55-1:00
@@ -192,14 +210,19 @@ class TestFindJadwal(TestCase):
         result = self.prolog.query(find_jadwal(duration, Result))
         result = remove_trailing_false_or_true(result)
         result = get_list_from_list_of_dicts(result, 'Result')
-        self.assertEqual([
-            [
-                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 30), time_point(1, 0, 35))),
-            ], [
-                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
-            ], [
-                booked_slot(NPM_FIRST, dont_care, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
-            ],
-        ], result)
 
+        all_possible_solutions = []
+        for npm_a, npm_b, npm_c in permutations((NPM_FIRST, NPM_SECOND, NPM_THIRD)):
+            all_possible_solutions.append([
+                booked_slot(npm_a, dont_care, time_range(time_point(1, 0, 45), time_point(1, 0, 50))),
+                booked_slot(npm_b, dont_care, time_range(time_point(1, 0, 50), time_point(1, 0, 55))),
+                booked_slot(npm_c, dont_care, time_range(time_point(1, 0, 55), time_point(1, 1, 0)))
+            ])
+        self.assertGreaterEqual(len(result), 1)
+        for result_item in result:
+            for one_of_possible_solution in all_possible_solutions:
+                if compare_list_just_like_a_set(result_item, one_of_possible_solution):
+                    break
+            else:
+                self.fail()
 
