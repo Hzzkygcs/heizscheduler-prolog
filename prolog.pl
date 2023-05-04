@@ -82,6 +82,14 @@ find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimePoi
     NewBookedSlot = booked_slot(Npm, IsPreferred, TimeRange),
     find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], ListOfRawTimePointBruteforces, FinalBookedSlots).
 
+count_preferred(ListOfBookedSlot, NumberOfPreferred) :-
+    count_preferred(ListOfBookedSlot, 0, NumberOfPreferred).
+
+count_preferred([], X, X).
+count_preferred([booked_slot(_, IsPreferred, _) | ListOfBookedSlot], CurrentTotalNumberOfPreferred, FinalNumberOfPreferred) :-
+    NewNumberOfPreferred is IsPreferred + CurrentTotalNumberOfPreferred,
+    count_preferred(ListOfBookedSlot, NewNumberOfPreferred, FinalNumberOfPreferred).
+
 
 %find_jadwal(_):-
 %    all_npm(NPM)

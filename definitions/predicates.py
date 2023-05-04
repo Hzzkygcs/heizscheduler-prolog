@@ -76,3 +76,8 @@ class list_of_timeranges_to_list_of_timepoints(define_parameterized_predicate("l
 class unique_call(define_parameterized_predicate("unique_call")):
     def __init__(self, template, goal, bag):
         super().__init__(template, goal, bag)
+
+
+class count_preferred(define_parameterized_predicate("count_preferred")):
+    def __init__(self, list_of_booked_slots, number_of_preferred):
+        super().__init__(list_of_booked_slots, number_of_preferred)
