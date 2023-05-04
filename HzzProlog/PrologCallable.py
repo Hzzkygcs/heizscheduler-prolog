@@ -51,7 +51,12 @@ class PrologCallable(BasePrologCallable):
         return str(self) == other
 
 
-Variable = PrologCallable
+T = TypeVar('T')
+
+
+class Variable(Generic[T], PrologCallable):
+    def __init__(self, name):
+        super().__init__(name)
 
 
 class PrologOperator(BasePrologCallable):

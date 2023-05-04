@@ -90,3 +90,16 @@ count_preferred([booked_slot(_, IsPreferred, _) | ListOfBookedSlot], CurrentTota
     NewNumberOfPreferred is IsPreferred + CurrentTotalNumberOfPreferred,
     count_preferred(ListOfBookedSlot, NewNumberOfPreferred, FinalNumberOfPreferred).
 
+extract_minutes_from_booked_slot_starting_time(
+    booked_slot(_, _, time_range(Start, _)), Minutes
+) :- convert_to_minutes(Start, Minutes).
+
+
+:- use_module(library(pairs)).
+sort_booked_slots_by_starting_time(ListOfBookedSlot, SortedListOfBookedSlot) :-
+    map_list_to_pairs(extract_minutes_from_booked_slot_starting_time,
+                      ListOfBookedSlot,
+                      PairsOfStartingTimeAndBookedSlot),
+    keysort(PairsOfStartingTimeAndBookedSlot, Sorted),
+    pairs_values(Sorted, SortedListOfBookedSlot).
+

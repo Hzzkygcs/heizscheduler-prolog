@@ -85,3 +85,9 @@ class unique_call(define_parameterized_predicate("unique_call")):
 class count_preferred(define_parameterized_predicate("count_preferred")):
     def __init__(self, list_of_booked_slots, number_of_preferred):
         super().__init__(list_of_booked_slots, number_of_preferred)
+
+
+class sort_booked_slots_by_starting_time(define_parameterized_predicate("sort_booked_slots_by_starting_time")):
+    def __init__(self, list_of_booked_slots: list[booked_slot],
+                 output_sorted_of_booked_slot: Variable[list[booked_slot]]):
+        super().__init__(list_of_booked_slots, output_sorted_of_booked_slot)
