@@ -8,7 +8,7 @@ from definitions.operators import time_point
 from definitions.paths import HZZ_TIME_PL_IO
 from definitions.predicates import list_of_timeranges_to_list_of_timepoints
 from definitions.variables import Result
-from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
+from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
 
 
 class TestListOfTimerangeToListOfTimePoint(TestCase):

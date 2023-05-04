@@ -9,7 +9,7 @@ from definitions.operators import time_point
 from definitions.paths import MAIN_PROLOG_FILE_IO
 from definitions.predicates import check_if_they_have_time, have_time
 from definitions.variables import dont_care
-from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
+from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
 
 
 def extract_bool(result):

@@ -90,11 +90,3 @@ count_preferred([booked_slot(_, IsPreferred, _) | ListOfBookedSlot], CurrentTota
     NewNumberOfPreferred is IsPreferred + CurrentTotalNumberOfPreferred,
     count_preferred(ListOfBookedSlot, NewNumberOfPreferred, FinalNumberOfPreferred).
 
-
-%find_jadwal(_):-
-%    all_npm(NPM)
-%    .
-%have_time_all(List) :- findall(
-%    [NPM, Hari:Jam:Tanggal],
-%    (have_time(NPM, _, Hari:Jam:Tanggal, _), time(Hari:Jam:Tanggal)), List).
-

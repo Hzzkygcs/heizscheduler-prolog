@@ -10,7 +10,7 @@ from definitions.operators import time_point
 from definitions.paths import MAIN_PROLOG_FILE_IO
 from definitions.predicates import available, have_time, find_jadwal
 from definitions.variables import Result, dont_care
-from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
+from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
 
 HOUR = 60
 DAY = 24*HOUR

@@ -25,7 +25,11 @@ class available(define_parameterized_predicate("available")):
 
 
 time_in_range = define_parameterized_predicate("time_in_range")
-duration = define_parameterized_predicate("duration")
+
+
+class duration(define_parameterized_predicate("duration")):
+    def __init__(self, input_time_range: time_range, resulting_duration: int):
+        super().__init__(input_time_range, resulting_duration)
 
 
 class find_jadwal(define_parameterized_predicate("find_jadwal")):

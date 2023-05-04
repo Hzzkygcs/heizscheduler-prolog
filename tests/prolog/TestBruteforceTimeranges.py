@@ -8,8 +8,8 @@ from definitions.operators import time_point
 from definitions.paths import MAIN_PROLOG_FILE_IO
 from definitions.predicates import bruteforce_timerange
 from definitions.variables import Result
-from tests.list_utils import get_list_from_list_of_dicts
-from tests.list_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
+from tests.testing_utils import get_list_from_list_of_dicts
+from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
 
 HOUR = 60
 DAY = 24*HOUR
