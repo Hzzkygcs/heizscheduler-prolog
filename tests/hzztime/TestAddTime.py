@@ -4,7 +4,7 @@ from HzzProlog.HzzProlog import HzzProlog
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import datetime
 from definitions.paths import HZZ_TIME_PL_IO
-from definitions.predicates import add_time, subtract_time
+from definitions.predicates import add_time
 from definitions.variables import Result
 
 JAM = 60

@@ -1,10 +1,10 @@
 from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
-from definitions.predicates import convert_from_minutes
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import datetime
 from definitions.paths import HZZ_TIME_PL_IO
+from definitions.predicates import convert_from_minutes
 from definitions.variables import Result
 
 JAM = 60

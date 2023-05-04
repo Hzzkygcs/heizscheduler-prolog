@@ -39,7 +39,7 @@ subtract_time(D:H:M, Minutes, Result) :-
     Sum is InitialMinutes - Minutes,
     convert_from_minutes(Sum, Result).
 
-duration(time_range(D1:H1:M1, D2:H2:M2), Duration) :-  % In minutes
+duration(time_range(D1:H1:M1, D2:H2:M2), Duration) :-  % In minutes. Not tested yet
     convert_to_minutes(D1:H1:M1, Minutes1),
     convert_to_minutes(D2:H2:M2, Minutes2),
     Duration is Minutes1 + Minutes2.
@@ -74,9 +74,7 @@ unique_call(Template, Goal, Bag) :-
 
 
 list_of_timeranges_to_list_of_timepoints(ListOfTimerange, ResultingListOfTimepoint) :-
-    findall(
-        X,
-        (
+    findall(X, (
             member(time_range(Start, End), ListOfTimerange),
             (X=Start ; X=End)
         ), ResultingListOfTimepoint
