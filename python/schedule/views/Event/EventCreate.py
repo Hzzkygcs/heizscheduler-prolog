@@ -53,7 +53,7 @@ class EventCreate(BaseScheduleView):
     def saveNewEvent(self, user, name, schedules):
         created_schedules = []
         event = Event.objects.create(name=name, owner_id=user.npm,
-                                     slot_selection_minute_multiplier=15, slot_book_minute_width=30)
+                                     slot_book_minute_width=30)
 
         for schedule in schedules:
             start, end = schedule['start'], schedule['end']

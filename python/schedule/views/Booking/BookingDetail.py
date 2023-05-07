@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
-from schedule.models import Event, DateRange
+from schedule.models import Event, DateRange, Schedule
 from schedule.views.BaseScheduleView import BaseScheduleView
 from schedule.views.util import convert_to_datetime
 
@@ -18,10 +18,10 @@ class BookingDetail(BaseScheduleView):
 
     def get(self, req, event_id):
         event = Event.objects.get(ID=event_id)
-        available_booking_slots = []  # supaya json-able TODO
+        booked_slots = Schedule.objects.all().filter(event=event)  # supaya json-able TODO
 
         return render(req, "booking/available-booking-list.html", {
-            'bookings': available_booking_slots,
+            'bookings': booked_slots,
             'event_name': event.name,
         })
 
