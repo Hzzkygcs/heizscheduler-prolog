@@ -1,23 +1,11 @@
-from django.utils import timezone
-from datetime import datetime
 import json
 
-from django.http import HttpResponse
 from django.shortcuts import render
-from kink import di
 
-from auth_module.core.Factory.UserFactory import UserFactory
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
-from auth_module.core.repository.UserRepository import UserRepository
 from auth_module.models import User
-from global_exception.exceptions import BadRequest
-from global_exception.exceptions.BadRequest import BadRequestException
-from schedule.core.Repository.DateRangeRepository import DateRangeRepository
-from schedule.core.Repository.ScheduleRepository import ScheduleRepository
-from schedule.core.ScheduleFactory import ScheduleFactory
 from schedule.models import Event, DateRange
 from schedule.views.BaseScheduleView import BaseScheduleView
-from schedule.views.Event.EventCreate import EventCreate
 from schedule.views.util import convert_to_datetime
 
 
@@ -30,8 +18,7 @@ class BookingDetail(BaseScheduleView):
 
     def get(self, req, event_id):
         event = Event.objects.get(ID=event_id)
-        available_booking_slots = event.get_all_booking_slots()
-        available_booking_slots = [i.to_dict() for i in available_booking_slots]  # supaya json-able
+        available_booking_slots = []  # supaya json-able TODO
 
         return render(req, "booking/available-booking-list.html", {
             'bookings': available_booking_slots,

@@ -91,3 +91,13 @@ class sort_booked_slots_by_starting_time(define_parameterized_predicate("sort_bo
     def __init__(self, list_of_booked_slots: list[booked_slot],
                  output_sorted_of_booked_slot: Variable[list[booked_slot]]):
         super().__init__(list_of_booked_slots, output_sorted_of_booked_slot)
+
+class get_booking_slot_distance(define_parameterized_predicate("get_booking_slot_distance")):
+    def __init__(self, booked_slot_1: booked_slot,
+                 booked_slot_2: booked_slot,
+                 result: Variable[int]):
+        super().__init__(booked_slot_1, booked_slot_2, result)
+
+class get_multiple_booking_slot_distance(define_parameterized_predicate("get_multiple_booking_slot_distance")):
+    def __init__(self, booked_slots: list[booked_slot], result: Variable[int]):
+        super().__init__(booked_slots, result)

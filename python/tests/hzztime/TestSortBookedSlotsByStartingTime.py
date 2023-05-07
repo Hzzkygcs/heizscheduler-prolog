@@ -20,6 +20,14 @@ booked_slot_2 = booked_slot(
     dont_care, dont_care, time_range(
         time_point(1, 2, 4), dont_care
     ))
+booked_slot_3 = booked_slot(
+    dont_care, dont_care, time_range(
+        time_point(1, 3, 4), dont_care
+    ))
+booked_slot_4 = booked_slot(
+    dont_care, dont_care, time_range(
+        time_point(2, 3, 4), dont_care
+    ))
 
 
 class TestSortBookedSlotsByStartingTime(TestCase):
@@ -62,4 +70,14 @@ class TestSortBookedSlotsByStartingTime(TestCase):
         assert len(result) == 1
         result = result[0]
         self.assertCountEqual([booked_slot_1, booked_slot_2], result)
+
+    def test__should_be_able_to_handle_multiple_item_list(self):
+        result = self.prolog.query(sort_booked_slots_by_starting_time(
+            [booked_slot_2, booked_slot_1, booked_slot_4, booked_slot_3], Result
+        ))
+        result = get_list_from_list_of_dicts(result, Result)
+        assert len(result) == 1
+        result = result[0]
+        self.assertCountEqual([booked_slot_1, booked_slot_2,
+                               booked_slot_3, booked_slot_4], result)
 

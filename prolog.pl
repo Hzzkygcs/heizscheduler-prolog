@@ -103,3 +103,21 @@ sort_booked_slots_by_starting_time(ListOfBookedSlot, SortedListOfBookedSlot) :-
     keysort(PairsOfStartingTimeAndBookedSlot, Sorted),
     pairs_values(Sorted, SortedListOfBookedSlot).
 
+get_booking_slot_distance(
+    booked_slot(_, _, time_range(_, FirstTaskEnd)),
+    booked_slot(_, _, time_range(SecondTaskStart, _)),
+    Duration
+) :-
+    duration(time_range(FirstTaskEnd, SecondTaskStart), Duration).
+
+get_multiple_booking_slot_distance(BookingSlots, ListOfDistances) :-
+    sort_booked_slots_by_starting_time(BookingSlots, SortedBookingSlots),
+    Goal=helper_get_multiple_booking_slot_distance(SortedBookingSlots, X),
+    findall(X, Goal, ListOfDistances).
+
+helper_get_multiple_booking_slot_distance([First,Second|_], Distance) :-
+    get_booking_slot_distance(First, Second, Distance).
+
+helper_get_multiple_booking_slot_distance([_|BookingSlots], Distance) :-
+    helper_get_multiple_booking_slot_distance(BookingSlots, Distance).
+

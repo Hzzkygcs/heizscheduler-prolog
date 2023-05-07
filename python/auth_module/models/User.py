@@ -11,6 +11,7 @@ class User(Model):
     app_label = 'auth_manager'
 
     npm = models.TextField(primary_key=True)
+    username = models.CharField(max_length=30)
     _password = models.BinaryField(editable=True, max_length=128)
     _salt = models.BinaryField(editable=True, max_length=4)
 
