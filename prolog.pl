@@ -6,10 +6,12 @@
 
 % {%begin ignore%}
 
+% available asdos
 available(time_range(1:12:10, 1:14:15)).
 available(time_range(2:12:10, 2:14:15)).
 available(time_range(3:12:10, 3:14:15)).
 
+% anak asdos booking
 have_time(2006463162, 1, time_range(1:10:10, 1:15:10)).
 have_time(2006463162, 1, time_range(3:13:45, 3:16:00)).
 have_time(2006463162, 0, time_range(3:13:30, 3:18:00)).
@@ -114,10 +116,21 @@ get_multiple_booking_slot_distance(BookingSlots, ListOfDistances) :-
     sort_booked_slots_by_starting_time(BookingSlots, SortedBookingSlots),
     Goal=helper_get_multiple_booking_slot_distance(SortedBookingSlots, X),
     findall(X, Goal, ListOfDistances).
-
 helper_get_multiple_booking_slot_distance([First,Second|_], Distance) :-
     get_booking_slot_distance(First, Second, Distance).
-
 helper_get_multiple_booking_slot_distance([_|BookingSlots], Distance) :-
     helper_get_multiple_booking_slot_distance(BookingSlots, Distance).
 
+
+get_booking_slot_distance_penalties(BookingSlots, Penalties) :-
+    get_multiple_booking_slot_distance(BookingSlots, ListOfDistances),
+    Goal=(member(Distance, ListOfDistances), get_booked_slot_penalty(Distance, Penalty)),
+    findall(Penalty, Goal, Penalties).
+
+
+% red cut (yg paling bawah mempengaruhi).
+get_booked_slot_penalty(MinuteRange, 4) :- 10 =< MinuteRange, MinuteRange < 25, !.
+get_booked_slot_penalty(MinuteRange, 3) :- 25 =< MinuteRange, MinuteRange < 45, !.
+get_booked_slot_penalty(MinuteRange, 2) :- 45 =< MinuteRange, MinuteRange < 60, !.
+get_booked_slot_penalty(MinuteRange, 1) :- 60 =< MinuteRange, MinuteRange < 120, !.
+get_booked_slot_penalty(_MinuteRange, 0).
