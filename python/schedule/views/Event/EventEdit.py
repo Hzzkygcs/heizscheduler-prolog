@@ -46,12 +46,12 @@ class EventEdit(BaseScheduleView):
 
         schedules = batch_convert_to_datetime(json.loads(body))
         print(schedules, logged_in_user.npm)
-        self.saveNewEvent(logged_in_user, event_to_be_edited, schedules)
+        self.saveNewEvent(event_to_be_edited, schedules)
 
         response = {'success': 1}
         return HttpResponse(json.dumps(response), content_type='application/json')
 
-    def saveNewEvent(self, user, event, schedules):
+    def saveNewEvent(self, event, schedules):
         created_schedules = []
         old_schedule = Schedule.objects.filter(event).all()
         for schedule in old_schedule:

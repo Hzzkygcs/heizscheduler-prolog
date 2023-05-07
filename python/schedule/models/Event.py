@@ -14,24 +14,24 @@ class Event(Model):
     name = models.CharField(max_length=25)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    slot_selection_minute_multiplier = models.IntegerField()
+    # slot_selection_minute_multiplier = models.IntegerField()
     slot_book_minute_width = models.IntegerField()
 
-    def get_all_booking_slots(self) -> list[BookingAvailability]:
-        ret = []
-        ret.extend(self.get_all_available_booking_slots())
-        ret.extend(self.get_all_booked_slots())
-        return ret
-
-    def get_all_available_booking_slots(self) -> list[BookingAvailability]:
-        ret = []
-        schedules = self.schedule_set.all()
-
-        for schedule in schedules:
-            available_slots = schedule.get_available_slots()
-            for available_slot in available_slots:
-                ret.append(BookingAvailability(schedule.ID, available_slot, True))
-        return ret
+    # def get_all_booking_slots(self) -> list[BookingAvailability]:
+    #     ret = []
+    #     ret.extend(self.get_all_available_booking_slots())
+    #     ret.extend(self.get_all_booked_slots())
+    #     return ret
+    #
+    # def get_all_available_booking_slots(self) -> list[BookingAvailability]:
+    #     ret = []
+    #     schedules = self.schedule_set.all()
+    #
+    #     for schedule in schedules:
+    #         available_slots = schedule.get_available_slots()
+    #         for available_slot in available_slots:
+    #             ret.append(BookingAvailability(schedule.ID, available_slot, True))
+    #     return ret
 
     def get_all_booked_slots(self):
         ret = []
