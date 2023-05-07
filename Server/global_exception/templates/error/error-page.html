@@ -1,0 +1,23 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error {{ status_code }}</title>
+
+    {% include "dependencies.html" %}
+    {% include "error/dependencies.html" %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body class="m-2">
+
+<div>
+    <h1 class="title">Error {{ status_code }}</h1>
+    <span>{{ err_msg }}</span>
+</div>
+
+
+</body>
+</html>

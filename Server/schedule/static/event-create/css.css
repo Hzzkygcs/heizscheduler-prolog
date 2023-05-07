@@ -1,0 +1,26 @@
+.outer-container{
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+
+.schedule-item{
+    display: grid;
+    grid-template-columns: repeat(5, auto) 1fr auto;
+    grid-column-gap: 0.3rem;
+}
+
+.schedule-item span{
+    display: flex;
+    align-items: center;
+}
+
+
+
+
+
+
+
+
+
+

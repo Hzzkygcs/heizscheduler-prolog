@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    {% include "dependencies.html" %}
+    {% include "auth/dependencies.html" %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<form action="{% url 'login' %}" method="post" class="w-full h-full">
+    {% csrf_token %}
+
+    <div class="flex justify-center items-center flex-col
+                h-screen w-full h-full">
+        <div class="grid grid-table">
+            <span>Email: </span>
+            <input name="email" class="text-input" type="email">
+
+            <span>Password: </span>
+            <input name="password" class="text-input" type="password">
+
+            <span class="dont-have-acc" style="grid-column: 1/3;">
+                <a href="{% url 'register' %}">Click here</a> to register
+            </span>
+
+            <div class="flex items-center justify-end mt-4 mb-0" style="grid-column: 1/3;">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-full">
+                    Login
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+a {
+  color: #0072c6; /* A dark blue color that stands out against light backgrounds */
+  text-decoration: none; /* Remove the underline to make it look more modern */
+  transition: all 0.3s ease-in-out; /* Add a smooth transition effect */
+}
+
+a:hover {
+  color: #004d99; /* Darken the color slightly on hover to indicate interactivity */
+  text-decoration: none; /* Keep the underline removed on hover */
+}
+
+span.dont-have-acc{
+    color: #333; /* A dark grey color that is easy to read */
+    line-height: 1.5; /* Add some spacing between lines to improve readability */
+    margin: 0;
+    font-size: 0.8rem;
+}
+</style>
+
+</body>
+</html>

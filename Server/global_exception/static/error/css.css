@@ -1,0 +1,12 @@
+.text-input{
+    padding: 5px;
+}
+
+.grid-table{
+    border: 1px solid #5b80b2;
+    padding: 1rem;
+    border-radius: 0.5rem;
+
+    grid-template-columns: auto 1fr;
+    grid-gap: 10px 25px;
+}

@@ -1,0 +1,31 @@
+.red-btn[type=button]{
+    display: inline-block;
+    border-radius: 9999px;
+    background-color: #dc4c64;
+    padding: 0.25rem 0.75rem 0.125rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1rem;
+    color: #fff;
+    box-shadow: 0 4px 9px -4px #dc4c64;
+    transition: all 0.15s ease-in-out;
+}
+
+.red-btn:hover {
+  background-color: #a02b3e;
+  box-shadow: 0 8px 9px -4px rgba(220, 76, 100, 0.3), 0 4px 18px 0 rgba(220, 76, 100, 0.2);
+}
+
+.red-btn:focus {
+  background-color: #a02b3e;
+  outline: none;
+  box-shadow: 0 8px 9px -4px rgba(220, 76, 100, 0.3), 0 4px 18px 0 rgba(220, 76, 100, 0.2);
+}
+
+.red-btn:active {
+  background-color: #7e2033;
+  box-shadow: 0 8px 9px -4px rgba(220, 76, 100, 0.3), 0 4px 18px 0 rgba(220, 76, 100, 0.2);
+}

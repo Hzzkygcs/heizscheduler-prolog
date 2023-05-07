@@ -79,3 +79,4 @@ list_of_timeranges_to_list_of_timepoints(ListOfTimerange, ResultingListOfTimepoi
             (X=Start ; X=End)
         ), ResultingListOfTimepoint
     ).
+

@@ -1,7 +1,6 @@
-/.idea
-venv/
-python venv/
+**/.idea
+**/venv/
+**/python venv/
 **/temp/
-/tests/temp/
 **/__pycache__/
 coba_coba/
