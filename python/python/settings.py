@@ -10,7 +10,26 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import sys
+
+import dj_database_url
+from dotenv import load_dotenv
+import os
 from pathlib import Path
+
+load_dotenv()
+
+
+def required_env(env_name):
+    ret = os.environ.get(env_name, None)
+    if ret is None:
+        raise EnvironmentError(f"{env_name} env variable is not set")
+    return ret
+
+
+def optional_env(env_name, default):
+    return os.environ.get(env_name, default)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +44,7 @@ SECRET_KEY = 'django-insecure-hi6ko23u=a94w5@+9&wj&9)q$3sv2kgnxj30i43xni%v=#_8=4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,16 +56,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'auth_module',
+    'schedule',
+    'global_exception',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'global_exception.middleware.AutomaticExceptionHandler.AutomaticExceptionHandler',
 ]
 
 ROOT_URLCONF = 'python.urls'
@@ -73,6 +97,23 @@ WSGI_APPLICATION = 'python.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+DB_PASSWORD = required_env('DB_PASSWORD')
+DB_NAME = optional_env('DB_NAME', 'postgres')
+DB_USER = optional_env('DB_USER', 'postgres')
+DB_HOST = optional_env('DB_HOST', 'db.ogvqfqxkcdjthwlirugr.supabase.co')
+DB_PORT = optional_env('DB_PORT', '5432')
+DB_ENGINE = 'django.db.backends.postgresql_psycopg2'
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': DB_ENGINE,
+#         'NAME': DB_NAME,
+#         'USER': DB_USER,
+#         'HOST': DB_HOST,
+#         'PORT': DB_PORT,
+#         'PASSWORD': DB_PASSWORD,
+#     }
+# }
 
 DATABASES = {
     'default': {
@@ -116,6 +157,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 STATIC_URL = 'static/'
 
 # Default primary key field type

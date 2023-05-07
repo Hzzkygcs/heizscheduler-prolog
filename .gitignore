@@ -4,3 +4,5 @@
 **/temp/
 **/__pycache__/
 coba_coba/
+**/db.sqlite3
+**/token.pkl
