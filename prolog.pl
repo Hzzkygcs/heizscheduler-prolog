@@ -122,6 +122,16 @@ helper_get_multiple_booking_slot_distance([_|BookingSlots], Distance) :-
     helper_get_multiple_booking_slot_distance(BookingSlots, Distance).
 
 
+get_booking_slot_distance_total_penalty(BookingSlots, Penalty) :-
+    get_booking_slot_distance_penalties(BookingSlots, Penalties),
+    list_sum(Penalties, Penalty).
+
+list_sum([], 0).  % not directly tested
+list_sum([X|List], Result) :-
+    list_sum(List, PrevSum),
+    Result is X + PrevSum.
+
+
 get_booking_slot_distance_penalties(BookingSlots, Penalties) :-
     get_multiple_booking_slot_distance(BookingSlots, ListOfDistances),
     Goal=(member(Distance, ListOfDistances), get_booked_slot_penalty(Distance, Penalty)),
@@ -134,3 +144,5 @@ get_booked_slot_penalty(MinuteRange, 3) :- 25 =< MinuteRange, MinuteRange < 45, 
 get_booked_slot_penalty(MinuteRange, 2) :- 45 =< MinuteRange, MinuteRange < 60, !.
 get_booked_slot_penalty(MinuteRange, 1) :- 60 =< MinuteRange, MinuteRange < 120, !.
 get_booked_slot_penalty(_MinuteRange, 0).
+
+
