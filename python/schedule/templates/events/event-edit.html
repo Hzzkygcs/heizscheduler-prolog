@@ -1,0 +1,101 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Event</title>
+
+
+    {% include "dependencies.html" %}
+    <script src="{% static 'event-create/date-time-model.js' %}"></script>
+    <link href="{% static 'event-create/css.css' %}" rel="stylesheet">
+    <script src="{% static 'event-create/main.js' %}"></script>
+
+
+    {% include "tailwind-elements-head.html" %}
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body class="bg-gray-900 w-screen min-h-screen">
+<div class="flex justify-center w-full p-5">
+    <div style="max-width: 750px; width: 100%">
+            <div class="schedules">
+                <div class="grid max-w-screen">
+                    <div class="mb-6" style="max-width: 100%;">
+                        <label for="npm"
+                               class="block mb-2 text-sm font-medium text-white">Event Name</label>
+                        <div class="grid" style="grid-template-columns: minmax(40vw, 80vw) 1fr; grid-gap: 7px;">
+                            <input type="text" name="event_name" id="event_name"
+                                   class="input-box dark"
+                                   placeholder="My Event" required>
+                            <div class="flex items-center justify-end">
+                                <button type="button"
+                                        onclick="saveToServer()"
+                                        class="tosca-green-btn w-14 h-8">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div>
+                <div class="grid" style="grid-template-columns: auto auto;">
+                    <label class="mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                        Schedules
+                    </label>
+                    <div class="flex justify-end">
+                        <button type="button"  onclick="showModal()"  class="tosca-green-btn w-8 h-8">
+                            +
+                        </button>
+                    </div>
+                </div>
+                <div class="list-of-schedules">
+
+                </div>
+            </div>
+        </div>
+</div>
+
+<template id="item-template">
+    <div class="schedule-item tosca-btn">
+        <span class="date">
+            Friday, 13 March 2023
+        </span>
+        <div class="p-1"></div>
+        <span class="start-time">
+            10:23
+        </span>
+        <span>-</span>
+        <span class="end-time">
+            12:40
+        </span>
+
+        <div></div>
+        <button type="button" class="delete-btn red-btn">
+          Delete
+        </button>
+    </div>
+</template>
+
+{% with schedules|json_script:"existed-schedules" as serialized_data %}
+    {{ serialized_data|safe }}
+{% endwith %}
+
+{% with event_id|json_script:"event_id" as serialized_data %}
+    {{ serialized_data|safe }}
+{% endwith %}
+
+    {% include 'events/input-modal/input-schedule-modal.html' %}
+
+
+    {% include "tailwind-elements-end-of-body.html" %}
+</body>
+</html>

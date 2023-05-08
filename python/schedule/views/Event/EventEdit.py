@@ -29,13 +29,14 @@ class EventEdit(BaseScheduleView):
         super().setup(request, *args, **kwargs)
 
     @authenticated
-    def get(self, req, logged_in_user: User):
-        events = logged_in_user.get_list_of_events()
-        print(events)
-        return render(req, "events/event-edit.html", {})
+    def get(self, req, event_id, logged_in_user: User):
+        event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
+        schedules = Schedule.objects.filter(event=event_to_be_edited, owner=logged_in_user).all()
+        print(schedules)
+        return render(req, "events/event-edit.html", {'event_id': event_id, 'schedules': schedules})
 
     @authenticated
-    def put(self, req, logged_in_user: User, event_id):
+    def put(self, req, event_id, logged_in_user: User):
         event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
         if event_to_be_edited is None:
             raise BadRequestException("")
@@ -46,19 +47,19 @@ class EventEdit(BaseScheduleView):
 
         schedules = batch_convert_to_datetime(json.loads(body))
         print(schedules, logged_in_user.npm)
-        self.saveNewEvent(event_to_be_edited, schedules)
+        self.saveNewEvent(event_to_be_edited, schedules, logged_in_user)
 
         response = {'success': 1}
         return HttpResponse(json.dumps(response), content_type='application/json')
 
-    def saveNewEvent(self, event, schedules):
+    def saveNewEvent(self, event, schedules, user):
         created_schedules = []
-        old_schedule = Schedule.objects.filter(event).all()
+        old_schedule = Schedule.objects.filter(event=event).all()
         for schedule in old_schedule:
             schedule.delete()
 
         for schedule in schedules:
             start, end = schedule['start'], schedule['end']
-            new_schedule = self.schedule_factory.create_schedule(event.ID, start, end)
+            new_schedule = self.schedule_factory.create_schedule(event.ID, start, end, owner=user)
             created_schedules.append(new_schedule)
         print(created_schedules)
