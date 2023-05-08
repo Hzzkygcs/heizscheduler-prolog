@@ -12,5 +12,6 @@ function initializeScheduleItem(date, startTime, endTime, selector="#item-templa
 
 
 function load_json_data_from_script_tag(script_id){
-    return JSON.parse(document.getElementById(script_id).textContent)
+    let text_content = document.getElementById(script_id).textContent;
+    return JSON.parse(text_content);
 }

@@ -12,7 +12,7 @@ from schedule.exceptions.DateRangeIntersectionException import DateRangeIntersec
 
 class DateRange(Model):
 
-    ID = models.AutoField(primary_key=True)
+    ID = models.AutoField(primary_key=True)  # auto gk usah diisi
     start_date_time = models.DateTimeField()
     end_date_time = models.DateTimeField()
 

@@ -44,19 +44,21 @@ class EventCreate(BaseScheduleView):
             raise BadRequestException("No post data: 'event_name'")
 
         schedules = batch_convert_to_datetime(json.loads(body))
-        print(schedules, logged_in_user.npm)
-        self.saveNewEvent(logged_in_user, event_name, schedules)
+
+        user_npm = logged_in_user.npm
+        self.saveNewEvent(user_npm, event_name, schedules)
 
         response = {'success': 1}
         return HttpResponse(json.dumps(response), content_type='application/json')
 
-    def saveNewEvent(self, user, name, schedules):
+    def saveNewEvent(self, user_npm, name, schedules):
         created_schedules = []
-        event = Event.objects.create(name=name, owner_id=user.npm,
+        owner = User.objects.get(npm=user_npm)
+        event = Event.objects.create(name=name, owner=owner,
                                      slot_book_minute_width=30)
 
         for schedule in schedules:
             start, end = schedule['start'], schedule['end']
-            new_schedule = self.schedule_factory.create_schedule(event.ID, start, end)
+            new_schedule = self.schedule_factory.create_schedule(event.ID, user_npm, start, end)
             created_schedules.append(new_schedule)
         print(created_schedules)

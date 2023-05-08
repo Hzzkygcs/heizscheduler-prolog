@@ -1,3 +1,4 @@
+from auth_module.models import User
 from schedule.core.Repository.DateRangeRepository import DateRangeRepository
 from schedule.core.Repository.ScheduleRepository import ScheduleRepository
 from schedule.models import Schedule
@@ -8,9 +9,10 @@ class ScheduleFactory:
         self.date_range_repository = date_range_repository
         self.schedule_repository = schedule_repository
 
-    def create_schedule(self, event_id, start, end):
+    def create_schedule(self, event_id, owner_id, start, end):
         date_range = self.date_range_repository.create_and_save(start, end)
 
         date_range_id = date_range.ID
-        schedule = Schedule.objects.create(datetime_range_id=date_range_id, event_id=event_id)
+        owner = User.objects.get(npm=owner_id)
+        schedule = Schedule.objects.create(datetime_range_id=date_range_id, event_id=event_id, owner=owner)
         return schedule
