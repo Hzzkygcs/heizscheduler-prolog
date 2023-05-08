@@ -10,3 +10,7 @@ class Event(Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     slot_book_minute_width = models.IntegerField()
+
+    @property
+    def booking_minute_duration(self):
+        return self.slot_book_minute_width
