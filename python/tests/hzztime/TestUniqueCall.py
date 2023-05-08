@@ -4,7 +4,7 @@ from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.PrologCallable import define_parameterized_predicate
 from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.builtin_predicates import member
-from definitions.paths import HZZ_TIME_PL_IO
+from definitions.paths import HZZ_TIME_PL_PATH
 from definitions.predicates import unique_call
 from definitions.variables import X, Result, _, Y, Y1, X1
 from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
@@ -15,7 +15,7 @@ fact = define_parameterized_predicate("fact")
 
 class TestUniqueCall(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
 
 
     def test__should_be_able_to_handle_zero_result(self):

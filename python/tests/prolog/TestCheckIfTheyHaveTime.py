@@ -6,7 +6,7 @@ from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.functors import time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import check_if_they_have_time, have_time
 from definitions.variables import dont_care
 from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
@@ -40,7 +40,7 @@ range_5_to_6 = time_range(time_5_0_0, time_6_0_0)
 
 class TestCheckIfTheyHaveTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_be_false_if_no_haveTime_fact_provided(self):

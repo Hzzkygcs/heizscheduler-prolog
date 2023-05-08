@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
 from definitions.operators import time_point
-from definitions.paths import HZZ_TIME_PL_IO
+from definitions.paths import HZZ_TIME_PL_PATH
 from definitions.predicates import less_than
 
 
@@ -16,7 +16,7 @@ def is_less_than(result):
 
 class LessThanTrue(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
 
     def test__should_be_true_if_RHS_is_more_than_a_day(self):
         result = self.prolog.query(less_than(
@@ -64,7 +64,7 @@ class LessThanTrue(TestCase):
 
 class LessThanFalse(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
 
     def test__should_be_false_if_they_are_equal(self):
         result = self.prolog.query(less_than(

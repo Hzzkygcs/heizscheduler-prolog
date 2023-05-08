@@ -5,7 +5,7 @@ from HzzProlog.test_util import remove_trailing_false_or_true, assert_prolog_out
 from definitions.functors import time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import bruteforce_timerange
 from definitions.variables import Result
 from tests.testing_utils import get_list_from_list_of_dicts
@@ -16,7 +16,7 @@ DAY = 24*HOUR
 
 class TestBruteForceTimeranges(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test_bruteforce_timeranges__should_try_bruteforce_forward_and_backward(self):

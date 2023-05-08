@@ -4,7 +4,7 @@ from HzzProlog.HzzProlog import HzzProlog
 from definitions.functors import time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import HZZ_TIME_PL_IO
+from definitions.paths import HZZ_TIME_PL_PATH
 from definitions.predicates import inside_another_timerange
 
 
@@ -18,7 +18,7 @@ def extract_bool(result):
 
 class TestInsideAnotherTimerange(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_be_true_if_both_are_exactly_the_same(self):

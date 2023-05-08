@@ -6,7 +6,7 @@ from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.functors import time_range, booked_slot
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import list_of_timeranges_inside_booked_slot, get_booking_slot_distance_penalties, \
     get_booking_slot_distance_total_penalty
 from definitions.variables import dont_care, Result
@@ -22,7 +22,7 @@ MINUTE_DIFFERENCE_NO_PENALTY_LESS_THAN_10 = 9
 
 class TestGetBookingSlotDistanceTotalPenalty(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
         define_tokenizer_regex(self.prolog)
         self.booked_slot_generator = BookedSlotGenerator()
 

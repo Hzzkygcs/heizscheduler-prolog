@@ -3,7 +3,7 @@ from unittest import TestCase
 from HzzProlog.HzzProlog import HzzProlog
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import datetime
-from definitions.paths import HZZ_TIME_PL_IO
+from definitions.paths import HZZ_TIME_PL_PATH
 from definitions.predicates import add_time
 from definitions.variables import Result
 
@@ -13,7 +13,7 @@ HARI = JAM * 24
 
 class TestAddTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
         define_tokenizer_regex(self.prolog)
 
 

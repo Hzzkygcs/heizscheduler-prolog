@@ -5,14 +5,14 @@ from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.test_util import assert_prolog_output_the_same
 from definitions.functors import time_range
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import available, time, have_time
 from definitions.variables import X, Y, Z, dont_care
 
 
 class TestTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
 
     def test_time__should_return_list_of_endpoints_correctly_from_available(self):
         self.prolog.add_facts("available_definitions", [

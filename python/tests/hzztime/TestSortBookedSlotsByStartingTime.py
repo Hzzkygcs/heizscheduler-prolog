@@ -5,7 +5,7 @@ from HzzProlog.PrologCallable import define_parameterized_predicate
 from definitions.functors import booked_slot, time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import sort_booked_slots_by_starting_time
 from definitions.variables import Result, dont_care
 from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
@@ -32,7 +32,7 @@ booked_slot_4 = booked_slot(
 
 class TestSortBookedSlotsByStartingTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_be_able_to_handle_empty_list(self):

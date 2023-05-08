@@ -5,7 +5,7 @@ from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.functors import time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import HZZ_TIME_PL_IO
+from definitions.paths import HZZ_TIME_PL_PATH
 from definitions.predicates import list_of_timeranges_to_list_of_timepoints
 from definitions.variables import Result
 from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_of_dicts
@@ -13,7 +13,7 @@ from tests.testing_utils.get_list_from_list_of_dicts import get_list_from_list_o
 
 class TestListOfTimerangeToListOfTimePoint(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_IO)
+        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__empty_input_should_result_in_empty_output(self):

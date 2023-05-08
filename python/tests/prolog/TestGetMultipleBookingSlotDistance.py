@@ -7,7 +7,7 @@ from HzzProlog.test_util import remove_trailing_false_or_true, assert_prolog_out
 from definitions.functors import time_range, booked_slot
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import MAIN_PROLOG_FILE_IO
+from definitions.paths import FIND_JADWAL_PATH
 from definitions.predicates import available, have_time, find_jadwal, get_booking_slot_distance, \
     get_multiple_booking_slot_distance
 from definitions.variables import Result, dont_care
@@ -33,7 +33,7 @@ range_2 = (5-3)*24*60 + (5-8)*60 + (8 - 5)
 
 class TestGetMultipleBookingSlotDistance(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(MAIN_PROLOG_FILE_IO)
+        self.prolog = HzzProlog(FIND_JADWAL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_return_time_differences_correctly(self):
