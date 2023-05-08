@@ -13,6 +13,7 @@ class Schedule(Model):
     datetime_range = models.OneToOneField(DateRange, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     booker = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_preferred = models.BooleanField(default=False)
 
     @property
     def start_date_time(self):

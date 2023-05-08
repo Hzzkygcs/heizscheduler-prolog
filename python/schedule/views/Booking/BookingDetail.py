@@ -23,9 +23,10 @@ class BookingDetail(BaseScheduleView):
         booked_slots_lst = []
         for slot in booked_slots:
             booked_slots_lst.append({
-                'name': slot.booker.name,
+                'npm': slot.booker.npm,
                 'start': slot.start_date_time,
                 'end': slot.end_date_time,
+                'is_preferred': slot.is_preferred,
             })
 
         return render(req, "booking/available-booking-list.html", {

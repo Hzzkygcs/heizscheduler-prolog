@@ -10,8 +10,8 @@ function getSchedules(script_id='available-bookings'){
     const convertedAvailBookings = [];
 
     for (const availBooking of availBookings) {
-        let start = new Date(availBooking.datetime_range.start_date_time);
-        let end = new Date(availBooking.datetime_range.end_date_time);
+        let start = new Date(availBooking.start);
+        let end = new Date(availBooking.end);
         const startSplitted = splitDateTime(start);
         const endSplitted = splitDateTime(end);
 
@@ -20,11 +20,11 @@ function getSchedules(script_id='available-bookings'){
             schedule: new Schedule(startSplitted.date, startSplitted.time, endSplitted.time),
             start: start,
             end: end,
-            available: availBooking.available,
+            is_preferred: availBooking.is_preferred,
             booker_name: availBooking.booker_name,
         });
     }
-
+    console.log(convertedAvailBookings)
     return convertedAvailBookings;
 }
 
@@ -41,21 +41,21 @@ function reloadListOfSchedule(bookings, parentElement){
 
     let index = 0;
     for (const booking of bookings) {
-        console.log(booking.available)
-        const newEl = instantiateItem(index, parentElement, booking,  booking.available, booking.booker_name)
+        console.log(booking.is_preferred)
+        const newEl = instantiateItem(index, parentElement, booking,  booking.is_preferred, booking.booker_name)
         parentElement.append(newEl);
         index++;
     }
 }
 
-function instantiateItem(index, parentElement, booking, available, booker_name) {
+function instantiateItem(index, parentElement, booking, is_preferred, booker_name) {
     const schedule = booking.schedule;
     const date = dateObjToDateStringFormat(schedule.date);
     const startTime = schedule.startTime.toString();
     const endTime = schedule.endTime.toString();
 
     const newEl = initializeScheduleItem(date, startTime, endTime);
-    if (available){
+    if (!is_preferred){
         newEl.click(((availBooking) =>
             (e) => {
                 console.log("clicked");

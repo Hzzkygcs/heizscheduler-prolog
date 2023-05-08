@@ -11,7 +11,6 @@ class EventsView(BaseScheduleView):
     @authenticated
     def get(self, req, logged_in_user: User):
         events = logged_in_user.get_list_of_events()
-        print(events)
 
         event_data = []
         user_events = logged_in_user.event_set.all()
