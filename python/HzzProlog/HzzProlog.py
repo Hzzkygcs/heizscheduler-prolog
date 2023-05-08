@@ -161,12 +161,8 @@ class PrologTemplateProcessingContext:
 
         included_templates[hash(template)] = template.temp_file_path
 
-        generator = template.get_and_replace_imports()  # SIDE EFFECT
-        while True:
-            try:
-                import_file_name = next(generator)
-            except StopIteration:
-                break
+         # SIDE EFFECT
+        def provide_modified_import_name(import_file_name):
             directory_name = os.path.dirname(template.script_file_abs_path)
             abs_imported_file_path = os.path.join(directory_name, import_file_name)
 
@@ -176,10 +172,8 @@ class PrologTemplateProcessingContext:
             processed_file_name = self.save_injected_script_to_file(imported_template)
             processed_file_name = os.path.basename(processed_file_name)
             processed_file_name = os.path.splitext(processed_file_name)[0]
-            try:
-                generator.send(processed_file_name)
-            except StopIteration:
-                break
+            return processed_file_name
+        template.get_and_replace_imports(provide_modified_import_name)
         template.save_injected_script_to_file()  # SIDE EFFECT
         return template.temp_file_path
 
@@ -219,11 +213,11 @@ class PrologTemplatePreprocessor:
         self.script_file_content = self.original_file_content
         self.load_temporary_file_name()
 
-    def get_and_replace_imports(self):
+    def get_and_replace_imports(self, get_modified_import_name: Callable[[str], str]):
         patterns = [
-            (":-\\s*\\[([a-zA-Z0-9]+)\\]\\s*\\.", lambda x: f"[{x}]"),
-            (":-\\s*consult\\(([a-zA-Z0-9]+)\\)\\s*\\.", lambda x: f"consult({x})"),
-             (":-\\s*ensure_loaded\\(([a-zA-Z0-9]+)\\)\\s*\\.", lambda x: f"ensure_loaded({x})"),
+            (":-\\s*\\[([a-zA-Z0-9_]+)\\]\\s*\\.", lambda x: f"[{x}]"),
+            (":-\\s*consult\\(([a-zA-Z0-9_]+)\\)\\s*\\.", lambda x: f"consult({x})"),
+             (":-\\s*ensure_loaded\\(([a-zA-Z0-9_]+)\\)\\s*\\.", lambda x: f"ensure_loaded({x})"),
         ]
         file_content = self.script_file_content
         for pattern, import_transformer in patterns:
@@ -236,7 +230,7 @@ class PrologTemplatePreprocessor:
                     temp_file_content.append(token)
                     continue
                 original_imported_file_name = match.group(1)
-                modified_imported_file_name = yield original_imported_file_name
+                modified_imported_file_name = get_modified_import_name(original_imported_file_name)
 
                 import_syntax = import_transformer(modified_imported_file_name)
                 assert len({".", "/", "\\"} & set(import_syntax)) == 0
