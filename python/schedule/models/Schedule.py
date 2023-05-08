@@ -9,10 +9,10 @@ from schedule.models.Event import Event
 
 
 class Schedule(Model):
-    ID = models.AutoField(primary_key=True)
+    ID = models.AutoField(primary_key=True)  # auto gk ush diisi
     datetime_range = models.OneToOneField(DateRange, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    booker = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     is_preferred = models.BooleanField(default=False)
 
     @property
@@ -22,8 +22,6 @@ class Schedule(Model):
     @property
     def end_date_time(self):
         return self.datetime_range.end_date_time
-
-
 
 
 @receiver(post_delete, sender=Schedule)

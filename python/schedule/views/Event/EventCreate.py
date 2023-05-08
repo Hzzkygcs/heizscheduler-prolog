@@ -53,7 +53,8 @@ class EventCreate(BaseScheduleView):
 
     def saveNewEvent(self, user_npm, name, schedules):
         created_schedules = []
-        event = Event.objects.create(name=name, owner_id=user_npm,
+        owner = User.objects.get(npm=user_npm)
+        event = Event.objects.create(name=name, owner=owner,
                                      slot_book_minute_width=30)
 
         for schedule in schedules:
