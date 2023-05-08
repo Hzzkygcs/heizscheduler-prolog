@@ -18,10 +18,18 @@ class BookingDetail(BaseScheduleView):
 
     def get(self, req, event_id):
         event = Event.objects.get(ID=event_id)
-        booked_slots = Schedule.objects.all().filter(event=event)  # supaya json-able TODO
+        booked_slots = Schedule.objects.all().filter(event=event)
+
+        booked_slots_lst = []
+        for slot in booked_slots:
+            booked_slots_lst.append({
+                'name': slot.booker.name,
+                'start': slot.start_date_time,
+                'end': slot.end_date_time,
+            })
 
         return render(req, "booking/available-booking-list.html", {
-            'bookings': booked_slots,
+            'bookings': booked_slots_lst,
             'event_name': event.name,
         })
 

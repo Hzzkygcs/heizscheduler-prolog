@@ -12,7 +12,7 @@ class Schedule(Model):
     ID = models.AutoField(primary_key=True)
     datetime_range = models.OneToOneField(DateRange, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    booker = models.ForeignKey(User)
+    booker = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
     def start_date_time(self):
