@@ -11,6 +11,7 @@ from random import randint
 from typing import Union, Callable
 
 from HzzProlog.PrologCallable import BasePrologCallable
+from HzzProlog.exceptions.PrologScriptNotFoundException import PrologScriptNotFoundException
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from PrologOutputProcessor import PrologOutputProcessor
@@ -183,6 +184,7 @@ class PrologTemplatePreprocessor:
     def __init__(self, script_file_abs_path: str, file_content=None, delete_temp_files=True):
         self.facts = {}
         assert os.path.isabs(script_file_abs_path)
+        self.assert_file_exists(script_file_abs_path)
         self.script_file_abs_path = script_file_abs_path
         self.temp_folders = os.path.join(self.script_folder_abs_path, "temp")
 
@@ -197,6 +199,10 @@ class PrologTemplatePreprocessor:
         self.script_file_content = None
         self.reset()
         self.before_preprocessed_script_hash = hash(self.script_file_content)
+
+    def assert_file_exists(self, script_file_abs_path):
+        if not os.path.isfile(script_file_abs_path):
+            raise PrologScriptNotFoundException(script_file_abs_path)
 
     def __repr__(self):
         return f"<<{self.temp_file_path}>>"
