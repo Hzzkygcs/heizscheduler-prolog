@@ -81,7 +81,7 @@ function submitModal(){
     reloadListOfSchedule(schedules, $(LIST_OF_SCHEDULES_EL))
 }
 
-function getSchedules(script_id='existed-schedules'){
+function getExistingSchedules(script_id='existed-schedules'){
     const availBookings = load_json_data_from_script_tag(script_id);
     const convertedAvailBookings = [];
 
@@ -92,20 +92,18 @@ function getSchedules(script_id='existed-schedules'){
         const endSplitted = splitDateTime(end);
 
         console.assert(startSplitted.date.valueOf() === endSplitted.date.valueOf());
-        convertedAvailBookings.push({
-            schedule: new Schedule(startSplitted.date, startSplitted.time, endSplitted.time),
-            start: start,
-            end: end,
-            is_preferred: availBooking.is_preferred,
-            booker_name: availBooking.booker_name,
-        });
+
+        const existing_schedule = new Schedule(startSplitted.date, startSplitted.time, endSplitted.time);
+        schedules.push(existing_schedule)
+        schedules.sort(SCHEDULE_SORT)
     }
-    console.log(convertedAvailBookings)
-    return convertedAvailBookings;
+    console.log(schedules)
 }
 
 
 $(document).ready(() => {
+    console.log("test");
+    getExistingSchedules();
     reloadListOfSchedule(schedules, $(LIST_OF_SCHEDULES_EL));
 });
 
@@ -164,15 +162,9 @@ function noOverlappingSchedule(schedules){
 }
 
 
-function validate(){
-    if ($("#event_name").val().length == 0){
-        throw new ValidationError("Event Name should not be null");
-    }
-
-}
-
 function saveToServer(){
-    validate();
+
+    const event_id = load_json_data_from_script_tag('event_id')
 
     const data = [];
     for (const schedule of schedules) {
@@ -182,8 +174,7 @@ function saveToServer(){
         })
     }
 
-    $.post("/events/create", {
-        event_name: $("#event_name").val(),
+    $.post("/events/edit/" + event_id, {
         schedules: JSON.stringify(data),
     }, (data) => {
         if (data.success === 1) {

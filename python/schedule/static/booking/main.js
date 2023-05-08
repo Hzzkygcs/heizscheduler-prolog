@@ -123,14 +123,3 @@ function submitModal(startDateObj, endDateObj){
     });
 }
 
-
-
-
-function splitDateTime(date) {
-    return {
-        date: dateTruncateToPrevMidnight(date),
-        time: Time.fromDateObj(date)
-    };
-}
-
-

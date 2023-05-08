@@ -11,8 +11,8 @@ from schedule.views.PrologDemo import PrologDemo
 from schedule.views.PrologDemo2 import PrologDemo2
 
 urlpatterns = [
-    path('events', EventsView.as_view(), name='event_list'),
-    path('prolog-demo', PrologDemo.as_view(), name='prolog-demo'),
+    path('events/', EventsView.as_view(), name='event_list'),
+    path('prolog-demo/', PrologDemo.as_view(), name='prolog-demo'),
     path('prolog-demo/<int:event_id>', PrologDemo2.as_view(), name='prolog-demo'),
 
     path('events/create', EventCreate.as_view(), name='event_create'),
