@@ -70,5 +70,5 @@ get_overall_soft_constraint_penalty(BookingSlots, Penalty) :-
     length(BookingSlots, Length),
     get_booking_slot_distance_total_penalty(BookingSlots, DistancePenalty),
     count_preferred(BookingSlots, NumberOfPreferred),
-    UnmetPreferencePenalty is Length - NumberOfPreferred,
+    UnmetPreferencePenalty is Length - NumberOfPreferred,  % swap
     Penalty is UnmetPreferencePenalty + DistancePenalty*3/4.  % weight ditakar pakai intuisi saja

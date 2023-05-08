@@ -1,4 +1,5 @@
 :- [time_processing_utilities].
+:- [soft_constraints].
 
 :- dynamic available/1.
 :- dynamic have_time/3.
@@ -44,7 +45,6 @@ find_jadwal(Duration, Result) :-
         TemporaryResult, find_jadwal(Duration, NpmList, [], ListOfRawTimePointBruteforces, TemporaryResult), Result
     ).
 
-
 find_jadwal(_, [], FinalBookedSlots, _, FinalBookedSlots).
 find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimePointBruteforces, FinalBookedSlots) :-
     list_of_timeranges_inside_booked_slot(CurrentBookedSlots, ListOfTimeRangesInsideBookedSlot),
@@ -62,3 +62,21 @@ find_jadwal(Duration, [Npm | RemainingNpm], CurrentBookedSlots, ListOfRawTimePoi
 
     NewBookedSlot = booked_slot(Npm, IsPreferred, TimeRange),
     find_jadwal(Duration, RemainingNpm, [NewBookedSlot | CurrentBookedSlots], ListOfRawTimePointBruteforces, FinalBookedSlots).
+
+find_jadwal_and_penalty(Duration, Result) :-
+    find_jadwal(Duration, ListOfBookedSlots),
+    get_overall_soft_constraint_penalty(ListOfBookedSlots, PenaltyScore),
+    Result=penalty_and_slots(PenaltyScore, ListOfBookedSlots).
+
+:- use_module(library(pairs)).
+find_jadwal_and_score_sorted_list(Duration, ResultingList) :-
+    findall(Key-Value, find_jadwal_and_penalty(Duration, penalty_and_slots(Key, Value)), UnsortedPairs),
+    keysort(UnsortedPairs, SortedPairs),
+    ItemResult=penalty_and_slots(PenaltyScore, ListOfBookedSlots),
+    Goal=member(PenaltyScore-ListOfBookedSlots, SortedPairs),
+    findall(ItemResult, Goal, ResultingList).
+
+
+find_jadwal_and_score_sorted_member(Duration, ResultingMember) :-
+    find_jadwal_and_score_sorted_list(Duration, List),
+    member(ResultingMember, List).

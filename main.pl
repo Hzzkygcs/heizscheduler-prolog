@@ -1,5 +1,4 @@
 :- [find_jadwal].
-:- [soft_constraints].
 
 
 % {%begin ignore%}
