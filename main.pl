@@ -18,6 +18,7 @@ have_time(2006462664, 0, time_range(3:13:30, 3:18:00)).
 
 % {%end ignore%}
 
+% {{definitions}}
 % {{available_definitions}}
 % {{have_time_definitions}}
 % {{testing_definitions}}

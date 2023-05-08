@@ -112,3 +112,8 @@ class get_booking_slot_distance_penalties(define_parameterized_predicate("get_bo
 class get_booking_slot_distance_total_penalty(define_parameterized_predicate("get_booking_slot_distance_total_penalty")):
     def __init__(self, booked_slots: list[booked_slot], result: Variable[int]):
         super().__init__(booked_slots, result)
+
+
+class find_jadwal_and_score_sorted_member(define_parameterized_predicate("find_jadwal_and_score_sorted_member")):
+    def __init__(self, duration: int, result: Variable[list[booked_slot]]):
+        super().__init__(duration, result)
