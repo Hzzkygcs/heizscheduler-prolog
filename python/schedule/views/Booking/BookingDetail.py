@@ -20,17 +20,30 @@ class BookingDetail(BaseScheduleView):
         event = Event.objects.get(ID=event_id)
         booked_slots = Schedule.objects.all().filter(event=event)
 
-        booked_slots_lst = []
+        set_user = set()
         for slot in booked_slots:
+            set_user.add(slot.owner.npm)
+
+        booked_slots_lst = []
+
+        for user in set_user:
             booked_slots_lst.append({
-                'npm': slot.owner.npm,
-                'start': slot.start_date_time,
-                'end': slot.end_date_time,
-                'is_preferred': slot.is_preferred,
+                'user': user,
+                'slots': []
             })
 
+        for slot in booked_slots:
+            for booked_slot in booked_slots_lst:
+                if booked_slot['user'] == slot.owner.npm:
+                    booked_slot['slots'].append({
+                        'start': slot.start_date_time,
+                        'end': slot.end_date_time,
+                        'is_preferred': slot.is_preferred,
+                    })
+
         return render(req, "booking/available-booking-list.html", {
-            'bookings': booked_slots_lst,
+            'event_id': event_id,
+            'schedules': booked_slots_lst,
             'event_name': event.name,
         })
 

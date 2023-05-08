@@ -55,30 +55,20 @@
 
 
             </div>
-            <div>
-                <div class="grid" style="grid-template-columns: auto auto;">
-                    <label class="mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
-                        {{ bookings.npm }}
-                    </label>
-                    <div class="flex justify-end">
+            {% for schedule in schedules %}
+                <div>
+                    <div class="grid" style="grid-template-columns: auto auto;">
+                        <label class="mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                            {{ schedule.user }}
+                        </label>
+                        <div class="flex justify-end">
+                        </div>
+                    </div>
+                    <div class="list-of-schedules">
+
                     </div>
                 </div>
-                <div class="list-of-schedules">
-
-                </div>
-
-                <div class="grid" style="grid-template-columns: auto auto;">
-                    <label class="mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
-                        NPM2
-                    </label>
-                    <div class="flex justify-end">
-                    </div>
-                </div>
-                <div class="list-of-schedules">
-
-                </div>
-
-            </div>
+            {% endfor %}
         </div>
 </div>
 
@@ -103,7 +93,7 @@
     </div>
 </template>
 
-{% with bookings|json_script:"available-bookings" as serialized_data %}
+{% with schedules|json_script:"available-bookings" as serialized_data %}
     {{ serialized_data|safe }}
 {% endwith %}
 
