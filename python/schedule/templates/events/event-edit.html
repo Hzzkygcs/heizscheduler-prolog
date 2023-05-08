@@ -11,7 +11,8 @@
     {% include "dependencies.html" %}
     <script src="{% static 'event-create/date-time-model.js' %}"></script>
     <link href="{% static 'event-create/css.css' %}" rel="stylesheet">
-    <script src="{% static 'event-create/main.js' %}"></script>
+    <script src="{% static 'event-edit/main.js' %}"></script>
+    {% comment %} <script src="{% static 'booking/main.js' %}"></script> {% endcomment %}
 
 
     {% include "tailwind-elements-head.html" %}
@@ -25,12 +26,12 @@
             <div class="schedules">
                 <div class="grid max-w-screen">
                     <div class="mb-6" style="max-width: 100%;">
-                        <label for="npm"
-                               class="block mb-2 text-sm font-medium text-white">Event Name</label>
                         <div class="grid" style="grid-template-columns: minmax(40vw, 80vw) 1fr; grid-gap: 7px;">
-                            <input type="text" name="event_name" id="event_name"
-                                   class="input-box dark"
-                                   placeholder="My Event" required>
+                            <div class="flex items-center">
+                                <h1 class="text-4xl font-bold block mb-2 text-white">
+                                    {{ event_name }}
+                                </h1>
+                            </div>
                             <div class="flex items-center justify-end">
                                 <button type="button"
                                         onclick="saveToServer()"

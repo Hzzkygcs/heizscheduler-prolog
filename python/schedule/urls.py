@@ -10,8 +10,8 @@ from schedule.views.Label.LabelsView import LabelsView
 from schedule.views.PrologDemo import PrologDemo
 
 urlpatterns = [
-    path('events', EventsView.as_view(), name='event_list'),
-    path('prolog-demo', PrologDemo.as_view(), name='prolog-demo'),
+    path('events/', EventsView.as_view(), name='event_list'),
+    path('prolog-demo/', PrologDemo.as_view(), name='prolog-demo'),
 
     path('events/create', EventCreate.as_view(), name='event_create'),
     path('events/edit/<int:event_id>', EventEdit.as_view(), name='event_edit'),

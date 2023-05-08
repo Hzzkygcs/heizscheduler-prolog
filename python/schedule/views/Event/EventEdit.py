@@ -29,19 +29,35 @@ class EventEdit(BaseScheduleView):
         super().setup(request, *args, **kwargs)
 
     @authenticated
-    def get(self, req, event_id, logged_in_user: User):
+    def get(self, req, logged_in_user: User, *, event_id):
+        print('event_id', event_id)
         event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
-        schedules = Schedule.objects.filter(event=event_to_be_edited, owner=logged_in_user).all()
+        schedules_obj = Schedule.objects.filter(event=event_to_be_edited, owner=logged_in_user).all()
+        
+        schedules = []
+        for schedule in schedules_obj:
+            schedules.append({
+                'npm': schedule.owner.npm,
+                'start': schedule.start_date_time,
+                'end': schedule.end_date_time,
+                'is_preferred': schedule.is_preferred,
+            })
         print(schedules)
-        return render(req, "events/event-edit.html", {'event_id': event_id, 'schedules': schedules})
+        data = {
+                'event_id': event_id, 
+                'event_name': event_to_be_edited.name, 
+                'schedules': schedules
+                }
+        print(data)
+        return render(req, "events/event-edit.html", data)
 
     @authenticated
-    def put(self, req, event_id, logged_in_user: User):
+    def post(self, req, logged_in_user: User, *, event_id):
         event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
         if event_to_be_edited is None:
             raise BadRequestException("")
 
-        body = req.PUT.get('schedules')
+        body = req.POST.get('schedules')
         if body is None:
             raise BadRequestException("No post data: 'schedules'")
 
@@ -60,6 +76,6 @@ class EventEdit(BaseScheduleView):
 
         for schedule in schedules:
             start, end = schedule['start'], schedule['end']
-            new_schedule = self.schedule_factory.create_schedule(event.ID, start, end, owner=user)
+            new_schedule = self.schedule_factory.create_schedule(event_id=event.ID, owner_id=user.npm, start=start, end=end)
             created_schedules.append(new_schedule)
         print(created_schedules)

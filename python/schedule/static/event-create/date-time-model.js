@@ -149,3 +149,9 @@ function dateTruncateToPrevMidnight(date){
     return date;
 }
 
+function splitDateTime(date) {
+    return {
+        date: dateTruncateToPrevMidnight(date),
+        time: Time.fromDateObj(date)
+    };
+}
