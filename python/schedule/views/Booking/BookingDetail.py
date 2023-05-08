@@ -42,6 +42,7 @@ class BookingDetail(BaseScheduleView):
                     })
 
         return render(req, "booking/available-booking-list.html", {
+            'event_id': event_id,
             'schedules': booked_slots_lst,
             'event_name': event.name,
         })
