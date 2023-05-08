@@ -4,7 +4,7 @@ from HzzProlog.HzzProlog import HzzProlog
 from definitions.functors import time_range
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import datetime
-from definitions.paths import HZZ_TIME_PL_PATH
+from definitions.paths import TIME_PROCESSING_UTILITIES_PL_PATH
 from definitions.predicates import duration
 from definitions.variables import X
 
@@ -14,7 +14,7 @@ HARI = JAM * 24
 
 class TestAddTime(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
+        self.prolog = HzzProlog(TIME_PROCESSING_UTILITIES_PL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_return_0_if_starttime_and_endtime_are_equal(self):

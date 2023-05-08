@@ -2,14 +2,14 @@ from unittest import TestCase
 
 from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.test_util import assert_prolog_output_the_same
-from definitions.paths import FIND_JADWAL_PATH
+from definitions.paths import MAIN_PROLOG_PATH
 from definitions.predicates import have_time, all_npm
 from definitions.variables import X, dont_care
 
 
 class TestAllNpm(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(FIND_JADWAL_PATH)
+        self.prolog = HzzProlog(MAIN_PROLOG_PATH)
 
     def test_all_npm__should_all_npm_from_haveTime(self):
         self.prolog.add_facts("have_time_definitions", [

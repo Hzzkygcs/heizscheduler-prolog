@@ -5,14 +5,14 @@ from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.functors import time_range, booked_slot
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import time_point
-from definitions.paths import FIND_JADWAL_PATH
+from definitions.paths import MAIN_PROLOG_PATH
 from definitions.predicates import list_of_timeranges_inside_booked_slot
 from definitions.variables import dont_care, Result
 
 
 class TestListOfTimeRangesInsideBookedSlot(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(FIND_JADWAL_PATH)
+        self.prolog = HzzProlog(MAIN_PROLOG_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_return_empty_timerange_list_if_no_booked_slots(self):

@@ -3,7 +3,7 @@ from unittest import TestCase
 from HzzProlog.HzzProlog import HzzProlog
 from definitions.functors import time_range
 from definitions.operators import time_point
-from definitions.paths import HZZ_TIME_PL_PATH
+from definitions.paths import TIME_PROCESSING_UTILITIES_PL_PATH
 from definitions.predicates import time_conflict_list
 
 
@@ -17,7 +17,7 @@ def is_conflict(result):
 
 class TestTimeConflictList(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
+        self.prolog = HzzProlog(TIME_PROCESSING_UTILITIES_PL_PATH)
 
     def test__end_time_of_a_timeRange_should_be_considered_as_exclusive(self):
         result = self.prolog.query(time_conflict_list(

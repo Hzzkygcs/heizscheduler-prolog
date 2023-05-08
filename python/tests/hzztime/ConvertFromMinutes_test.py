@@ -3,7 +3,7 @@ from unittest import TestCase
 from HzzProlog.HzzProlog import HzzProlog
 from definitions.misc import define_tokenizer_regex
 from definitions.operators import datetime
-from definitions.paths import HZZ_TIME_PL_PATH
+from definitions.paths import TIME_PROCESSING_UTILITIES_PL_PATH
 from definitions.predicates import convert_from_minutes
 from definitions.variables import Result
 
@@ -13,7 +13,7 @@ HARI = JAM * 60
 
 class TestConvertFromMinutes(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(HZZ_TIME_PL_PATH)
+        self.prolog = HzzProlog(TIME_PROCESSING_UTILITIES_PL_PATH)
         define_tokenizer_regex(self.prolog)
 
     def test__should_convert_minutes_correctly(self):

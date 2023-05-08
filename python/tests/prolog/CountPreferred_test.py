@@ -3,14 +3,14 @@ from unittest import TestCase
 from HzzProlog.HzzProlog import HzzProlog
 from HzzProlog.test_util import remove_trailing_false_or_true
 from definitions.functors import booked_slot
-from definitions.paths import FIND_JADWAL_PATH
+from definitions.paths import MAIN_PROLOG_PATH
 from definitions.predicates import count_preferred
 from definitions.variables import X, dont_care
 
 
 class TestCountPreferred(TestCase):
     def setUp(self) -> None:
-        self.prolog = HzzProlog(FIND_JADWAL_PATH)
+        self.prolog = HzzProlog(MAIN_PROLOG_PATH)
 
     def test__should_return_0_for_empty_list(self):
         self._run_test([])
