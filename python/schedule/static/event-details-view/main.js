@@ -76,7 +76,7 @@ function instantiateItem(index, parentElement, booking, is_preferred, booker_nam
     const startTime = schedule.startTime.toString();
     const endTime = schedule.endTime.toString();
 
-    const newEl = initializeScheduleItem(date, startTime, endTime);
+    const newEl = initializeScheduleItem(date, startTime, endTime, false);
     newEl.click(on_click ?? (() => {}));
     if (is_preferred)
         newEl.addClass("starred");

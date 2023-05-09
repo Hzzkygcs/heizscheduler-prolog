@@ -123,7 +123,7 @@ function reloadListOfSchedule(schedules, parentElement){
         const startTime = schedule.startTime.toString();
         const endTime = schedule.endTime.toString();
 
-        const newEl = initializeScheduleItem(date, startTime, endTime);
+        const newEl = initializeScheduleItem(date, startTime, endTime, true);
 
         const delBtn = newEl.find(".delete-btn");
         delBtn.click(((ind) => (e) => {

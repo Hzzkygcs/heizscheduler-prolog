@@ -1,11 +1,14 @@
 const SCHEDULE_SORT = (a, b) => a.compare(b);
 
-function initializeScheduleItem(date, startTime, endTime, selector="#item-template") {
+function initializeScheduleItem(date, startTime, endTime, deletable=false, selector="#item-template") {
     const newEl = $($(selector).html());
 
     newEl.find(".date").text(date);
     newEl.find(".start-time").text(startTime);
     newEl.find(".end-time").text(endTime);
+
+    if (deletable)
+        newEl.addClass("deletable");
 
     return newEl;
 }

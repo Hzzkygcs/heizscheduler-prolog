@@ -81,22 +81,7 @@
 
 {#booking-item-template#}
 <template id="item-template">
-    <div class="schedule-item tosca-btn clickable py-1 my-2">
-        <span class="date">
-            Friday, 13 March 2023
-        </span>
-        <div class="p-1"></div>
-        <span class="start-time">
-            10:23
-        </span>
-        <span>-</span>
-        <span class="end-time">
-            12:40
-        </span>
-
-        <div class="dummy px-2"></div>
-        <div class="is-preferred-symbol px-4">&starf;</div>
-    </div>
+    {% include 'events/elements/schedule-item-template.html' %}
 </template>
 
 {% with schedules|json_script:"available-bookings" as serialized_data %}
