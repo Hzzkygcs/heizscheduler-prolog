@@ -15,6 +15,7 @@ from global_exception.exceptions.BadRequest import BadRequestException
 from schedule.core.Repository.DateRangeRepository import DateRangeRepository
 from schedule.core.Repository.ScheduleRepository import ScheduleRepository
 from schedule.core.ScheduleFactory import ScheduleFactory
+from schedule.exceptions.EventNotFoundException import EventNotFoundException
 from schedule.models import Event, Schedule
 from schedule.views.BaseScheduleView import BaseScheduleView
 from schedule.views.util import batch_convert_to_datetime
@@ -31,7 +32,7 @@ class EventEdit(BaseScheduleView):
     @authenticated
     def get(self, req, logged_in_user: User, *, event_id):
         print('event_id', event_id)
-        event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
+        event_to_be_edited = get_event_by_id(event_id)
         schedules_obj = Schedule.objects.filter(event=event_to_be_edited, owner=logged_in_user).all()
         
         schedules = []
@@ -53,9 +54,7 @@ class EventEdit(BaseScheduleView):
 
     @authenticated
     def post(self, req, logged_in_user: User, *, event_id):
-        event_to_be_edited = logged_in_user.event_set.get(ID=event_id)
-        if event_to_be_edited is None:
-            raise BadRequestException("")
+        event_to_be_edited = get_event_by_id(event_id)
 
         body = req.POST.get('schedules')
         if body is None:
@@ -70,12 +69,18 @@ class EventEdit(BaseScheduleView):
 
     def saveNewEvent(self, event, schedules, user):
         created_schedules = []
-        old_schedule = Schedule.objects.filter(event=event).all()
-        for schedule in old_schedule:
-            schedule.delete()
+        old_schedule = Schedule.objects.filter(event=event, owner_id=user.pk).all()
+        old_schedule.delete()
 
         for schedule in schedules:
             start, end = schedule['start'], schedule['end']
             new_schedule = self.schedule_factory.create_schedule(event_id=event.ID, owner_id=user.npm, start=start, end=end)
             created_schedules.append(new_schedule)
         print(created_schedules)
+
+
+def get_event_by_id(event_id):
+    event_to_be_edited = Event.objects.filter(ID=event_id).first()
+    if event_to_be_edited is None:
+        raise EventNotFoundException()
+    return event_to_be_edited
