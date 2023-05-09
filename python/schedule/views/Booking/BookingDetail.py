@@ -41,7 +41,7 @@ class BookingDetail(BaseScheduleView):
                         'is_preferred': slot.is_preferred,
                     })
 
-        return render(req, "booking/available-booking-list.html", {
+        return render(req, "events-detail/available-booking-list.html", {
             'event_id': event_id,
             'schedules': booked_slots_lst,
             'event_name': event.name,
@@ -60,6 +60,6 @@ class BookingDetail(BaseScheduleView):
         daterange = DateRange(start_date_time=start, end_date_time=end)
 
         event.save_booking_if_valid(name, daterange)
-        return render(req, "booking/available-booking-list.html", {
+        return render(req, "events-detail/available-booking-list.html", {
             'success': 1,
         })

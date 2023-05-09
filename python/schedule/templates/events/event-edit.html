@@ -67,24 +67,7 @@
 </div>
 
 <template id="item-template">
-    <div class="schedule-item tosca-btn clickable">
-        <span class="date">
-            Friday, 13 March 2023
-        </span>
-        <div class="p-1"></div>
-        <span class="start-time">
-            10:23
-        </span>
-        <span>-</span>
-        <span class="end-time">
-            12:40
-        </span>
-
-        <div></div>
-        <button type="button" class="delete-btn red-btn">
-          Delete
-        </button>
-    </div>
+    {% include 'events/elements/schedule-item-template.html' %}
 </template>
 
 {% with schedules|json_script:"existed-schedules" as serialized_data %}
