@@ -45,19 +45,6 @@ function reloadListOfSchedule(bookings, parentElement){
         reloadListOfScheduleOfAUser(userNpm, bookingsOfTheUser);
     }
 }
-function reloadListOfScheduleOfAUser(npm, bookings){
-    console.log(npm);
-    bookings = bookings.sort((a, b) => SCHEDULE_SORT(a.schedule, b.schedule))
-    const parentElement = newListItemOfSchedulesForEachNpmTemplate(npm);
-
-    let index = 0;
-    for (const booking of bookings) {
-        console.log(booking.is_preferred)
-        const newEl = instantiateItem(index, parentElement, booking,  booking.is_preferred, booking.booker_name)
-        parentElement.append(newEl);
-        index++;
-    }
-}
 function newListItemOfSchedulesForEachNpmTemplate(npm) {
     const template = $(".list-of-schedules-for-each-npm-template");
     const ret = $(template.html());
@@ -70,20 +57,18 @@ function newListItemOfSchedulesForEachNpmTemplate(npm) {
 
 
 
-function instantiateItem(index, parentElement, booking, is_preferred, booker_name, on_click=null) {
-    const schedule = booking.schedule;
-    const date = dateObjToDateStringFormat(schedule.date);
-    const startTime = schedule.startTime.toString();
-    const endTime = schedule.endTime.toString();
+function reloadListOfScheduleOfAUser(npm, bookings){
+    console.log(npm);
+    bookings = bookings.sort((a, b) => SCHEDULE_SORT(a.schedule, b.schedule))
+    const parentElement = newListItemOfSchedulesForEachNpmTemplate(npm);
 
-    const newEl = initializeScheduleItem(date, startTime, endTime, false);
-    newEl.click(on_click ?? (() => {}));
-    if (is_preferred)
-        newEl.addClass("starred");
-    if (on_click == null)
-        newEl.removeClass("clickable");
-    return newEl;
+    for (const booking of bookings) {
+        console.log(booking.is_preferred)
+        const newEl = instantiateItem(booking.schedule, booking.is_preferred)
+        parentElement.append(newEl);
+    }
 }
+
 
 
 

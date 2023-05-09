@@ -119,21 +119,14 @@ function reloadListOfSchedule(schedules, parentElement){
 
     let index = 0;
     for (const schedule of schedules) {
-        const date = dateObjToDateStringFormat(schedule.date);
-        const startTime = schedule.startTime.toString();
-        const endTime = schedule.endTime.toString();
-
-        const newEl = initializeScheduleItem(date, startTime, endTime, true);
-
-        const delBtn = newEl.find(".delete-btn");
-        delBtn.click(((ind) => (e) => {
+        const onDelete = ((ind) => (e) => {
             const isConfirmed = confirm(`Do you really want to delete this schedule?`);
             if (isConfirmed){
                 schedules.splice(ind, 1);
                 reloadListOfSchedule(schedules, parentElement);
             }
-        })(index));
-
+        })(index);
+        const newEl = instantiateItem(schedule, schedule.preferred, {onDelete:onDelete});
         parentElement.append(newEl);
         index++;
     }

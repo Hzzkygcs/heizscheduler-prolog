@@ -5,10 +5,13 @@
 
 .schedule-item{
     display: grid;
-    grid-template-columns: repeat(5, auto) 1fr auto;
+    grid-template-columns: repeat(5, auto) 1fr auto auto;
     grid-column-gap: 0.3rem;
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
+}
+.schedule-item .is-preferred-symbol{
+    text-align: center;
 }
 
 .schedule-item .delete-btn{
