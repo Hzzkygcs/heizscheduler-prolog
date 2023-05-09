@@ -7,22 +7,25 @@ $(document).ready(function () {
 
 function getSchedules(script_id='available-bookings'){
     const availBookings = load_json_data_from_script_tag(script_id);
-    const convertedAvailBookings = [];
+    const convertedAvailBookings = {};
 
-    for (const userNPM of availBookings) {
-        for (const availBooking of userNPM.slots) {
+    for (const user of availBookings) {
+        const userNpm = user.user;
+        convertedAvailBookings[userNpm] = [];
+
+        for (const availBooking of user.slots) {
             let start = new Date(availBooking.start);
             let end = new Date(availBooking.end);
             const startSplitted = splitDateTime(start);
             const endSplitted = splitDateTime(end);
 
             console.assert(startSplitted.date.valueOf() === endSplitted.date.valueOf());
-            convertedAvailBookings.push({
+            convertedAvailBookings[userNpm].push({
                 schedule: new Schedule(startSplitted.date, startSplitted.time, endSplitted.time),
                 start: start,
                 end: end,
                 is_preferred: availBooking.is_preferred,
-                booker_name: availBooking.booker_name,
+                booker_name: userNpm,
             });
         }
     }
@@ -32,14 +35,22 @@ function getSchedules(script_id='available-bookings'){
 
 
 /**
- * @param bookings
+ * @param bookings  --> dict[NPM, list[bookings]]
  * @param parentElement
  */
 function reloadListOfSchedule(bookings, parentElement){
     console.log("reloaded");
+    for (const userNpm of Object.keys(bookings)){
+        const bookingsOfTheUser = bookings[userNpm];
+        console.log("NPM");
+        console.log(bookingsOfTheUser);
+        reloadListOfScheduleOfAUser(userNpm, bookingsOfTheUser);
+    }
+}
+function reloadListOfScheduleOfAUser(npm, bookings){
+    console.log(npm);
     bookings = bookings.sort((a, b) => SCHEDULE_SORT(a.schedule, b.schedule))
-    parentElement = $(parentElement);
-    parentElement.empty();
+    const parentElement = newListItemOfSchedulesForEachNpmTemplate(npm);
 
     let index = 0;
     for (const booking of bookings) {
@@ -49,6 +60,17 @@ function reloadListOfSchedule(bookings, parentElement){
         index++;
     }
 }
+function newListItemOfSchedulesForEachNpmTemplate(npm) {
+    const template = $(".list-of-schedules-for-each-npm-template");
+    const ret = $(template.html());
+    ret.addClass(`${npm}`);
+    ret.find('.user-id').text(npm);
+
+    $(".list-of-schedules-for-each-npm").append(ret);
+    return ret.find('.list-of-schedules');
+}
+
+
 
 function instantiateItem(index, parentElement, booking, is_preferred, booker_name) {
     const schedule = booking.schedule;

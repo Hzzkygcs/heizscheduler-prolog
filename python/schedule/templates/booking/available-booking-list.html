@@ -11,7 +11,7 @@
     {% include "dependencies.html" %}
     <script src="{% static 'event-create/date-time-model.js' %}"></script>
     <link href="{% static 'event-create/css.css' %}" rel="stylesheet">
-    <script src="{% static 'booking/main.js' %}"></script>
+    <script src="{% static 'event-details-view/main.js' %}"></script>
 
 
     {% include "tailwind-elements-head.html" %}
@@ -55,10 +55,16 @@
 
 
             </div>
-            {% for schedule in schedules %}
+            <div class="list-of-schedules-for-each-npm">
+                {% for schedule in schedules %}
+
+                {% endfor %}
+            </div>
+            <template class="list-of-schedules-for-each-npm-template">
                 <div>
                     <div class="grid" style="grid-template-columns: auto auto;">
-                        <label class="mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                        <label class="user-id
+                                      mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
                             {{ schedule.user }}
                         </label>
                         <div class="flex justify-end">
@@ -68,7 +74,7 @@
 
                     </div>
                 </div>
-            {% endfor %}
+            </template>
         </div>
 </div>
 
