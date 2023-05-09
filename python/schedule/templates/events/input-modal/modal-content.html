@@ -1,6 +1,7 @@
+{% load static %}
+
   <div id="schedule-date"
     class="relative mb-3 w-full"
-    data-te-datepicker-init
     data-te-input-wrapper-init>
     <input
       type="text"
@@ -43,34 +44,69 @@
 </div>
 
 
-<button type="button"
-        onclick="submitModal()"
-        class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-    submit
-</button>
+
+
+{#<script src="{% static 'library/d3/d3.js' %}"></script>#}
+{#<script src="{% static 'library/jquery-boilerplate/jquery.boilerplate.js' %}"></script>#}
+
+{# MODIFIED VERSION OF timerangewheelslider #}
+{#<script src="{% static 'library/timerangewheelslider/plugin.js' %}"></script>#}
+
+<div id="circular-range-slider">
+    <div class="slider-content"></div>
+</div>
+
+<link rel="stylesheet" href="{% static 'library/circular-slider/roundslider.css' %}" />
+<script src="{% static 'library/circular-slider/roundslider.js' %}"></script>
+<style>
+    #circular-range-slider{
+        margin: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #circular-range-slider .slider-content .rs-range-color  {
+        background-color: #33B5E5;
+    }
+    #circular-range-slider .slider-content .rs-path-color  {
+        background-color: #C2E9F7;
+    }
+    #circular-range-slider .slider-content .rs-handle  {
+        background-color: #C2E9F7;
+        padding: 7px;
+        border: 2px solid #C2E9F7;
+    }
+    #circular-range-slider .slider-content .rs-handle.rs-focus  {
+        border-color: #33B5E5;
+    }
+    #circular-range-slider .slider-content .rs-handle:after  {
+        border-color: #33B5E5;
+        background-color: #33B5E5;
+    }
+    #circular-range-slider .slider-content .rs-border  {
+        border-color: transparent;
+    }
+</style>
+
+
+
+<div class="flex justify-end">
+    <button type="button"
+            onclick="submitModal()"
+            class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+        submit
+    </button>
+</div>
+
+
 
 <script>
-    let inputSchedule = {
-
-    };
+    let inputSchedule = {};
 
     $(document).ready(() => {
-        const pickerIncs = $(".timepicker-inc");
-        for (const pickerInc of pickerIncs) {
-            const timepickerInc = new te.Timepicker(pickerInc, {
-                increment: true,
-                format24: true,
-            });
-{% comment %}            let onTimePick = ((pickerInc) => {
-                return (e) => {
-                    console.log(pickerInc);
-                    console.log(e);
-                }
-            })(pickerInc);
-            console.log(timepickerInc)
-
-            $(timepickerInc).on('input.te.timepicker', onTimePick);{% endcomment %}
-        }
+        initiateTimeWheelSlider();
+        initiateTimepickerDatepicker();
     });
 </script>
 
