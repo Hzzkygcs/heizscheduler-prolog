@@ -42,8 +42,6 @@ function reloadListOfSchedule(bookings, parentElement){
     console.log("reloaded");
     for (const userNpm of Object.keys(bookings)){
         const bookingsOfTheUser = bookings[userNpm];
-        console.log("NPM");
-        console.log(bookingsOfTheUser);
         reloadListOfScheduleOfAUser(userNpm, bookingsOfTheUser);
     }
 }

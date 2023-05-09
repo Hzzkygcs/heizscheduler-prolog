@@ -1,9 +1,13 @@
+/**
+ * @type {Schedule[]}
+ */
 let schedules = [];
 
 
 const DATE_EL = "#schedule-date";
 const START_TIME_EL = "#start-time";
 const END_TIME_EL = "#end-time";
+const IS_PREFERRED = "#preferred";
 const LIST_OF_SCHEDULES_EL = ".list-of-schedules";
 
 const eventCreateInputModal = {};
@@ -72,6 +76,7 @@ function getScheduleObjFromModalInput(){
     let date = getDateObjFromDatePicker($(DATE_EL));
     let start = getDataFromTimePicker($(START_TIME_EL));
     let end = getDataFromTimePicker($(END_TIME_EL));
+    let is_preferred = $(IS_PREFERRED)[0].checked;
 
     if (start > end){
         throw new ValidationError("Start time cannot be greater than the end time");
@@ -79,7 +84,7 @@ function getScheduleObjFromModalInput(){
     if (!isValidDate(date)){
         throw new ValidationError("Please pick valid date");
     }
-    return new Schedule(date, start, end);
+    return new Schedule(date, start, end, is_preferred);
 }
 
 function isValidDate(d) {
@@ -169,6 +174,7 @@ function commonSaveSchedulesToServer(url="",
         data.push({
             start: schedule.getStartDateObj(),
             end: schedule.getEndDateObj(),
+            is_preferred: schedule.preferred,
         })
     }
 

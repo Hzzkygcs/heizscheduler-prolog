@@ -25,6 +25,7 @@
     display: none;
 }
 .tosca-btn.starred .is-preferred-symbol{
+    display: block;
     color: white;
     text-shadow: black 1px 1px 1px;
 }

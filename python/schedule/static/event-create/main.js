@@ -3,6 +3,7 @@
 function getSchedules(script_id='existed-schedules'){
     const availBookings = load_json_data_from_script_tag(script_id);
     const convertedAvailBookings = [];
+    console.log("asd")
 
     for (const availBooking of availBookings) {
         let start = new Date(availBooking.start);
@@ -41,3 +42,7 @@ const saveToServer =
 function saveToServer(){
     commonSaveSchedulesToServer("/events/create", validate);
 }
+
+$(document).ready(function () {
+    $(".is-preferred").hide();
+})

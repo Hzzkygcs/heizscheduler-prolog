@@ -60,7 +60,8 @@ class EventEdit(BaseScheduleView):
         if body is None:
             raise BadRequestException("No post data: 'schedules'")
 
-        schedules = batch_convert_to_datetime(json.loads(body))
+        parsed_body = json.loads(body)
+        schedules = batch_convert_to_datetime(parsed_body)
         print(schedules, logged_in_user.npm)
         self.saveNewEvent(event_to_be_edited, schedules, logged_in_user)
 
@@ -73,10 +74,18 @@ class EventEdit(BaseScheduleView):
         old_schedule.delete()
 
         for schedule in schedules:
-            start, end = schedule['start'], schedule['end']
-            new_schedule = self.schedule_factory.create_schedule(event_id=event.ID, owner_id=user.npm, start=start, end=end)
+            start, end, is_preferred = schedule['start'], schedule['end'], schedule['is_preferred']
+            new_schedule = self.schedule_factory.create_schedule(event_id=event.ID, owner_id=user.npm,
+                                                                 start=start, end=end, is_preferred=is_preferred)
             created_schedules.append(new_schedule)
         print(created_schedules)
+
+
+def extract_is_preferred(lst):
+    ret = []
+    for i in lst:
+        ret.append(i['is_preferred'])
+    return ret
 
 
 def get_event_by_id(event_id):
