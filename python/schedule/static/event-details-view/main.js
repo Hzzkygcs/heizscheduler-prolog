@@ -72,33 +72,16 @@ function newListItemOfSchedulesForEachNpmTemplate(npm) {
 
 
 
-function instantiateItem(index, parentElement, booking, is_preferred, booker_name) {
+function instantiateItem(index, parentElement, booking, is_preferred, booker_name, on_click=null) {
     const schedule = booking.schedule;
     const date = dateObjToDateStringFormat(schedule.date);
     const startTime = schedule.startTime.toString();
     const endTime = schedule.endTime.toString();
 
     const newEl = initializeScheduleItem(date, startTime, endTime);
-    if (!is_preferred){
-        newEl.click(((availBooking) =>
-            (e) => {
-                console.log("clicked");
-                showModal(date, `${startTime} - ${endTime}`);
-
-                const submitBtn = $("#submit-modal-btn");
-                submitBtn.unbind();
-                submitBtn.click(() => {
-                    submitModal(availBooking.start, availBooking.end);
-                });
-            }
-        )(booking));
-    }else{
-        newEl.find(".booker-name").text(
-            `[Booked by: ${booker_name}]`
-        );
-        newEl.addClass("red");
-        newEl.addClass("unclickable");
-    }
+    newEl.click(on_click ?? (() => {}));
+    if (on_click == null)
+        newEl.removeClass("clickable");
     return newEl;
 }
 
@@ -107,41 +90,14 @@ function instantiateItem(index, parentElement, booking, is_preferred, booker_nam
 
 
 function showModal(date, timeRepr){
-    const el = $('#my-modal');
-    el.css('display', 'grid');
-    const book_btn = el.find('#submit-modal-btn');
-    book_btn.html("Book");
+    throw new Error("not implemented");
 
-    el.find('.date-repr').html(date)
-    el.find('.time-repr').html(timeRepr)
 }
 function hideModal(){
     $('#my-modal').css('display', 'none');
 }
 function submitModal(startDateObj, endDateObj){
-    const el = $('#my-modal');
-    const booker_name = el.find('#booker-name').val();
+    throw new Error("not implemented");
 
-    if (booker_name.length === 0){
-        alert("Please enter your name")
-        return;
-    }
-
-    const book_btn = el.find('#submit-modal-btn');
-    book_btn.html("Booking");
-
-    $.post(window.location, {
-        data: JSON.stringify({
-            start: startDateObj,
-            end: endDateObj,
-            name: booker_name,
-        })
-    }, function (data) {
-        console.assert(data.success === 1);
-        window.location.reload();
-    }).fail((e) => {
-        alert("Booking failed!");
-        console.log(e);
-    });
 }
 

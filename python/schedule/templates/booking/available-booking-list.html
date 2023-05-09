@@ -24,13 +24,13 @@
     <div style="max-width: 750px; width: 100%">
             <div class="schedules">
                 <div class="grid max-w-screen">
-                    <div class="grid gap-2 md:grid-cols-3" style="max-width: 100%;">
-                        <h1 class="text-4xl font-bold block mb-2 text-white">
+                    <div class="mt-4 grid gap-2" style="max-width: 100%; grid-template-columns: 1fr auto auto;">
+                        <span class="text-4xl font-bold block mb-2 text-white">
                             {{ event_name }}
-                        </h1>
+                        </span>
 
-                        <div class="relative m-4 justify-end">
-                            <div class="absolute right-0 bottom-0">
+                        <div class="ml-4 flex justify-end">
+                            <div class="">
                                 <a href="">
                                     <button type="submit" class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700">
                                         Result
@@ -39,8 +39,8 @@
                             </div>
                         </div>
 
-                        <div class="relative m-4 justify-end">
-                            <div class="absolute right-0 bottom-0">
+                        <div class="flex justify-end">
+                            <div class="">
                                 <a href="{% url 'event_edit' event_id %}">
                                     <button type="submit" class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700">
                                         Edit My Schedule
@@ -61,10 +61,10 @@
                 {% endfor %}
             </div>
             <template class="list-of-schedules-for-each-npm-template">
-                <div>
+                <div class="mt-5">
                     <div class="grid" style="grid-template-columns: auto auto;">
                         <label class="user-id
-                                      mb-2 text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                                      text-sm font-medium text-gray-900 dark:text-white flex items-center">
                             {{ schedule.user }}
                         </label>
                         <div class="flex justify-end">
@@ -81,7 +81,7 @@
 
 {#booking-item-template#}
 <template id="item-template">
-    <div class="schedule-item tosca-btn py-1 my-2">
+    <div class="schedule-item tosca-btn clickable py-1 my-2">
         <span class="date">
             Friday, 13 March 2023
         </span>
