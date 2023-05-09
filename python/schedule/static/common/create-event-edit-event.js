@@ -76,7 +76,14 @@ function getScheduleObjFromModalInput(){
     if (start > end){
         throw new ValidationError("Start time cannot be greater than the end time");
     }
+    if (!isValidDate(date)){
+        throw new ValidationError("Please pick valid date");
+    }
     return new Schedule(date, start, end);
+}
+
+function isValidDate(d) {
+    return d instanceof Date && !isNaN(d);
 }
 
 function submitModal(){
@@ -152,7 +159,9 @@ function noOverlappingSchedule(schedules){
 
 
 
-function commonSaveSchedulesToServer(url="", validation=()=>{}){
+function commonSaveSchedulesToServer(url="",
+                                     validation=()=>{},
+                                     onSuccess=(x)=>{window.location.href = "../";}){
     validation();
 
     const data = [];
@@ -163,12 +172,12 @@ function commonSaveSchedulesToServer(url="", validation=()=>{}){
         })
     }
 
-    $.post("/events/create", {
+    $.post(url, {
         event_name: $("#event_name").val(),
         schedules: JSON.stringify(data),
     }, (data) => {
         if (data.success === 1) {
-            window.location.href = "../";
+            onSuccess(data);
         }else
             alert(data);
     });

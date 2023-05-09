@@ -28,5 +28,7 @@ $(document).ready(() => {
 function saveToServer(){
     const event_id = load_json_data_from_script_tag('event_id')
     const url = "/events/edit/" + event_id;
-    commonSaveSchedulesToServer(event_id, url);
+    commonSaveSchedulesToServer(url, ()=>{}, ()=>{
+        history.back();
+    });
 }
