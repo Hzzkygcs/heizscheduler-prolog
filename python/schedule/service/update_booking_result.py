@@ -110,7 +110,7 @@ def get__available__prolog_fact_from_schedule_object(schedule: Schedule):
 
 
 def get__have_time__prolog_fact_from_schedule_object(schedule: Schedule):
-    npm = schedule.owner.id
+    npm = schedule.owner.pk
     is_preferred = schedule.is_preferred
     start_time = schedule.start_date_time
     end_time = schedule.end_date_time

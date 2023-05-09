@@ -6,5 +6,6 @@ from global_exception.exceptions.AutomaticallyHandledException import Automatica
 class InvalidImpossibleScheduleException(AutomaticallyHandledException):
     def __init__(self):
         super().__init__(status_code=HTTPStatus.BAD_REQUEST,
-                         message="No schedule combination found")
+                         message="Your schedule is rejected: "
+                                 "no schedule combinations could be generated to satisfy your schedules")
 

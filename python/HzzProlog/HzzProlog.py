@@ -119,6 +119,8 @@ class HzzProlog:
     def query_no_chained_equality(self, query, approx_number_of_output=100, print_query=False):
         results = self.query(query, approx_number_of_output, print_query)
         for result in results:
+            if not isinstance(result, dict):
+                continue
             for key, val in result.items():
                 result[key] = get_value(val)
         return results

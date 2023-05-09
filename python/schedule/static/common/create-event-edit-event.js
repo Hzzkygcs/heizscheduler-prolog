@@ -179,6 +179,8 @@ function commonSaveSchedulesToServer(url="",
             onSuccess(data);
         }else
             alert(data);
+    }).fail(function (data) {
+        alert(data.responseJSON.err_msg);
     });
 }
 

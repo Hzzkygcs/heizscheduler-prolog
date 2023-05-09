@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
 import json
@@ -17,6 +18,7 @@ from schedule.core.Repository.ScheduleRepository import ScheduleRepository
 from schedule.core.ScheduleFactory import ScheduleFactory
 from schedule.exceptions.EventNotFoundException import EventNotFoundException
 from schedule.models import Event, Schedule
+from schedule.service.update_booking_result import update_booking_results_of_an_event
 from schedule.views.BaseScheduleView import BaseScheduleView
 from schedule.views.util import batch_convert_to_datetime
 
@@ -52,6 +54,7 @@ class EventEdit(BaseScheduleView):
         print(data)
         return render(req, "events/event-edit.html", data)
 
+    @transaction.atomic
     @authenticated
     def post(self, req, logged_in_user: User, *, event_id):
         event_to_be_edited = get_event_by_id(event_id)
@@ -64,6 +67,7 @@ class EventEdit(BaseScheduleView):
         schedules = batch_convert_to_datetime(parsed_body)
         print(schedules, logged_in_user.npm)
         self.saveNewEvent(event_to_be_edited, schedules, logged_in_user)
+        update_booking_results_of_an_event(event_id)
 
         response = {'success': 1}
         return HttpResponse(json.dumps(response), content_type='application/json')
