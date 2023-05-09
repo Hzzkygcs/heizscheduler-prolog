@@ -80,6 +80,8 @@ function instantiateItem(index, parentElement, booking, is_preferred, booker_nam
 
     const newEl = initializeScheduleItem(date, startTime, endTime);
     newEl.click(on_click ?? (() => {}));
+    if (is_preferred)
+        newEl.addClass("starred");
     if (on_click == null)
         newEl.removeClass("clickable");
     return newEl;
