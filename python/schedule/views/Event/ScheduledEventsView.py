@@ -4,7 +4,7 @@ from django.urls import reverse
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
 from schedule.views.BaseScheduleView import BaseScheduleView
-from schedule.views.Event.BookingResults import render_get_for_event_details_and_booking_result, \
+from schedule.views.Event.BookingResults import get_template_data_for_event_details_and_booking_result, \
     booking_result__or__schedule__to_dict
 
 

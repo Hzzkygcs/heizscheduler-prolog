@@ -21,11 +21,22 @@ class BookingResultsViews(BaseScheduleView):
         update_booking_results_of_an_event(event_id)
         event = Event.objects.get(ID=event_id)
         booked_slots = BookingResult.objects.filter(event=event).all()
-        return render_get_for_event_details_and_booking_result(req, event, booked_slots,
-                                                               "events-detail/booking-result.html")
+        data = get_template_data_for_event_details_and_booking_result(event, booked_slots)
+        data['penalty_score'] = get_penalty_score_from_booked_slots(booked_slots)
+
+        return render(req, "events-detail/booking-result.html", data)
 
 
-def render_get_for_event_details_and_booking_result(req, event, booked_slots, template):
+def get_penalty_score_from_booked_slots(booked_slots: list[BookingResult]):
+    penalty_score = '-'
+    if len(booked_slots) != 0:
+        penalty_score = booked_slots[0].penalty_score
+        for slot in booked_slots:
+            assert penalty_score == slot.penalty_score
+    return penalty_score
+
+
+def get_template_data_for_event_details_and_booking_result(event, booked_slots):
         set_user = set()
         for slot in booked_slots:
             set_user.add(slot.owner.npm)
@@ -43,11 +54,11 @@ def render_get_for_event_details_and_booking_result(req, event, booked_slots, te
                 if booked_slot['user'] == slot.owner.npm:
                     booked_slot['slots'].append(booking_result__or__schedule__to_dict(slot))
 
-        return render(req, template, {
+        return {
             'event_id': event.pk,
             'schedules': users_and_slots,
             'event_name': event.name,
-        })
+        }
 
 
 def booking_result__or__schedule__to_dict(slot):
