@@ -69,7 +69,7 @@ END_MINUTE = Variable('END_MINUTE')
 
 
 def get_prolog_best_jadwal(duration, facts):
-    prolog = get_main_prolog(False)
+    prolog = get_main_prolog()
     prolog.add_facts('definitions', facts)
     results = prolog.query_no_chained_equality(get_best_jadwal(
         duration,

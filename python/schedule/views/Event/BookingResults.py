@@ -37,28 +37,28 @@ def get_penalty_score_from_booked_slots(booked_slots: list[BookingResult]):
 
 
 def get_template_data_for_event_details_and_booking_result(event, booked_slots):
-        set_user = set()
-        for slot in booked_slots:
-            set_user.add(slot.owner.npm)
+    set_user = set()
+    for slot in booked_slots:
+        set_user.add(slot.owner.npm)
 
-        users_and_slots = []
+    users_and_slots = []
 
-        for user in set_user:
-            users_and_slots.append({
-                'user': user,
-                'slots': []
-            })
+    for user in set_user:
+        users_and_slots.append({
+            'user': user,
+            'slots': []
+        })
 
-        for slot in booked_slots:
-            for booked_slot in users_and_slots:
-                if booked_slot['user'] == slot.owner.npm:
-                    booked_slot['slots'].append(booking_result__or__schedule__to_dict(slot))
+    for slot in booked_slots:
+        for booked_slot in users_and_slots:
+            if booked_slot['user'] == slot.owner.npm:
+                booked_slot['slots'].append(booking_result__or__schedule__to_dict(slot))
 
-        return {
-            'event_id': event.pk,
-            'schedules': users_and_slots,
-            'event_name': event.name,
-        }
+    return {
+        'event_id': event.pk,
+        'schedules': users_and_slots,
+        'event_name': event.name,
+    }
 
 
 def booking_result__or__schedule__to_dict(slot):

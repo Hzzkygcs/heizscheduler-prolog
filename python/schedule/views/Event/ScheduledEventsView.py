@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
+from schedule.models import BookingResult
 from schedule.views.BaseScheduleView import BaseScheduleView
 from schedule.views.Event.BookingResults import get_template_data_for_event_details_and_booking_result, \
     booking_result__or__schedule__to_dict
@@ -17,9 +18,9 @@ class ScheduledEventsViews(BaseScheduleView):
 
     @authenticated
     def get(self, req, logged_in_user: User):
-        his_booking_results = logged_in_user.bookingresult_set.all()
+        his_booking_results = list(logged_in_user.bookingresult_set.all())
+        his_booking_results.sort(key=by_start_time)
         schedules = []
-
 
         for booking_result in his_booking_results:
             sub_dict = booking_result__or__schedule__to_dict(booking_result)
@@ -38,3 +39,7 @@ class ScheduledEventsViews(BaseScheduleView):
             'schedules': schedules,
             'event_name': "My Schedules",
         })
+
+
+def by_start_time(booking_result: BookingResult):
+    return booking_result.start_date_time
