@@ -13,6 +13,7 @@ class BookingResult(Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     is_preferred = models.BooleanField(default=False)
+    penalty_score = models.FloatField()
 
     @property
     def start_date_time(self):

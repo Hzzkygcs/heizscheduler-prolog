@@ -1,4 +1,8 @@
+from datetime import datetime
+
 from django.db import transaction
+from django.utils import timezone
+from pydantic.schema import timedelta
 
 from HzzProlog.PrologCallable import define_prolog_operator, Variable
 from HzzProlog.test_util import remove_trailing_false_or_true
@@ -9,7 +13,7 @@ from definitions.predicates import available, have_time, find_jadwal_and_score_s
 from definitions.variables import Result, X, Y
 from schedule.exceptions.EventNotFoundException import EventNotFoundException
 from schedule.exceptions.InvalidImpossibleScheduleException import InvalidImpossibleScheduleException
-from schedule.models import Schedule, Event
+from schedule.models import Schedule, Event, DateRange
 from schedule.models.BookingResult import BookingResult
 
 @transaction.atomic
@@ -26,19 +30,23 @@ def clear_booking_results_of_an_event(event_id):
     booking_results = BookingResult.objects.filter(event_id=event_id)
     booking_results.delete()
 
-
+@transaction.atomic
 def generate_and_save_booking_results_of_an_event(event: Event):
-    # TODO save ke database
     facts = get__available__have_time__facts(event.pk, event.owner_id)
     results = get_prolog_best_jadwal(event.booking_minute_duration, facts)
-    # TODO convert to BookingResult
     if len(results) == 0:
         raise InvalidImpossibleScheduleException()
-    return results
+
+    booking_results = []
+    for result in results:
+        booking_results = dictionary_to_booking_result(result)
+        booking_results.save()
+        booking_results.append(booking_results)
+    return booking_results
 
 
 
-DONT_CARE_1 = Variable('DONT_CARE_1')
+PENALTY_SCORE = Variable('DONT_CARE_1')
 NPM = Variable('NPM')
 IS_PREFERRED = Variable('IS_PREFERRED')
 START_DAY = Variable('START_DAY')
@@ -55,13 +63,23 @@ def get_prolog_best_jadwal(duration, facts):
     prolog.add_facts('definitions', facts)
     results = prolog.query_no_chained_equality(get_best_jadwal(
         duration,
-        DONT_CARE_1,
+        PENALTY_SCORE,
         booked_slot(NPM, IS_PREFERRED, time_range(time_point(START_DAY, START_HOUR, START_MINUTE),
                                                   time_point(END_DAY, END_HOUR, END_MINUTE),))
     ), print_query=True)
     results = remove_trailing_false_or_true(results)
     return results
 
+
+def dictionary_to_booking_result(results: dict[Variable, BookingResult]):
+    start = from_day_hour_minute(results[START_DAY], results[START_HOUR], results[START_MINUTE])
+    end = from_day_hour_minute(results[END_DAY], results[START_HOUR], results[START_MINUTE])
+    datetime_range = DateRange(start_date_time=start, end_date_time=end)
+    return BookingResult.objects.create(
+        owner_id=results[NPM],
+        datetime_range=datetime_range,
+        penalty_score=results[PENALTY_SCORE],
+    )
 
 
 
@@ -104,8 +122,8 @@ def get__available__prolog_fact_from_schedule_object(schedule: Schedule):
     end_time = schedule.end_date_time
 
     return available(time_range(
-        time_point(start_time.day, start_time.hour, start_time.minute),
-        time_point(end_time.day, end_time.hour, end_time.minute),
+        time_point(*get_day_hour_minute(start_time),),
+        time_point(*get_day_hour_minute(end_time),),
     ))
 
 
@@ -116,7 +134,32 @@ def get__have_time__prolog_fact_from_schedule_object(schedule: Schedule):
     end_time = schedule.end_date_time
 
     return have_time(npm, int(is_preferred), time_range(
-        time_point(start_time.day, start_time.hour, start_time.minute),
-        time_point(end_time.day, end_time.hour, end_time.minute),
+        time_point(*get_day_hour_minute(start_time)),
+        time_point(*get_day_hour_minute(end_time)),
     ))
+
+
+EPOCH = timezone.make_aware(datetime(1970, 1, 1))
+
+
+def from_day_hour_minute(day, hour, minute):
+    return EPOCH + timedelta(days=day, hours=hour, minutes=minute)
+
+
+def get_day_hour_minute(date_time: datetime):
+    since_epoch = date_time - EPOCH
+    number_of_days = since_epoch.days
+
+    remaining_hour_second: timedelta = date_time - (EPOCH + timedelta(days=number_of_days))
+    remaining_total_seconds = remaining_hour_second.seconds
+    minutes = remaining_total_seconds // 60
+    minute = minutes % 60
+    hour = minutes // 60
+
+    ret = number_of_days, hour, minute
+    return ret
+
+
+temp_for_testing = timezone.make_aware(datetime(2020, 2, 3, 4, 5, 6))
+assert (from_day_hour_minute(*get_day_hour_minute(temp_for_testing)) - temp_for_testing).microseconds == 0
 
