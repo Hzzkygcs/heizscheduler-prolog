@@ -53,7 +53,7 @@ def generate_and_save_booking_results_of_an_event(event: Event):
     for result in results:
         booking_result = dictionary_to_booking_result(event.pk, result)
         booking_results.append(booking_result)
-    return booking_results
+    return booking_results, results
 
 
 PENALTY_SCORE = Variable('PENALTY_SCORE')
@@ -76,6 +76,16 @@ def get_prolog_best_jadwal(duration, facts):
         PENALTY_SCORE,
         booked_slot(NPM, IS_PREFERRED, time_range(time_point(START_DAY, START_HOUR, START_MINUTE),
                                                   time_point(END_DAY, END_HOUR, END_MINUTE),))
+    ), print_query=True)
+    results = remove_trailing_false_or_true(results)
+    return results
+
+def get_prolog_all_jadwal(duration, facts):
+    prolog = get_main_prolog()
+    prolog.add_facts('definitions', facts)
+    results = prolog.query_no_chained_equality(find_jadwal_and_score_sorted_member(
+        duration,
+        X
     ), print_query=True)
     results = remove_trailing_false_or_true(results)
     return results
