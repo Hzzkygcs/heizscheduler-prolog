@@ -102,23 +102,13 @@ WSGI_APPLICATION = 'python.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DB_PASSWORD = required_env('DB_PASSWORD')
+DB_PASSWORD = optional_env('DB_PASSWORD', None)
 DB_NAME = optional_env('DB_NAME', 'postgres')
 DB_USER = optional_env('DB_USER', 'postgres')
-DB_HOST = optional_env('DB_HOST', 'db.ogvqfqxkcdjthwlirugr.supabase.co')
+DB_HOST = optional_env('DB_HOST', 'db.hjgsvakvfiogeqsnhasq.supabase.co')
 DB_PORT = optional_env('DB_PORT', '5432')
 DB_ENGINE = 'django.db.backends.postgresql_psycopg2'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': DB_ENGINE,
-#         'NAME': DB_NAME,
-#         'USER': DB_USER,
-#         'HOST': DB_HOST,
-#         'PORT': DB_PORT,
-#         'PASSWORD': DB_PASSWORD,
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -126,7 +116,21 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+if DB_PASSWORD is not None:
+    print("RUNNING WITH SUPABASE")
+    print(DB_PASSWORD)
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+            'PASSWORD': DB_PASSWORD,
+        }
+    }
+else:
+    print("RUNNING WITH IN-MEMORY DATABASE")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
