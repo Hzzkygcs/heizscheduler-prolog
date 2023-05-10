@@ -1,4 +1,4 @@
-const SCHEDULE_SORT = (a, b) => a.compare(b);
+const SCHEDULE_SORTING_FUNCTION = (a, b) => a.compare(b);
 
 function initializeScheduleItem(date, startTime, endTime, deletable=false, selector="#item-template") {
     const newEl = $($(selector).html());

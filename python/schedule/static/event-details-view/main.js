@@ -59,7 +59,7 @@ function newListItemOfSchedulesForEachNpmTemplate(npm) {
 
 function reloadListOfScheduleOfAUser(npm, bookings){
     console.log(npm);
-    bookings = bookings.sort((a, b) => SCHEDULE_SORT(a.schedule, b.schedule))
+    bookings = bookings.sort((a, b) => SCHEDULE_SORTING_FUNCTION(a.schedule, b.schedule))
     const parentElement = newListItemOfSchedulesForEachNpmTemplate(npm);
 
     for (const booking of bookings) {

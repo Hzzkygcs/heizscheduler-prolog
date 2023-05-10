@@ -99,7 +99,7 @@ function submitModal(){
         return;
 
     schedulesCopy.push(schedule);
-    schedulesCopy = schedulesCopy.sort(SCHEDULE_SORT);
+    schedulesCopy = schedulesCopy.sort(SCHEDULE_SORTING_FUNCTION);
 
     schedules = schedulesCopy;
     hideModal();
@@ -113,7 +113,7 @@ function submitModal(){
  */
 function reloadListOfSchedule(schedules, parentElement){
     console.log("reloaded");
-    schedules = schedules.sort(SCHEDULE_SORT)
+    schedules = schedules.sort(SCHEDULE_SORTING_FUNCTION)
     parentElement = $(parentElement);
     parentElement.empty();
 
@@ -126,7 +126,12 @@ function reloadListOfSchedule(schedules, parentElement){
                 reloadListOfSchedule(schedules, parentElement);
             }
         })(index);
-        const newEl = instantiateItem(schedule, schedule.preferred, {onDelete:onDelete});
+        const onClick = ((schedule) => (e) => {
+            schedule.preferred = !schedule.preferred;
+            reloadListOfSchedule(schedules, parentElement);
+        })(schedule);
+        const newEl = instantiateItem(schedule, schedule.preferred, {
+            onDelete:onDelete, onClick: onClick});
         parentElement.append(newEl);
         index++;
     }
@@ -138,7 +143,7 @@ function reloadListOfSchedule(schedules, parentElement){
  * @returns {boolean}
  */
 function noOverlappingSchedule(schedules){
-    schedules = schedules.sort(SCHEDULE_SORT);
+    schedules = schedules.sort(SCHEDULE_SORTING_FUNCTION);
 
     for (let i = 0; i < schedules.length - 1; i++) {
         const curr = schedules[i];

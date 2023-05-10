@@ -21,7 +21,7 @@ function getExistingSchedules(script_id='existed-schedules'){
         const existing_schedule = new Schedule(
             startSplitted.date, startSplitted.time, endSplitted.time, availBooking.is_preferred);
         schedules.push(existing_schedule)
-        schedules.sort(SCHEDULE_SORT)
+        schedules.sort(SCHEDULE_SORTING_FUNCTION)
     }
     console.log(schedules)
 }
