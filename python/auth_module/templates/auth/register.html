@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<form action="{% url 'register' %}" method="post" class="w-full h-full">
+<form action="{% url 'register' %}" id="submit-form" method="post" class="register w-full h-full">
     {% csrf_token %}
 
     <div class="flex justify-center items-center flex-col
@@ -23,6 +23,14 @@
 
             <span>Password: </span>
             <input name="password" class="text-input" type="password">
+
+            <span>Confirmation Password: </span>
+            <input name="confirm-password" class="text-input" type="password">
+
+            <span class="error-msg text-rose-600" style="grid-column: 1/3; text-align: right; display: none;"></span>
+            <span class="dont-have-acc hyperlink" style="grid-column: 1/3;">
+                <a href="{% url 'login' %}">Click here</a> to login
+            </span>
 
             <div class="flex items-center justify-end mt-4 mb-0" style="grid-column: 1/3;">
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-full">

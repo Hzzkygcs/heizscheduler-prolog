@@ -1,6 +1,9 @@
 .text-input{
     padding: 5px;
+    background-color: aliceblue;
+    border: 1px rgb(100, 100, 100);
 }
+
 
 .grid-table{
     border: 1px solid #5b80b2;
@@ -9,4 +12,22 @@
 
     grid-template-columns: auto 1fr;
     grid-gap: 10px 25px;
+}
+
+.hyperlink a {
+    color: #0072c6; /* A dark blue color that stands out against light backgrounds */
+    text-decoration: none; /* Remove the underline to make it look more modern */
+    transition: all 0.3s ease-in-out; /* Add a smooth transition effect */
+}
+
+.hyperlink a:hover {
+    color: #004d99; /* Darken the color slightly on hover to indicate interactivity */
+    text-decoration: none; /* Keep the underline removed on hover */
+}
+
+span.dont-have-acc{
+    color: #333; /* A dark grey color that is easy to read */
+    line-height: 1.5; /* Add some spacing between lines to improve readability */
+    margin: 0;
+    font-size: 0.8rem;
 }

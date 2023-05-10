@@ -10,6 +10,7 @@ from auth_module.core.AuthManagement import AuthManagement
 from auth_module.core.Factory.UserFactory import UserFactory
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.core.repository.UserRepository import UserRepository
+from auth_module.exceptions.IncompleteDataException import validate_fields_exist
 from auth_module.models import User
 
 
@@ -64,7 +65,9 @@ class RegisterView(BaseAuthView):
 class LoginView(BaseAuthView):
     def get(self, req):
         return render(req, "auth/login.html", {})
+
     def post(self, req):
+        validate_fields_exist(req.POST, ['npm', 'password'])
         npm = req.POST['npm']
         password = req.POST['password']
         user = self.user_repository.find_user_by_npm(npm)
