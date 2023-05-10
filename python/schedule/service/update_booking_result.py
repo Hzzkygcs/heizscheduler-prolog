@@ -26,10 +26,10 @@ def update_booking_results_of_an_event(event_id):
     return generate_and_save_booking_results_of_an_event(event)
 
 
-
 def clear_booking_results_of_an_event(event_id):
     booking_results = BookingResult.objects.filter(event_id=event_id)
     booking_results.delete()
+
 
 @transaction.atomic
 def generate_and_save_booking_results_of_an_event(event: Event):
