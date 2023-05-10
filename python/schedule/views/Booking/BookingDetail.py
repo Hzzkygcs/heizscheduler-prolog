@@ -6,6 +6,7 @@ from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
 from schedule.models import Event, DateRange, Schedule
 from schedule.views.BaseScheduleView import BaseScheduleView
+from schedule.views.Event.BookingResults import render_get_for_event_details_and_booking_result
 from schedule.views.util import convert_to_datetime
 
 
@@ -19,33 +20,8 @@ class BookingDetail(BaseScheduleView):
     def get(self, req, event_id):
         event = Event.objects.get(ID=event_id)
         booked_slots = Schedule.objects.all().filter(event=event)
-
-        set_user = set()
-        for slot in booked_slots:
-            set_user.add(slot.owner.npm)
-
-        booked_slots_lst = []
-
-        for user in set_user:
-            booked_slots_lst.append({
-                'user': user,
-                'slots': []
-            })
-
-        for slot in booked_slots:
-            for booked_slot in booked_slots_lst:
-                if booked_slot['user'] == slot.owner.npm:
-                    booked_slot['slots'].append({
-                        'start': slot.start_date_time,
-                        'end': slot.end_date_time,
-                        'is_preferred': slot.is_preferred,
-                    })
-
-        return render(req, "events-detail/available-booking-list.html", {
-            'event_id': event_id,
-            'schedules': booked_slots_lst,
-            'event_name': event.name,
-        })
+        return render_get_for_event_details_and_booking_result(req, event, booked_slots,
+                                                               "events-detail/available-booking-list.html")
 
     @authenticated
     def post(self, req, logged_in_user: User, event_id):

@@ -21,7 +21,11 @@ class BookingResultsViews(BaseScheduleView):
         update_booking_results_of_an_event(event_id)
         event = Event.objects.get(ID=event_id)
         booked_slots = BookingResult.objects.filter(event=event).all()
+        return render_get_for_event_details_and_booking_result(req, event, booked_slots,
+                                                               "events-detail/booking-result.html")
 
+
+def render_get_for_event_details_and_booking_result(req, event, booked_slots, template):
         set_user = set()
         for slot in booked_slots:
             set_user.add(slot.owner.npm)
@@ -43,8 +47,8 @@ class BookingResultsViews(BaseScheduleView):
                         'is_preferred': slot.is_preferred,
                     })
 
-        return render(req, "events-detail/booking-result.html", {
-            'event_id': event_id,
+        return render(req, template, {
+            'event_id': event.pk,
             'schedules': users_and_slots,
             'event_name': event.name,
         })
