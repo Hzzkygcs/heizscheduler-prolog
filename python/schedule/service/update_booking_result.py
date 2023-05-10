@@ -16,6 +16,7 @@ from schedule.exceptions.InvalidImpossibleScheduleException import InvalidImposs
 from schedule.models import Schedule, Event, DateRange
 from schedule.models.BookingResult import BookingResult
 
+
 @transaction.atomic
 def update_booking_results_of_an_event(event_id):
     clear_booking_results_of_an_event(event_id)
@@ -43,7 +44,6 @@ def generate_and_save_booking_results_of_an_event(event: Event):
         booking_results.save()
         booking_results.append(booking_results)
     return booking_results
-
 
 
 PENALTY_SCORE = Variable('DONT_CARE_1')
