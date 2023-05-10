@@ -56,7 +56,7 @@ def generate_and_save_booking_results_of_an_event(event: Event):
     return booking_results
 
 
-PENALTY_SCORE = Variable('DONT_CARE_1')
+PENALTY_SCORE = Variable('PENALTY_SCORE')
 NPM = Variable('NPM')
 IS_PREFERRED = Variable('IS_PREFERRED')
 START_DAY = Variable('START_DAY')
@@ -69,7 +69,7 @@ END_MINUTE = Variable('END_MINUTE')
 
 
 def get_prolog_best_jadwal(duration, facts):
-    prolog = get_main_prolog()
+    prolog = get_main_prolog(False)
     prolog.add_facts('definitions', facts)
     results = prolog.query_no_chained_equality(get_best_jadwal(
         duration,
@@ -92,6 +92,7 @@ def dictionary_to_booking_result(event_id, results: dict[Variable, BookingResult
         datetime_range=datetime_range,
         event_id=event_id,
         penalty_score=results[PENALTY_SCORE],
+        is_preferred=results[IS_PREFERRED],
     )
 
 
