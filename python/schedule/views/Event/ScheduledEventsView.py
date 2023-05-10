@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
-from schedule.models import BookingResult
+from schedule.models import BookingResult, Event
 from schedule.views.BaseScheduleView import BaseScheduleView
 from schedule.views.Event.BookingResults import get_template_data_for_event_details_and_booking_result, \
     booking_result__or__schedule__to_dict
@@ -18,18 +18,29 @@ class ScheduledEventsViews(BaseScheduleView):
 
     @authenticated
     def get(self, req, logged_in_user: User):
-        his_booking_results = list(logged_in_user.bookingresult_set.all())
-        his_booking_results.sort(key=by_start_time)
+        all_his_events = logged_in_user.event_set.all()
+        all_his_appointments_as_event_host = []
+        for event in all_his_events:
+            all_his_appointments_as_event_host.extend(list(event.bookingresult_set.all()))
+
+        his_schedules = list(logged_in_user.bookingresult_set.all())
+        his_schedules += all_his_appointments_as_event_host
+        his_schedules.sort(key=by_start_time)
         schedules = []
 
-        for booking_result in his_booking_results:
+        for booking_result in his_schedules:
             sub_dict = booking_result__or__schedule__to_dict(booking_result)
             sub_dict['onclick_redirect'] = reverse('booking_results', args=(booking_result.event_id,))
 
+            partner_info = f"(hosted by {booking_result.event.owner.npm})"
+            hosted_by_me = (booking_result.event.owner.npm == logged_in_user.pk)
+            if hosted_by_me:
+                partner_info = f"(with  {booking_result.event.owner.npm}, me as the host)"
+
             schedules.append({
                 # must be unique
-                'user': f"id {booking_result.event_id} - {booking_result.event.name} "
-                        f"(by {booking_result.event.owner.npm})",
+                'user': f"id {booking_result.event_id} - {booking_result.event.name}"
+                        f" {partner_info}",
                 'slots': [sub_dict]
             })
 
