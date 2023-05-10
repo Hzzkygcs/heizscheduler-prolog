@@ -1,7 +1,6 @@
 $(document).ready(function () {
     const parentEl = $(".list-of-schedules");
     const schedules = getSchedules();
-    console.log(schedules)
     reloadListOfSchedule(schedules, parentEl);
 })
 
@@ -20,16 +19,17 @@ function getSchedules(script_id='available-bookings'){
             const endSplitted = splitDateTime(end);
 
             console.assert(startSplitted.date.valueOf() === endSplitted.date.valueOf());
+
             convertedAvailBookings[userNpm].push({
                 schedule: new Schedule(startSplitted.date, startSplitted.time, endSplitted.time),
                 start: start,
                 end: end,
                 is_preferred: availBooking.is_preferred,
                 booker_name: userNpm,
+                onclick_redirect: availBooking.onclick_redirect,
             });
         }
     }
-    console.log(convertedAvailBookings)
     return convertedAvailBookings;
 }
 
@@ -40,6 +40,7 @@ function getSchedules(script_id='available-bookings'){
  */
 function reloadListOfSchedule(bookings, parentElement){
     console.log("reloaded");
+    console.log(bookings)
     for (const userNpm of Object.keys(bookings)){
         const bookingsOfTheUser = bookings[userNpm];
         reloadListOfScheduleOfAUser(userNpm, bookingsOfTheUser);
@@ -58,13 +59,22 @@ function newListItemOfSchedulesForEachNpmTemplate(npm) {
 
 
 function reloadListOfScheduleOfAUser(npm, bookings){
-    console.log(npm);
     bookings = bookings.sort((a, b) => SCHEDULE_SORTING_FUNCTION(a.schedule, b.schedule))
     const parentElement = newListItemOfSchedulesForEachNpmTemplate(npm);
 
     for (const booking of bookings) {
-        console.log(booking.is_preferred)
-        const newEl = instantiateItem(booking.schedule, booking.is_preferred)
+        let onClick = null;
+
+        if (booking.onclick_redirect != null){
+            onClick = ((onclick_redirect) => (e) => {
+                window.location = onclick_redirect;
+            })(booking.onclick_redirect);
+        }
+        console.log(booking.onclick_redirect, onClick);
+
+        const newEl = instantiateItem(booking.schedule, booking.is_preferred, {
+            onClick: onClick
+        })
         parentElement.append(newEl);
     }
 }

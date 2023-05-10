@@ -41,11 +41,7 @@ def render_get_for_event_details_and_booking_result(req, event, booked_slots, te
         for slot in booked_slots:
             for booked_slot in users_and_slots:
                 if booked_slot['user'] == slot.owner.npm:
-                    booked_slot['slots'].append({
-                        'start': slot.start_date_time,
-                        'end': slot.end_date_time,
-                        'is_preferred': slot.is_preferred,
-                    })
+                    booked_slot['slots'].append(booking_result__or__schedule__to_dict(slot))
 
         return render(req, template, {
             'event_id': event.pk,
@@ -53,3 +49,10 @@ def render_get_for_event_details_and_booking_result(req, event, booked_slots, te
             'event_name': event.name,
         })
 
+
+def booking_result__or__schedule__to_dict(slot):
+    return {
+        'start': slot.start_date_time,
+        'end': slot.end_date_time,
+        'is_preferred': slot.is_preferred,
+    }
