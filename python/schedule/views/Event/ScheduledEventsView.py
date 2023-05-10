@@ -35,7 +35,7 @@ class ScheduledEventsViews(BaseScheduleView):
             partner_info = f"(hosted by {booking_result.event.owner.npm})"
             hosted_by_me = (booking_result.event.owner.npm == logged_in_user.pk)
             if hosted_by_me:
-                partner_info = f"(with  {booking_result.event.owner.npm}, me as the host)"
+                partner_info = f"(with  {booking_result.owner.npm}, me as the host)"
 
             schedules.append({
                 # must be unique
