@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
@@ -15,7 +16,8 @@ class EventsView(BaseScheduleView):
         for event in user_events:
             event_data.append({
                 'name': event.name,
-                'id': event.ID
+                'id': event.ID,
+                'click_url': reverse('event_booking_details', args=(event.pk,))
             })
 
         return render(req, "events/event-list.html", {
