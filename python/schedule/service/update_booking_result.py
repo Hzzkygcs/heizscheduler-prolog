@@ -20,10 +20,21 @@ from schedule.models.BookingResult import BookingResult
 @transaction.atomic
 def update_booking_results_of_an_event(event_id):
     clear_booking_results_of_an_event(event_id)
+    if get_member_count_of_an_event(event_id) == 1:
+        print("Only one member, not generating new booking list...")
+        return
+
     event = Event.objects.filter(ID=event_id).first()
     if event is None:
         raise EventNotFoundException()
     return generate_and_save_booking_results_of_an_event(event)
+
+def get_member_count_of_an_event(event_id):
+    owners = list(Schedule.objects.filter(event_id=event_id).values('owner'))
+    unique_npm = set()
+    for owner in owners:
+        unique_npm.add(owner['owner'])
+    return len(unique_npm)
 
 
 def clear_booking_results_of_an_event(event_id):
@@ -40,9 +51,8 @@ def generate_and_save_booking_results_of_an_event(event: Event):
 
     booking_results = []
     for result in results:
-        booking_results = dictionary_to_booking_result(result)
-        booking_results.save()
-        booking_results.append(booking_results)
+        booking_result = dictionary_to_booking_result(event.pk, result)
+        booking_results.append(booking_result)
     return booking_results
 
 
@@ -71,13 +81,16 @@ def get_prolog_best_jadwal(duration, facts):
     return results
 
 
-def dictionary_to_booking_result(results: dict[Variable, BookingResult]):
+def dictionary_to_booking_result(event_id, results: dict[Variable, BookingResult]):
     start = from_day_hour_minute(results[START_DAY], results[START_HOUR], results[START_MINUTE])
     end = from_day_hour_minute(results[END_DAY], results[START_HOUR], results[START_MINUTE])
+
     datetime_range = DateRange(start_date_time=start, end_date_time=end)
+    datetime_range.save()
     return BookingResult.objects.create(
         owner_id=results[NPM],
         datetime_range=datetime_range,
+        event_id=event_id,
         penalty_score=results[PENALTY_SCORE],
     )
 
