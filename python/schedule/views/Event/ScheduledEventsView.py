@@ -5,8 +5,8 @@ from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.models import User
 from schedule.models import BookingResult, Event
 from schedule.views.BaseScheduleView import BaseScheduleView
-from schedule.views.Event.BookingResults import get_template_data_for_event_details_and_booking_result, \
-    booking_result__or__schedule__to_dict
+from schedule.service.utils_for_event_details__my_schedule__booking_result import \
+    get_template_data_for_event_details_and_booking_result, booking_result__or__schedule__to_dict
 
 
 class ScheduledEventsViews(BaseScheduleView):

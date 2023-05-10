@@ -1,8 +1,32 @@
 $(document).ready(function () {
     const parentEl = $(".list-of-schedules");
     const schedules = getSchedules();
-    reloadListOfSchedule(schedules, parentEl);
-})
+    console.log(schedules)
+    reloadListOfSchedule(schedules, parentEl, (lst) => {
+        lst = putUserToTop("(Me", lst);
+        return putUserToTop("Host)", lst);
+    });
+});
+
+/**
+ * @param {string} substring
+ * @param {string[]} NPMs
+ */
+function putUserToTop(substring, NPMs) {
+    let index = 0;
+    for (const npm of NPMs) {
+        if (npm.toLowerCase().includes(substring.toLowerCase()))
+            break;
+        index++;
+    }
+    if (index >= NPMs.length)
+        return NPMs;
+    const data = NPMs[index];
+    NPMs.splice(index, 1);
+    NPMs.unshift(data);
+    return NPMs;
+}
+
 
 function getSchedules(script_id='available-bookings'){
     const availBookings = load_json_data_from_script_tag(script_id);
@@ -37,15 +61,20 @@ function getSchedules(script_id='available-bookings'){
 /**
  * @param bookings  --> dict[NPM, list[bookings]]
  * @param parentElement
+ * @param sorter
  */
-function reloadListOfSchedule(bookings, parentElement){
+function reloadListOfSchedule(bookings, parentElement, sorter=(x)=>x){
     console.log("reloaded");
     console.log(bookings)
-    for (const userNpm of Object.keys(bookings)){
+
+    let keys = Object.keys(bookings);
+    keys = sorter(keys);
+    for (const userNpm of keys){
         const bookingsOfTheUser = bookings[userNpm];
         reloadListOfScheduleOfAUser(userNpm, bookingsOfTheUser);
     }
 }
+
 function newListItemOfSchedulesForEachNpmTemplate(npm) {
     const template = $(".list-of-schedules-for-each-npm-template");
     const ret = $(template.html());
