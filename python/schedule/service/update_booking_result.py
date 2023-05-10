@@ -83,7 +83,7 @@ def get_prolog_best_jadwal(duration, facts):
 
 def dictionary_to_booking_result(event_id, results: dict[Variable, BookingResult]):
     start = from_day_hour_minute(results[START_DAY], results[START_HOUR], results[START_MINUTE])
-    end = from_day_hour_minute(results[END_DAY], results[START_HOUR], results[START_MINUTE])
+    end = from_day_hour_minute(results[END_DAY], results[END_HOUR], results[END_MINUTE])
 
     datetime_range = DateRange(start_date_time=start, end_date_time=end)
     datetime_range.save()

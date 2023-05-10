@@ -31,20 +31,14 @@
                         </span>
 
                         <div class="ml-4 flex justify-end">
-                            <div class="">
-                                <a href="{% url 'booking_results' event_id %}">
-                                    <button type="submit" class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700">
-                                        Result
-                                    </button>
-                                </a>
-                            </div>
                         </div>
 
                         <div class="flex justify-end">
                             <div class="">
-                                <a href="{% url 'event_edit' event_id %}">
-                                    <button type="submit" class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700">
-                                        Edit My Schedule
+                                <a href="{% url 'event_booking_details' event_id %}">
+                                    <button type="submit"
+                                            class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700">
+                                        Back
                                     </button>
                                 </a>
                             </div>
