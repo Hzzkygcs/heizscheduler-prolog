@@ -28,6 +28,10 @@ $(document).ready(function() {
             return false;
         }
         valid = true;
+        if (isRegistrationForm()){
+            window.location = "/";
+            return false;
+        }
         form().submit();
         return false;
     });
