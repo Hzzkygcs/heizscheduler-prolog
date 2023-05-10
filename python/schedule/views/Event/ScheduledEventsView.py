@@ -32,10 +32,10 @@ class ScheduledEventsViews(BaseScheduleView):
             sub_dict = booking_result__or__schedule__to_dict(booking_result)
             sub_dict['onclick_redirect'] = reverse('booking_results', args=(booking_result.event_id,))
 
-            partner_info = f"(hosted by {booking_result.event.owner.npm})"
+            partner_info = f"(host: {booking_result.event.owner.npm})"
             hosted_by_me = (booking_result.event.owner.npm == logged_in_user.pk)
             if hosted_by_me:
-                partner_info = f"(with  {booking_result.owner.npm}, me as the host)"
+                partner_info = f"(host: me, with  {booking_result.owner.npm})"
 
             schedules.append({
                 # must be unique
