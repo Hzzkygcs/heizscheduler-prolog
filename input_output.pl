@@ -1,4 +1,4 @@
-:- dynamic scheduleAsdos/6, scheduleMahasiswa/8.
+:- dynamic available/1, have_time/3.
 
 print_menu :-
     repeat,
@@ -34,20 +34,20 @@ switch(2) :-
 
 switch(3) :-
     write('Schedule Asdos:'), nl,
-    findall(scheduleAsdos(HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd),
-        scheduleAsdos(HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd), AsdosSchedules),
-    write(AsdosSchedules),nl,
+    findall(available(time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd)),
+        available(time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd)), AsdosSchedules),
+    write(AsdosSchedules), nl,
 
     write('Schedule Mahasiswa:'), nl,
-    findall(scheduleMahasiswa(NPM, IsPreferred, HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd),
-        scheduleMahasiswa(NPM, IsPreferred, HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd), MahasiswaSchedules),
+    findall(have_time(NPM, IsPreferred, time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd)),
+        have_time(NPM, IsPreferred, time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd)), MahasiswaSchedules),
     write(MahasiswaSchedules).
 
 switch(4) :-
     write('Invalid input. Please enter 1, 2, or 3.'), nl.
 
 addScheduleAsdos(HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd) :-
-    assertz(scheduleAsdos(HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd)).
+    assertz(available(time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd))).
 
 addScheduleMahasiswa(NPM, IsPreferred, HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd) :-
-    assertz(scheduleMahasiswa(NPM, IsPreferred, HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd)).
+    assertz(have_time(NPM, IsPreferred, time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd))).
