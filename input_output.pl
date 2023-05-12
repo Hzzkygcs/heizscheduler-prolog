@@ -13,23 +13,23 @@ print_menu :-
 
 
 switch(1) :-
-    write('hari start: '),read(HariStart),nl,
-    write('jam start: '),read(JamStart),nl,
-    write('menit start: '),read(MenitStart),nl,
-    write('hari end: '),read(HariEnd),nl,
-    write('jam end: '),read(JamEnd),nl,
-    write('menit end: '),read(MenitEnd),nl,
+    write('hari start  (non-negative int): '),read(HariStart),nl,
+    write('jam start   (non-negative int): '),read(JamStart),nl,
+    write('menit start (non-negative int): '),read(MenitStart),nl,
+    write('hari end    (non-negative int): '),read(HariEnd),nl,
+    write('jam end     (non-negative int): '),read(JamEnd),nl,
+    write('menit end   (non-negative int): '),read(MenitEnd),nl,
     addScheduleAsdos(HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd).
 
 switch(2) :-
-    write('npm: '),read(NPM),nl,
-    write('is_preferred: '),read(IsPreferred),nl,
-    write('hari start: '),read(HariStart),nl,
-    write('jam start: '),read(JamStart),nl,
-    write('menit start: '),read(MenitStart),nl,
-    write('hari end: '),read(HariEnd),nl,
-    write('jam end: '),read(JamEnd),nl,
-    write('menit end: '),read(MenitEnd),nl,
+    write('npm or identifier             : '),read(NPM),nl,
+    write('is_preferred          (0 or 1): '),read(IsPreferred),nl,
+    write('hari start  (non-negative int): '),read(HariStart),nl,
+    write('jam start   (non-negative int): '),read(JamStart),nl,
+    write('menit start (non-negative int): '),read(MenitStart),nl,
+    write('hari end    (non-negative int): '),read(HariEnd),nl,
+    write('jam end     (non-negative int): '),read(JamEnd),nl,
+    write('menit end   (non-negative int): '),read(MenitEnd),nl,
     addScheduleMahasiswa(NPM, IsPreferred, HariStart, JamStart, MenitStart, HariEnd, JamEnd, MenitEnd).
 
 switch(3) :-
