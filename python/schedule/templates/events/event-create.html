@@ -11,6 +11,8 @@
     {% include "dependencies.html" %}
     <script src="{% static 'event-create/date-time-model.js' %}"></script>
     <link href="{% static 'event-create/css.css' %}" rel="stylesheet">
+    <script src="{% static 'common/view-details-create-edit-event.js' %}"></script>
+    <script src="{% static 'common/create-event-edit-event.js' %}"></script>
     <script src="{% static 'event-create/main.js' %}"></script>
 
 
@@ -65,24 +67,7 @@
 </div>
 
 <template id="item-template">
-    <div class="schedule-item tosca-btn">
-        <span class="date">
-            Friday, 13 March 2023
-        </span>
-        <div class="p-1"></div>
-        <span class="start-time">
-            10:23
-        </span>
-        <span>-</span>
-        <span class="end-time">
-            12:40
-        </span>
-
-        <div></div>
-        <button type="button" class="delete-btn red-btn">
-          Delete
-        </button>
-    </div>
+    {% include 'events/elements/schedule-item-template.html' %}
 </template>
 
 

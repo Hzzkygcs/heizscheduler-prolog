@@ -10,6 +10,7 @@ from multiprocessing.pool import ThreadPool
 from random import randint
 from typing import Union, Callable
 
+from HzzProlog.ChainEquality import ChainedEquality, get_value
 from HzzProlog.PrologCallable import BasePrologCallable
 from HzzProlog.exceptions.PrologScriptNotFoundException import PrologScriptNotFoundException
 
@@ -45,6 +46,7 @@ class HzzProlog:
         self.custom_regex_tokenizer.sort(key=lambda x: x[0])
 
     def add_facts(self, template_variable_name: str, fact_definitions: list[Union[str, BasePrologCallable]]):
+        assert isinstance(fact_definitions, list)
         return self.main_prolog_script.add_facts(template_variable_name, fact_definitions)
 
     def add_fact(self, template_variable_name: str, fact_definition: Union[str, BasePrologCallable]):
@@ -66,7 +68,8 @@ class HzzProlog:
             stderr=subprocess.PIPE,
             text=True
         )
-        self.start_token = "START_TOKEN"
+        self.start_token = f"START_TOKEN_{randint(0, 100_000)}"
+        self.backtrack_token = None
 
     def prefix(self):
         return "\n".join([
@@ -82,9 +85,14 @@ class HzzProlog:
         assert next(prolog_output_processor.iter_tokens) == "."
 
     def suffix(self, approx_number_of_output):
-        return ", write('BACKTRACK').\n" + ";\n" * (approx_number_of_output - 1)
+        return f", write('{self.get_backtrack_token()}').\n" + ";\n" * (approx_number_of_output - 1)
 
-    def query_raw(self, query, approx_number_of_output=1, print_query=False):
+    def get_backtrack_token(self):
+        if self.backtrack_token is None:
+            self.backtrack_token = f"BACKTRACK_{randint(0, 100_000)}"
+        return self.backtrack_token
+
+    def query_raw(self, query, approx_number_of_output=200, print_query=False):
         self.reset()
         query = str(query)
         assert not query.endswith("."), "query should NOT be ended with punctuation"
@@ -95,24 +103,35 @@ class HzzProlog:
         stdout, stderr = self.p.communicate(input=query)
         return stdout, stderr
 
-    def query(self, query, approx_number_of_output=100, print_query=False):
+    def query(self, query, approx_number_of_output=200, print_query=False):
         output, err_output = self.query_raw(query, approx_number_of_output=approx_number_of_output,
                                             print_query=print_query)
         self.last_stdout = output
 
         if err_output:
             if self._error_is_because_too_few_semi_colon(err_output):
-                output += "BACKTRACK false."
+                output += f"{self.get_backtrack_token()} false."
                 warnings.warn("Too few semicolons")
             elif self._is_invalid_script_error(err_output):
                 raise PrologException(err_output, self.last_processed_file_content)
             elif not self._error_is_because_too_much_semicolon(err_output):
                 raise PrologException(err_output, self.last_processed_file_content)
 
-        output_processor = PrologOutputProcessor(output, additional_regex=self.custom_regex_tokenizer)
+        output_processor = PrologOutputProcessor(output,
+                                                 splitter_token=self.get_backtrack_token(),
+                                                 additional_regex=self.custom_regex_tokenizer)
         self.remove_start_of_output_mark(output_processor)
         ret = output_processor.process_token()
         return ret
+
+    def query_no_chained_equality(self, query, approx_number_of_output=100, print_query=False):
+        results = self.query(query, approx_number_of_output, print_query)
+        for result in results:
+            if not isinstance(result, dict):
+                continue
+            for key, val in result.items():
+                result[key] = get_value(val)
+        return results
 
     def _error_is_because_too_few_semi_colon(self, err_msg):
         if err_msg is None:

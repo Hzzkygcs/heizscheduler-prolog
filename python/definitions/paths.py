@@ -14,8 +14,8 @@ FIND_JADWAL_PATH = get_abs_path_from_relative_path("../../find_jadwal.pl")
 TIME_PROCESSING_UTILITIES_PL_PATH = get_abs_path_from_relative_path("../../time_processing_utilities.pl")
 
 
-def get_main_prolog():
-    ret = HzzProlog(MAIN_PROLOG_PATH)
+def get_main_prolog(delete_temp_files=True):
+    ret = HzzProlog(MAIN_PROLOG_PATH, delete_temp_files=delete_temp_files)
     define_tokenizer_regex(ret)
     return ret
 

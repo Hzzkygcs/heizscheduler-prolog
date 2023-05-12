@@ -1,4 +1,5 @@
 import abc
+import string
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -10,6 +11,8 @@ from auth_module.core.AuthManagement import AuthManagement
 from auth_module.core.Factory.UserFactory import UserFactory
 from auth_module.core.decorator.AuthenticatedDecorator import authenticated
 from auth_module.core.repository.UserRepository import UserRepository
+from auth_module.exceptions.IncompleteDataException import validate_fields_exist
+from auth_module.exceptions.InvalidUsernameException import InvalidUsernameException
 from auth_module.models import User
 
 
@@ -53,18 +56,33 @@ class RegisterView(BaseAuthView):
         return render(req, "auth/register.html", {})
 
     def post(self, req):
-        npm = req.POST['npm']
+        validate_fields_exist(req.POST, ['npm', 'password'])
+        username_or_npm = req.POST['npm']
+        validate_username(username_or_npm)
         password = req.POST['password']
-        new_user = self.user_factory.create_user(npm, password)
+        new_user = self.user_factory.create_user(username_or_npm, password)
         self.user_repository.register_new_user(new_user)
         return redirect('login')
+
+
+def validate_username(username):
+    if len(username) > 15:
+        raise InvalidUsernameException("Username cannot be longer than 15 characters")
+    if len(username) <= 1:
+        raise InvalidUsernameException("Username cannot smaller than 2 characters")
+    consist_non_alphanum_char = bool(set(username) - set(string.ascii_lowercase + string.digits + "_"))
+    if consist_non_alphanum_char:
+        raise InvalidUsernameException("Username can only contain lower case alphanumeric and underscore")
+
 
 
 @inject
 class LoginView(BaseAuthView):
     def get(self, req):
         return render(req, "auth/login.html", {})
+
     def post(self, req):
+        validate_fields_exist(req.POST, ['npm', 'password'])
         npm = req.POST['npm']
         password = req.POST['password']
         user = self.user_repository.find_user_by_npm(npm)

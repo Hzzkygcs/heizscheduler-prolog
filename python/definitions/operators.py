@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Union
 
 import deprecation
 
-from HzzProlog.PrologCallable import define_prolog_operator
+from HzzProlog.PrologCallable import define_prolog_operator, Variable
 
 
 class datetime(define_prolog_operator('datetime', ":")):
@@ -17,7 +17,8 @@ class deprecated_time_range(define_prolog_operator("time_range", "-")):
 
 
 class time_point(define_prolog_operator("time_point", ":")):
-    def __init__(self, day: int, hour: int, minute: Optional[int]=None):
+    def __init__(self, day: Union[int, Variable[int]], hour: Union[int, Variable[int]],
+                 minute: Optional[Union[int, Variable[int]]]=None):
         args = [day, hour]
         if minute is not None:
             args.append(minute)

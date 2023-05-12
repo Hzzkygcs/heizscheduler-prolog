@@ -1,0 +1,95 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Booking</title>
+
+
+    {% include "dependencies.html" %}
+    <script src="{% static 'event-create/date-time-model.js' %}"></script>
+    <link href="{% static 'event-create/css.css' %}" rel="stylesheet">
+    <script src="{% static 'common/view-details-create-edit-event.js' %}"></script>
+    <script src="{% static 'event-details-view/main.js' %}"></script>
+
+
+    {% include "tailwind-elements-head.html" %}
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body class="bg-gray-900 w-screen min-h-screen">
+<div class="flex justify-center w-full p-5">
+    <div style="max-width: 750px; width: 100%">
+            <div class="schedules">
+                <div class="grid max-w-screen">
+                    <div class="mt-4 grid gap-2" style="max-width: 100%; grid-template-columns: 1fr auto auto;">
+                        <span class="text-4xl font-bold block mb-2 text-white">
+                            {{ event_name }}
+                        </span>
+
+                        <div class="ml-4 flex justify-end">
+                        </div>
+
+                        <div class="flex justify-end">
+                            <div class="">
+                                <a href="{% url 'event_booking_details' event_id %}">
+                                    <button type="submit"
+                                            class="px-5 py-2 font-bold text-white bg-blue-500 rounded-md
+                                                   hover:bg-blue-700">
+                                        Schedule Details
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div>
+                    Penalty score: {{ penalty_score }}
+                </div>
+
+            </div>
+            <div class="list-of-schedules-for-each-npm">
+                {% for schedule in schedules %}
+
+                {% endfor %}
+            </div>
+            <template class="list-of-schedules-for-each-npm-template">
+                <div class="mt-5">
+                    <div class="grid" style="grid-template-columns: auto auto;">
+                        <label class="user-id
+                                      text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                            {{ schedule.user }}
+                        </label>
+                        <div class="flex justify-end">
+                        </div>
+                    </div>
+                    <div class="list-of-schedules">
+
+                    </div>
+                </div>
+            </template>
+        </div>
+</div>
+
+
+{#booking-item-template#}
+<template id="item-template">
+    {% include 'events/elements/schedule-item-template.html' %}
+</template>
+
+{% with schedules|json_script:"available-bookings" as serialized_data %}
+    {{ serialized_data|safe }}
+{% endwith %}
+
+
+    {% include 'events-detail/input-modal/input-booking-modal.html' %}
+
+
+    {% include "tailwind-elements-end-of-body.html" %}
+</body>
+</html>

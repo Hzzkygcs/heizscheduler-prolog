@@ -12,7 +12,10 @@ class AutomaticallyHandledException(Exception):
 
     def get_response(self, _req) -> HttpResponseBase:
         data = json.dumps({
-            'status_code': self.status_code,
-            'err_msg': self.err_msg,
+            'reason': {
+                'error_code': self.__class__.__name__,
+                'status_code': self.status_code,
+                'message': self.err_msg,
+            }
         })
         return self.HttpResponse(data, content_type="application/json", status=self.status_code)

@@ -5,12 +5,12 @@ function reload(eventsData, parentEl){
 
     for (const event of eventsData) {
         const newEl = $(eventItemTemplate.html());
-        const {name, id} = event;
+        const {name, id, click_url} = event;
         newEl.find(".event-name").text(name);
 
-        newEl.click(((id) => (e) => {
-            window.location.href = '/booking/' + id;
-        })(id));
+        newEl.click(((click_url) => (e) => {
+            window.location.href = click_url;
+        })(click_url));
 
         const delBtn = newEl.find('.delete-btn');
         delBtn.click(((id) => (e) => {

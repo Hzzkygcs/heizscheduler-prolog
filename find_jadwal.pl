@@ -80,3 +80,10 @@ find_jadwal_and_score_sorted_list(Duration, ResultingList) :-
 find_jadwal_and_score_sorted_member(Duration, ResultingMember) :-
     find_jadwal_and_score_sorted_list(Duration, List),
     member(ResultingMember, List).
+
+
+get_best_jadwal(Duration, Penalty, BookedSlot) :-
+    find_jadwal_and_score_sorted_list(
+        Duration, [FirstElement | _]),
+    FirstElement=penalty_and_slots(Penalty, Slots),
+    member(BookedSlot, Slots).

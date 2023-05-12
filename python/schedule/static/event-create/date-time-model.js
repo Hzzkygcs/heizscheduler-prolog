@@ -2,17 +2,20 @@ class Schedule{
     date;
     startTime;
     endTime;
+    preferred;
 
     /**
      * @param {Date} date
      * @param {Time} startTime
      * @param {Time} endTime
+     * @param {boolean} preferred
      */
-    constructor(date, startTime, endTime) {
+    constructor(date, startTime, endTime, preferred=false) {
         date = dateTruncateToPrevMidnight(date);
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.preferred = preferred;
     }
 
     valueOf(){
@@ -149,3 +152,9 @@ function dateTruncateToPrevMidnight(date){
     return date;
 }
 
+function splitDateTime(date) {
+    return {
+        date: dateTruncateToPrevMidnight(date),
+        time: Time.fromDateObj(date)
+    };
+}

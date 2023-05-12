@@ -59,8 +59,8 @@ class ChainedEquality:
 
     @staticmethod
     def unify_both_equality(first, second):
-        first_is_an_equation = not isinstance(first, ChainedEquality)
-        second_is_an_equation = not isinstance(second, ChainedEquality)
+        first_is_an_equation = isinstance(first, ChainedEquality)
+        second_is_an_equation = isinstance(second, ChainedEquality)
         assert first_is_an_equation and second_is_an_equation
         first: ChainedEquality
         second: ChainedEquality
@@ -86,10 +86,18 @@ class ChainedEquality:
             variable_value_mapping[variable_name] = equality
         return variable_value_mapping
 
+
 equality = ChainedEquality.equality
+
 
 def apply_to_defined_variables(defined_variables: dict[str, Union[int, str, ChainedEquality]],
                                new_variables: list[str], new_value):
     for new_variable in new_variables:
         defined_variables[new_variable] = new_value
     return defined_variables
+
+
+def get_value(item):
+    if isinstance(item, ChainedEquality):
+        return item.constant_value
+    return item

@@ -1,7 +1,8 @@
 
+
+
 .tosca-btn{
     padding: 0.1rem 0.1rem 0.1rem 0.7rem;
-    cursor: pointer;
     text-shadow: 1px 1px 1px rgba(27, 27, 27, 0.47);
 
     width: 100%;
@@ -17,6 +18,17 @@
     box-shadow: 0 4px 9px -4px #54b4d3;
     transition: all 0.15s ease-in-out;
 }
+.tosca-btn.clickable{
+    cursor: pointer;
+}
+.tosca-btn .is-preferred-symbol{
+    display: none;
+}
+.tosca-btn.starred .is-preferred-symbol{
+    display: block;
+    color: white;
+    text-shadow: black 1px 1px 1px;
+}
 
 .tosca-btn:hover {
   background-color: #2c8cb1;
@@ -29,7 +41,7 @@
   box-shadow: 0 8px 9px -4px rgba(84, 180, 211, 0.3), 0 4px 18px 0 rgba(84, 180, 211, 0.2);
 }
 
-.tosca-btn:active {
+.tosca-btn.clickable:active {
   background-color: #1f6c82;
   box-shadow: 0 8px 9px -4px rgba(84, 180, 211, 0.3), 0 4px 18px 0 rgba(84, 180, 211, 0.2);
 }

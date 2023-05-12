@@ -9,10 +9,11 @@ class ScheduleFactory:
         self.date_range_repository = date_range_repository
         self.schedule_repository = schedule_repository
 
-    def create_schedule(self, event_id, owner_id, start, end):
+    def create_schedule(self, event_id, owner_id, start, end, is_preferred=False):
         date_range = self.date_range_repository.create_and_save(start, end)
 
         date_range_id = date_range.ID
         owner = User.objects.get(npm=owner_id)
-        schedule = Schedule.objects.create(datetime_range_id=date_range_id, event_id=event_id, owner=owner)
+        schedule = Schedule.objects.create(datetime_range_id=date_range_id, event_id=event_id, owner=owner,
+                                           is_preferred=is_preferred)
         return schedule
