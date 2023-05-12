@@ -3,6 +3,7 @@
 
 % {%begin ignore%}
 :- [input_output].
+:- write("Welcome to HeizScheduler!!"), nl, nl, main_menu.
 % {%end ignore%}
 
 
