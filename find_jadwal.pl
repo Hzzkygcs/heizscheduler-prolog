@@ -9,11 +9,11 @@
 
 all_npm(NPM) :- have_time(NPM, _, _).
 
-time(Hari:Jam:Tanggal) :- available(time_range(Hari:Jam:Tanggal, _:_:_)).
-time(Hari:Jam:Tanggal) :- available(time_range(_:_:_, Hari:Jam:Tanggal)).
+time(Day:Hour:Minute) :- available(time_range(Day:Hour:Minute, _:_:_)).
+time(Day:Hour:Minute) :- available(time_range(_:_:_, Day:Hour:Minute)).
 
-time(Hari:Jam:Tanggal) :- have_time(_NPM, _IsPreferred, time_range(Hari:Jam:Tanggal, _:_:_)).
-time(Hari:Jam:Tanggal) :- have_time(_NPM, _IsPreferred, time_range(_:_:_, Hari:Jam:Tanggal)).
+time(Day:Hour:Minute) :- have_time(_NPM, _IsPreferred, time_range(Day:Hour:Minute, _:_:_)).
+time(Day:Hour:Minute) :- have_time(_NPM, _IsPreferred, time_range(_:_:_, Day:Hour:Minute)).
 time_all(List) :- findall(X, time(X), List).
 
 
