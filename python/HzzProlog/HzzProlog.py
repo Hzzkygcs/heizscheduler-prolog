@@ -68,7 +68,7 @@ class HzzProlog:
             stderr=subprocess.PIPE,
             text=True
         )
-        self.start_token = "START_TOKEN"
+        self.start_token = f"START_TOKEN_{randint(0, 100_000)}"
         self.backtrack_token = None
 
     def prefix(self):
