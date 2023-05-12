@@ -46,7 +46,7 @@ class TestInsideAnotherTimerange(TestCase):
         result = self.prolog.query(inside_another_timerange(
             time_range(time_point(1, 0, 0), time_point(2, 0, 0)),
             time_range(time_point(0, 0, 0), time_point(3, 0, 0)),
-        ))
+        ), print_query=True)
         self.assertTrue(extract_bool(result))
 
     def test__should_be_true_if_the_first_is_inside_the_second__hour(self):
