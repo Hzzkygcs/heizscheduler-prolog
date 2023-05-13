@@ -1,4 +1,5 @@
 import json
+import pprint
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -15,4 +16,5 @@ from schedule.service.update_booking_result import update_booking_results_of_an_
 class PrologDemo2(View):
     def get(self, req, event_id):
         _, res = update_booking_results_of_an_event(event_id)
-        return HttpResponse(json.dumps(res).encode('utf-8'), content_type="text/json")
+        body = pprint.pformat(res, indent=4)
+        return HttpResponse(json.dumps(body).encode('utf-8'), content_type="text/json")

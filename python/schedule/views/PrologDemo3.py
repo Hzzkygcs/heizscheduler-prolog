@@ -1,4 +1,5 @@
 import json
+import pprint
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -22,4 +23,9 @@ class PrologDemo3(View):
             raise EventNotFoundException()
         facts = get__available__have_time__facts(event.pk, event.owner_id)
         results = get_prolog_all_jadwal(event.booking_minute_duration, facts)
-        return HttpResponse(str(results).encode('utf-8'), content_type="text/json")
+        body = str(results)
+        body = body.replace("{", "\n    {")
+        body = body.replace("}", "}\n    ")
+        body = body.replace("[", "\n      [")
+        body = body.replace("]", "]\n      ")
+        return HttpResponse(body.encode('utf-8'), content_type="text/json")
