@@ -55,10 +55,10 @@ switch(3) :-
         have_time(NPM, IsPreferred, time_range(HariStart:JamStart:MenitStart, HariEnd:JamEnd:MenitEnd)), MahasiswaSchedules),
     write(MahasiswaSchedules), nl,
     nl,
-    write('Schedule Result: (Press enter to other possibilities)'), nl,
+    write('Schedule Result: '), nl,
     set_duration(SetDuration),
     find_jadwal_and_score_sorted_member(SetDuration, X),
-    print_penalty_and_slots(X), nl,
+    print_penalty_and_slots(X), write("Press enter to find other possibilities."), nl,
     get_single_char_until_newline,
     nl,
     fail.
